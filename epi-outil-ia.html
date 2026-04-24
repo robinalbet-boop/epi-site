@@ -628,7 +628,7 @@ async function extractTextFromPDF(file) {
     const content = await page.getTextContent();
     text += content.items.map(item => item.str).join(' ') + '\n';
   }
-  return text.substring(0, 15000); // Limiter à 15000 caractères
+  return text.substring(0, 6000); // Limiter à 15000 caractères
 }
 
 function toBase64(file) {
@@ -641,41 +641,9 @@ function toBase64(file) {
 }
 
 async function callClaude(entreeText, sortieText) {
-  const prompt = `Tu es un expert en états des lieux immobiliers. Compare ces deux EDL (entrée et sortie) et génère un JSON structuré avec ce format exact, sans markdown ni texte autour :
-{
-  "adresse": "adresse du bien",
-  "locataire": "nom du locataire",
-  "date_entree": "date",
-  "date_sortie": "date",
-  "sections": [
-    {
-      "nom": "Nom de la pièce",
-      "icon": "emoji",
-      "elements": [
-        {
-          "element": "nom de l'élément",
-          "etat_entree": "état à l'entrée",
-          "etat_sortie": "état à la sortie",
-          "statut": "ok|warn|bad",
-          "observation": "observation courte"
-        }
-      ]
-    }
-  ],
-  "degradations": [
-    {
-      "id": "deg1",
-      "titre": "Titre court",
-      "description": "Description précise",
-      "piece": "pièce concernée",
-      "statut": "warn|bad",
-      "prix_min": 80,
-      "prix_max": 200
-    }
-  ]
-}
-Statut : ok = pas de changement notable, warn = dégradation légère/entretien, bad = dégradation importante.
-N'inclus dans degradations que les éléments warn et bad.`;
+  const prompt = `Tu es expert EDL. Compare ces deux états des lieux et génère UNIQUEMENT un JSON valide, sans markdown, sans texte avant ou après. Format strict :
+{"adresse":"adresse","locataire":"nom","date_entree":"date","date_sortie":"date","sections":[{"nom":"Pièce","icon":"emoji","elements":[{"element":"nom","etat_entree":"état","etat_sortie":"état","statut":"ok","observation":""}]}],"degradations":[{"id":"d1","titre":"titre court","description":"desc","piece":"pièce","statut":"warn","prix_min":50,"prix_max":100}]}
+Règles: statut=ok/warn/bad. Ne mets dans degradations QUE les warn et bad. Maximum 5 sections, 8 éléments par section, 8 dégradations. Sois concis.`;
 
   const response = await fetch('/.netlify/functions/claude-proxy', {
     method: 'POST',
