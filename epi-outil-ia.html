@@ -628,7 +628,7 @@ async function extractTextFromPDF(file) {
     const content = await page.getTextContent();
     text += content.items.map(item => item.str).join(' ') + '\n';
   }
-  return text.substring(0, 6000); // Limiter à 15000 caractères
+  return text.substring(0, 3000); // Limiter à 15000 caractères
 }
 
 function toBase64(file) {
