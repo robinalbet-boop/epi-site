@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EPI — Outil Comparatif EDL</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -591,11 +593,11 @@ async function startAnalysis() {
   }
 
   // Read files as base64
-  const entreeB64 = await toBase64(files.entree);
-  const sortieB64 = await toBase64(files.sortie);
-
   try {
-    const result = await callClaude(entreeB64, sortieB64);
+    // Extraire le texte des PDFs côté navigateur
+    const entreeText = await extractTextFromPDF(files.entree);
+    const sortieText = await extractTextFromPDF(files.sortie);
+    const result = await callClaude(entreeText, sortieText);
     renderComparatif(result);
   } catch(e) {
     // Show real error instead of demo
@@ -617,6 +619,18 @@ async function startAnalysis() {
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+async function extractTextFromPDF(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let text = '';
+  for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(item => item.str).join(' ') + '\n';
+  }
+  return text.substring(0, 15000); // Limiter à 15000 caractères
+}
+
 function toBase64(file) {
   return new Promise((res, rej) => {
     const reader = new FileReader();
@@ -626,7 +640,7 @@ function toBase64(file) {
   });
 }
 
-async function callClaude(entreeB64, sortieB64) {
+async function callClaude(entreeText, sortieText) {
   const prompt = `Tu es un expert en états des lieux immobiliers. Compare ces deux EDL (entrée et sortie) et génère un JSON structuré avec ce format exact, sans markdown ni texte autour :
 {
   "adresse": "adresse du bien",
@@ -672,8 +686,8 @@ N'inclus dans degradations que les éléments warn et bad.`;
       messages: [{
         role: 'user',
         content: [
-          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: entreeB64 } },
-          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: sortieB64 } },
+          { type: 'text', text: 'EDL ENTREE:\n' + entreeText },
+          { type: 'text', text: 'EDL SORTIE:\n' + sortieText },
           { type: 'text', text: prompt }
         ]
       }]
