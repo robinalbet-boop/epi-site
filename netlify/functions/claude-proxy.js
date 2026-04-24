@@ -17,11 +17,7 @@ exports.handler = async function(event) {
 
   try {
     const body = JSON.parse(event.body);
-
-    // Réduire max_tokens pour accélérer la réponse
-    body.max_tokens = 2000;
-    
-    // Utiliser le modèle le plus rapide
+    body.max_tokens = 3000;
     body.model = 'claude-haiku-4-5';
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -35,13 +31,20 @@ exports.handler = async function(event) {
     });
 
     const text = await response.text();
+    const data = JSON.parse(text);
+    
+    // Vérifier si la réponse est complète
+    if (data.stop_reason === 'max_tokens') {
+      return {
+        statusCode: 200,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'max_tokens', message: 'Réponse trop longue, veuillez réessayer' })
+      };
+    }
 
     return {
       statusCode: response.status,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
       body: text
     };
   } catch(e) {
