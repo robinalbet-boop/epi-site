@@ -695,8 +695,25 @@ N'inclus dans degradations que les éléments warn et bad.`;
   });
 
   const data = await response.json();
+  // Debug : afficher la réponse brute
+  console.log('Réponse API brute:', JSON.stringify(data));
+  
+  if (data.error) {
+    throw new Error('Erreur API: ' + JSON.stringify(data.error));
+  }
+  
+  if (!data.content || !Array.isArray(data.content)) {
+    throw new Error('Réponse inattendue: ' + JSON.stringify(data));
+  }
+  
   const text = data.content.map(i => i.text || '').join('');
-  return JSON.parse(text.replace(/```json|```/g, '').trim());
+  const cleaned = text.replace(/```json|```/g, '').trim();
+  
+  // Trouver le JSON dans la réponse
+  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('Pas de JSON dans la réponse: ' + cleaned.substring(0, 200));
+  
+  return JSON.parse(jsonMatch[0]);
 }
 
 function getDemoData() {
