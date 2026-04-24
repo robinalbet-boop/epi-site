@@ -18,6 +18,12 @@ exports.handler = async function(event) {
   try {
     const body = JSON.parse(event.body);
 
+    // Réduire max_tokens pour accélérer la réponse
+    body.max_tokens = 2000;
+    
+    // Utiliser le modèle le plus rapide
+    body.model = 'claude-haiku-4-5';
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -42,7 +48,7 @@ exports.handler = async function(event) {
     return {
       statusCode: 500,
       headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ error: e.message, stack: e.stack })
+      body: JSON.stringify({ error: e.message })
     };
   }
 };
