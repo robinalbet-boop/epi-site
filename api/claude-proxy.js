@@ -7,15 +7,13 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  
-  // Debug : vérifier que la clé est bien chargée
   if (!apiKey) {
-    return res.status(500).json({ error: 'Clé API manquante dans les variables environnement' });
+    return res.status(500).json({ error: 'Clé API manquante' });
   }
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    body.max_tokens = 3000;
+    body.max_tokens = 8000;  // Augmenté pour réponse complète
     body.model = 'claude-haiku-4-5';
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -37,10 +35,6 @@ export default async function handler(req, res) {
 }
 
 export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-  },
+  api: { bodyParser: { sizeLimit: '10mb' } },
   maxDuration: 60,
 };
