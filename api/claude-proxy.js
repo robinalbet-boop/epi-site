@@ -6,8 +6,15 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  
+  // Debug : vérifier que la clé est bien chargée
+  if (!apiKey) {
+    return res.status(500).json({ error: 'Clé API manquante dans les variables environnement' });
+  }
+
   try {
-    const body = req.body;
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     body.max_tokens = 3000;
     body.model = 'claude-haiku-4-5';
 
@@ -15,18 +22,13 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify(body)
     });
 
     const data = await response.json();
-
-    if (data.stop_reason === 'max_tokens') {
-      return res.status(200).json({ error: 'max_tokens', message: 'Réponse trop longue' });
-    }
-
     return res.status(200).json(data);
 
   } catch (e) {
@@ -35,6 +37,10 @@ export default async function handler(req, res) {
 }
 
 export const config = {
-  api: { bodyParser: { sizeLimit: '10mb' } },
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
   maxDuration: 60,
 };
