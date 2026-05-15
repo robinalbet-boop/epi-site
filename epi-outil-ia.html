@@ -646,7 +646,7 @@ async function extractTextFromPDF(file) {
     if (text.length > 8000) break;
   }
 
-  return text.substring(0, 8000);
+  return text.substring(0, 20000);
 }
 
 function toBase64(file) {
