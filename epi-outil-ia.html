@@ -475,8 +475,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--gris); color:var(--tex
 
     <!-- PANEL 4 : DEVIS -->
     <div class="panel" id="panel-4">
-      <div class="section-title">Devis des réparations</div>
-      <div class="section-sub">Finalisez et téléchargez votre devis à transmettre au locataire.</div>
+      <div class="section-title">Retenues sur dépôt de garantie</div>
+      <div class="section-sub">Finalisez le document de retenues locatives à transmettre au locataire et à l'entreprise de travaux.</div>
       <div class="devis-layout">
         <div>
           <div class="devis-items">
@@ -506,13 +506,41 @@ body { font-family:'DM Sans',sans-serif; background:var(--gris); color:var(--tex
             <strong id="dp-total-val">0 €</strong>
           </div>
           <div class="dp-note">Montants indicatifs — tarifs artisans Île-de-France.<br>Devis définitif sur intervention.</div>
-          <button class="btn-devis" onclick="downloadDevis()">📥 Télécharger le devis PDF</button>
+          <button class="btn-devis" onclick="downloadDevisPDF()">📥 Télécharger retenues locatives PDF</button>
           <button class="btn-devis-sec" onclick="copyDevis()">📋 Copier le récapitulatif</button>
         </div>
       </div>
+
+      <!-- BOUTON RAPPORT BAILLEUR -->
+      <div style="margin-top:32px;padding:24px;background:linear-gradient(135deg,#f0f4ff,#e8eef7);border-radius:16px;border:1px solid rgba(26,60,110,0.1)">
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="flex:1">
+            <div style="font-weight:700;color:var(--bleu);font-size:16px;margin-bottom:4px">🔧 Travaux à la charge du bailleur</div>
+            <div style="font-size:13px;color:var(--texte-leger)">Voir le rapport de relocation : peinture, nettoyage et éléments à remplacer pour remettre le bien en location.</div>
+          </div>
+          <button onclick="showRapportRelocation()" style="background:var(--bleu);color:white;border:none;padding:12px 24px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px;white-space:nowrap">
+            📋 Voir le rapport bailleur
+          </button>
+        </div>
+      </div>
+
+      <!-- RAPPORT RELOCATION (caché par défaut) -->
+      <div id="rapport-relocation" style="display:none;margin-top:24px">
+        <div class="section-title" style="margin-bottom:16px">Rapport de relocation</div>
+        <div class="section-sub" style="margin-bottom:24px">Basé sur l'état des lieux de sortie — travaux à prévoir avant la prochaine location</div>
+        <div id="relocation-content"></div>
+        <div style="margin-top:20px;display:flex;gap:12px">
+          <button onclick="downloadRelocationPDF()" style="background:var(--bleu);color:white;border:none;padding:12px 24px;border-radius:10px;font-weight:600;cursor:pointer">
+            📥 Télécharger rapport PDF
+          </button>
+          <button onclick="document.getElementById('rapport-relocation').style.display='none'" style="background:white;color:var(--bleu);border:1.5px solid var(--bleu);padding:12px 24px;border-radius:10px;font-weight:600;cursor:pointer">
+            Masquer
+          </button>
+        </div>
+      </div>
+
       <div class="nav-buttons">
         <button class="btn-back" onclick="goPanel(3)">← Modifier la sélection</button>
-        <button class="btn-next" onclick="showToast('✅ Devis envoyé par email !')">📧 Envoyer par email</button>
       </div>
     </div>
 
@@ -659,9 +687,57 @@ function toBase64(file) {
 }
 
 async function callClaude(entreeText, sortieText) {
-  const prompt = `Tu es expert EDL. Compare ces deux états des lieux et génère UNIQUEMENT un JSON valide, sans markdown, sans texte avant ou après. Format strict :
-{"adresse":"adresse","locataire":"nom","date_entree":"date","date_sortie":"date","sections":[{"nom":"Pièce","icon":"emoji","elements":[{"element":"nom","etat_entree":"état","etat_sortie":"état","statut":"ok","observation":""}]}],"degradations":[{"id":"d1","titre":"titre court","description":"desc","piece":"pièce","statut":"warn","prix_min":50,"prix_max":100}]}
-Règles: statut=ok/warn/bad. Ne mets dans degradations QUE les warn et bad. Maximum 5 sections, 8 éléments par section, 8 dégradations. Sois concis.`;
+  const prompt = `Tu es un expert en états des lieux immobiliers et en droit locatif français (Loi ALUR). Analyse ces deux EDL et génère UNIQUEMENT un JSON valide sans markdown.
+
+RÈGLES STRICTES :
+1. Dans "sections/elements" : N'inclure QUE les éléments qui présentent une DIFFÉRENCE entre entrée et sortie (état qui change, observation nouvelle ou aggravée, défaut apparu). Ignorer tout élément IDENTIQUE.
+2. "responsabilite_locataire" = true si la dégradation est imputable au locataire selon la loi ALUR (usure anormale, dégradation volontaire ou par négligence). false si c'est usure normale ou charge du bailleur.
+3. "responsabilite_bailleur" = true si l'élément nécessite une remise en état à charge du bailleur pour la relocation (même si non imputable au locataire).
+4. Pour les prix : utiliser des tarifs artisans IDF réalistes 2024 (peinture: 25-45€/m², nettoyage: 15-25€/h, vitrage: 80-200€, serrure: 150-400€, etc.)
+5. Pour le rapport_relocation : noter chaque pièce sur la peinture (1=neuve, 2=bon état, 3=rafraîchissement, 4=réfection nécessaire, 5=urgente), nettoyage (propre/à nettoyer/sale) et lister éléments cassés/à remplacer.
+
+Format JSON strict :
+{
+  "adresse":"adresse complète",
+  "locataire":"nom prénom",
+  "date_entree":"date",
+  "date_sortie":"date",
+  "sections":[{
+    "nom":"Pièce",
+    "icon":"emoji",
+    "elements":[{
+      "element":"nom élément",
+      "etat_entree":"état + observations entrée",
+      "etat_sortie":"état + observations sortie",
+      "difference":"ce qui a changé précisément",
+      "statut":"warn|bad",
+      "responsabilite_locataire":true,
+      "observation":"explication juridique courte"
+    }]
+  }],
+  "retenues_locatives":[{
+    "id":"r1",
+    "titre":"titre court",
+    "description":"description précise",
+    "piece":"pièce",
+    "statut":"warn|bad",
+    "prix_min":50,
+    "prix_max":150,
+    "justification_alur":"base légale courte"
+  }],
+  "rapport_relocation":{
+    "pieces":[{
+      "nom":"Pièce",
+      "peinture_note":3,
+      "peinture_commentaire":"détail état peinture",
+      "nettoyage":"à nettoyer|propre|sale",
+      "nettoyage_commentaire":"détail",
+      "elements_remplacer":["élément cassé 1","élément cassé 2"]
+    }],
+    "nettoyage_general":"commentaire global nettoyage",
+    "travaux_bailleur":["travail 1","travail 2"]
+  }
+}`;
 
   const response = await fetch('/api/claude-proxy', {
     method: 'POST',
@@ -737,16 +813,24 @@ function getDemoData() {
         { element: "Sol carrelage", etat_entree: "Neuf", etat_sortie: "Bon état", statut: "ok", observation: "" },
       ]}
     ],
-    degradations: [
-      { id:"d1", titre:"Murs entrée — dégâts des eaux", description:"Moisissures + DDE sur pan mitoyen salon/façade", piece:"Entrée", statut:"bad", prix_min:300, prix_max:500 },
-      { id:"d2", titre:"Murs séjour — dégâts des eaux", description:"DDE sur 3 pans + retouche enduit grossière", piece:"Séjour", statut:"bad", prix_min:600, prix_max:900 },
-      { id:"d3", titre:"Plafond séjour — dégâts des eaux", description:"Ragréage + reprise peinture plafond", piece:"Séjour", statut:"bad", prix_min:300, prix_max:500 },
-      { id:"d4", titre:"Boîte aux lettres — serrure HS", description:"Serrure hors service, clés manquantes", piece:"Entrée", statut:"bad", prix_min:80, prix_max:150 },
-      { id:"d5", titre:"Radiateur cuisine — mal fixé", description:"Radiateur branlant, à refixer", piece:"Cuisine", statut:"bad", prix_min:80, prix_max:150 },
-      { id:"d6", titre:"Joint silicone douche — moisi", description:"Dépose + repose joints silicone douche", piece:"Salle de bains", statut:"warn", prix_min:80, prix_max:150 },
-      { id:"d7", titre:"VMC — moteur absent", description:"Remplacement moteur VMC", piece:"Salle de bains", statut:"warn", prix_min:150, prix_max:300 },
-      { id:"d8", titre:"Clés de cave — non restituées", description:"2 clés de cave manquantes", piece:"Divers", statut:"warn", prix_min:50, prix_max:100 },
-    ]
+    retenues_locatives: [
+      { id:"r1", titre:"Murs séjour — dégâts des eaux", description:"DDE sur 3 pans + retouche grossière", piece:"Séjour", statut:"bad", prix_min:600, prix_max:900, responsabilite_locataire:true, justification_alur:"Art. 7 loi 89-462 — dégradation dépassant l'usure normale" },
+      { id:"r2", titre:"Plafond séjour — dégâts des eaux", description:"Ragréage + reprise peinture plafond", piece:"Séjour", statut:"bad", prix_min:300, prix_max:500, responsabilite_locataire:true, justification_alur:"Décret 87-712 — entretien courant à charge du locataire" },
+      { id:"r3", titre:"Boîte aux lettres — serrure HS", description:"Serrure hors service, clés manquantes", piece:"Entrée", statut:"bad", prix_min:80, prix_max:150, responsabilite_locataire:true, justification_alur:"Art. 7d — obligation de restituer en bon état" },
+      { id:"r4", titre:"Joint silicone douche — moisi", description:"Dépose + repose joints silicone douche", piece:"Salle de bains", statut:"warn", prix_min:80, prix_max:150, responsabilite_locataire:true, justification_alur:"Décret 87-712 — joints à entretenir par le locataire" },
+      { id:"r5", titre:"VMC — moteur absent", description:"Remplacement moteur VMC salle de bains", piece:"Salle de bains", statut:"warn", prix_min:150, prix_max:300, responsabilite_locataire:true, justification_alur:"Art. 7 — obligation de maintenir en état de fonctionnement" },
+      { id:"r6", titre:"Clés de cave — non restituées", description:"2 clés de cave manquantes", piece:"Divers", statut:"warn", prix_min:50, prix_max:100, responsabilite_locataire:true, justification_alur:"Art. 22 — restitution de l'ensemble des clés" },
+    ],
+    rapport_relocation: {
+      pieces: [
+        { nom:"Entrée", peinture_note:3, peinture_commentaire:"Murs avec traces d'humidité, rafraîchissement nécessaire", nettoyage:"à nettoyer", nettoyage_commentaire:"Sol à nettoyer", elements_remplacer:[] },
+        { nom:"Séjour", peinture_note:4, peinture_commentaire:"Dégâts des eaux sur 3 pans + plafond, réfection complète nécessaire", nettoyage:"à nettoyer", nettoyage_commentaire:"Nettoyage complet après travaux", elements_remplacer:[] },
+        { nom:"Cuisine", peinture_note:3, peinture_commentaire:"Peinture acceptable, léger rafraîchissement conseillé", nettoyage:"à nettoyer", nettoyage_commentaire:"Dégraissage complet", elements_remplacer:["Radiateur à refixer"] },
+        { nom:"Salle de bains", peinture_note:2, peinture_commentaire:"Bon état général", nettoyage:"à nettoyer", nettoyage_commentaire:"Détartrage robinetterie", elements_remplacer:["Moteur VMC"] },
+      ],
+      nettoyage_general: "Nettoyage complet de l'appartement requis avant relocation. Particulièrement la cuisine et la salle de bains.",
+      travaux_bailleur: ["Vérification générale électricité", "Remplacement ampoules défectueuses", "Vérification chauffe-eau"]
+    }
   };
 }
 
@@ -762,41 +846,66 @@ function renderComparatif(data) {
   const container = document.getElementById('comp-tables');
   container.innerHTML = '';
 
-  data.sections.forEach(section => {
-    const div = document.createElement('div');
-    div.className = 'comp-section';
-    div.innerHTML = `
-      <div class="comp-section-header">
-        <span class="comp-section-icon">${section.icon}</span>
-        <span>${section.nom}</span>
-      </div>
-      <table class="comp-table">
-        <thead><tr>
-          <th>Élément</th><th>État entrée</th><th>État sortie</th><th>Observation</th><th>Statut</th>
-        </tr></thead>
-        <tbody>${section.elements.map(el => `
-          <tr>
-            <td><strong>${el.element}</strong></td>
-            <td>${el.etat_entree}</td>
-            <td>${el.etat_sortie}</td>
-            <td style="color:var(--texte-leger)">${el.observation || '—'}</td>
-            <td>${el.statut === 'ok' ? '<span class="tag tag-ok">✅ Stable</span>' :
-                  el.statut === 'warn' ? '<span class="tag tag-warn">⚠️ Moyen</span>' :
-                  '<span class="tag tag-bad">❌ Dégradé</span>'}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>`;
-    container.appendChild(div);
-  });
+  // Filtrer uniquement les éléments qui ont des dégradations (warn ou bad)
+  const sectionsAvecDeg = (data.sections || []).map(section => ({
+    ...section,
+    elements: (section.elements || []).filter(el => el.statut === 'warn' || el.statut === 'bad')
+  })).filter(section => section.elements.length > 0);
 
-  renderDegradations(data.degradations);
+  if (sectionsAvecDeg.length === 0) {
+    container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--texte-leger)">✅ Aucune dégradation détectée entre l'entrée et la sortie.</div>';
+  } else {
+    sectionsAvecDeg.forEach(section => {
+      const div = document.createElement('div');
+      div.className = 'comp-section';
+      div.innerHTML = `
+        <div class="comp-section-header">
+          <span class="comp-section-icon">${section.icon}</span>
+          <span>${section.nom}</span>
+        </div>
+        <table class="comp-table">
+          <thead><tr>
+            <th>Élément</th><th>État entrée</th><th>État sortie</th><th>Différence constatée</th><th>Resp. locataire</th><th>Statut</th>
+          </tr></thead>
+          <tbody>${section.elements.map(el => `
+            <tr>
+              <td><strong>${el.element}</strong></td>
+              <td style="color:var(--texte-leger);font-size:13px">${el.etat_entree}</td>
+              <td style="font-size:13px">${el.etat_sortie}</td>
+              <td style="color:var(--rouge);font-size:13px;font-style:italic">${el.difference || el.observation || '—'}</td>
+              <td>${el.responsabilite_locataire ? '<span style="color:var(--rouge);font-weight:600">✓ Oui</span>' : '<span style="color:var(--vert)">Non</span>'}</td>
+              <td>${el.statut === 'warn' ? '<span class="tag tag-warn">⚠️ Moyen</span>' : '<span class="tag tag-bad">❌ Dégradé</span>'}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`;
+      container.appendChild(div);
+    });
+  }
+
+  // Utiliser retenues_locatives ou degradations selon ce qui est disponible
+  const retenues = data.retenues_locatives || data.degradations || [];
+  renderRetenues(retenues);
+
+  // Stocker le rapport de relocation
+  if (data.rapport_relocation) {
+    window.rapportRelocation = data.rapport_relocation;
+  }
 }
 
-function renderDegradations(degs) {
+function renderRetenues(retenues) {
   const list = document.getElementById('degradations-list');
   list.innerHTML = '';
-  degs.forEach(deg => {
-    selectedDeg[deg.id] = { selected: true, min: deg.prix_min, max: deg.prix_max, titre: deg.titre, piece: deg.piece };
+
+  // Filtrer uniquement les retenues à charge du locataire
+  const retenuesLocataire = retenues.filter(r => r.responsabilite_locataire !== false);
+
+  if (retenuesLocataire.length === 0) {
+    list.innerHTML = '<div style="padding:30px;text-align:center;color:var(--texte-leger)">Aucune retenue locative identifiée.</div>';
+    return;
+  }
+
+  retenuesLocataire.forEach(deg => {
+    selectedDeg[deg.id] = { selected: true, min: deg.prix_min, max: deg.prix_max, titre: deg.titre, piece: deg.piece, justification: deg.justification_alur };
     const div = document.createElement('div');
     div.className = 'devis-item selected';
     div.id = 'item-' + deg.id;
@@ -805,6 +914,7 @@ function renderDegradations(degs) {
       <div class="di-info">
         <strong>${deg.titre}</strong>
         <span>${deg.description} — <em>${deg.piece}</em></span>
+        ${deg.justification_alur ? `<span style="font-size:11px;color:var(--bleu);font-style:italic">⚖️ ${deg.justification_alur}</span>` : ''}
       </div>
       <div class="di-tag">${deg.statut === 'bad' ? '<span class="tag tag-bad">❌ Majeur</span>' : '<span class="tag tag-warn">⚠️ Moyen</span>'}</div>
       <div>
@@ -866,40 +976,244 @@ function updateDevisPreview() {
   }
 }
 
-function downloadDevis() {
+function downloadDevisPDF() {
   const adresse = document.getElementById('dp-adresse').value;
   const locataire = document.getElementById('dp-locataire').value;
   const date = document.getElementById('dp-date').value;
+  const dateAujourdhui = new Date().toLocaleDateString('fr-FR');
   const selected = Object.entries(selectedDeg).filter(([,v]) => v.selected);
   let totalMin = 0, totalMax = 0;
   selected.forEach(([,v]) => { totalMin += v.min; totalMax += v.max; });
 
-  const lines = selected.map(([,v]) => `• ${v.titre} (${v.piece}) : ${v.min} – ${v.max} €`).join('\n');
-  const txt = `DEVIS EPI EXPERTISES
-====================
-Bien : ${adresse}
-Locataire : ${locataire}
-Date de sortie : ${date}
-Établi le : ${new Date().toLocaleDateString('fr-FR')}
+  const lignes = selected.map(([,v]) => `
+    <tr>
+      <td style="padding:10px 8px;border-bottom:1px solid #e8eef7">${v.titre}</td>
+      <td style="padding:10px 8px;border-bottom:1px solid #e8eef7;color:#5a6070;font-size:13px">${v.piece || ''}</td>
+      <td style="padding:10px 8px;border-bottom:1px solid #e8eef7;text-align:right;font-weight:600;color:#1a3c6e">${v.min} – ${v.max} €</td>
+    </tr>`).join('');
 
-POSTES DE RÉPARATION
---------------------
-${lines}
+  const justifications = selected.filter(([,v]) => v.justification).map(([,v]) =>
+    `<div style="margin-bottom:6px;font-size:12px">⚖️ <strong>${v.titre}</strong> : ${v.justification}</div>`
+  ).join('');
 
-TOTAL ESTIMÉ : ${totalMin} – ${totalMax} €
+  const html = `<!DOCTYPE html><html lang="fr"><head>
+  <meta charset="UTF-8">
+  <title>Retenues Locatives — EPI</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; background: white; padding: 0; }
+    .header { background: linear-gradient(135deg, #1a3c6e, #0d2548); padding: 40px 48px; color: white; }
+    .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
+    .logo-epi { font-family: Georgia, serif; font-size: 28px; font-weight: 700; letter-spacing: 2px; }
+    .logo-sub { font-size: 11px; letter-spacing: 2px; opacity: 0.7; margin-top: 4px; text-transform: uppercase; }
+    .doc-type { text-align: right; }
+    .doc-type h1 { font-size: 22px; font-weight: 700; color: #c9a84c; }
+    .doc-type p { font-size: 12px; opacity: 0.7; margin-top: 4px; }
+    .header-info { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+    .info-block label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.6; display: block; margin-bottom: 4px; }
+    .info-block span { font-size: 15px; font-weight: 600; }
+    .content { padding: 40px 48px; }
+    .section-title { font-size: 13px; font-weight: 700; color: #1a3c6e; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #1a3c6e; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+    thead th { background: #1a3c6e; color: white; padding: 12px 8px; text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; }
+    thead th:last-child { text-align: right; }
+    .total-row { background: #1a3c6e; color: white; }
+    .total-row td { padding: 14px 8px; font-weight: 700; font-size: 16px; }
+    .total-row td:last-child { text-align: right; color: #c9a84c; font-size: 18px; }
+    .alur-section { background: #f0f4ff; border-radius: 12px; padding: 20px; margin-bottom: 32px; }
+    .alur-title { font-size: 12px; font-weight: 700; color: #1a3c6e; margin-bottom: 10px; }
+    .footer { border-top: 2px solid #1a3c6e; padding: 24px 48px; display: flex; justify-content: space-between; align-items: center; }
+    .footer-epi { font-family: Georgia, serif; font-size: 18px; font-weight: 700; color: #1a3c6e; }
+    .footer-contact { font-size: 12px; color: #5a6070; text-align: right; }
+    .note { font-size: 12px; color: #5a6070; font-style: italic; padding: 12px; background: #f5f6fa; border-radius: 8px; margin-top: 12px; }
+    @media print { body { -webkit-print-color-adjust: exact; } }
+  </style>
+  </head><body>
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="logo-epi">EPI</div>
+        <div class="logo-sub">Expertises Immobilières Paris</div>
+      </div>
+      <div class="doc-type">
+        <h1>RETENUES LOCATIVES</h1>
+        <p>Établi le ${dateAujourdhui}</p>
+      </div>
+    </div>
+    <div class="header-info">
+      <div class="info-block"><label>Bien concerné</label><span>${adresse}</span></div>
+      <div class="info-block"><label>Locataire</label><span>${locataire}</span></div>
+      <div class="info-block"><label>Date de sortie</label><span>${date}</span></div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="section-title">Postes de retenue sur dépôt de garantie</div>
+    <table>
+      <thead><tr>
+        <th>Désignation</th><th>Pièce</th><th style="text-align:right">Estimation (€ TTC)</th>
+      </tr></thead>
+      <tbody>
+        ${lignes}
+        <tr class="total-row">
+          <td colspan="2">TOTAL ESTIMÉ</td>
+          <td>${totalMin} – ${totalMax} €</td>
+        </tr>
+      </tbody>
+    </table>
+    ${justifications ? `<div class="alur-section"><div class="alur-title">⚖️ Base légale (Loi ALUR / Décret du 26 août 1987)</div>${justifications}</div>` : ''}
+    <div class="note">
+      Montants indicatifs basés sur les tarifs moyens d'artisans en Île-de-France (2024).<br>
+      Ces estimations seront confirmées par devis d'entreprise. Le dépôt de garantie sera restitué dans le délai légal (1 mois si aucune retenue, 2 mois en cas de retenues).
+    </div>
+  </div>
+  <div class="footer">
+    <div>
+      <div class="footer-epi">EPI Expertises</div>
+      <div style="font-size:12px;color:#5a6070">15 Rue George Sand, 75016 Paris</div>
+    </div>
+    <div class="footer-contact">
+      contact@epi-gs.com<br>
+      06 74 07 61 24<br>
+      www.epi-gs.fr
+    </div>
+  </div>
+  </body></html>`;
 
-Montants indicatifs — tarifs artisans Île-de-France.
-Devis définitif sur intervention d'un professionnel.
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  setTimeout(() => { win.print(); }, 500);
+  showToast('📄 PDF ouvert — utilisez Imprimer → Enregistrer en PDF');
+}
 
-EPI Expertises — 15 Rue George Sand, 75016 Paris
-contact@epi-gs.com — 06 74 07 61 24`;
+function showRapportRelocation() {
+  const rapport = window.rapportRelocation;
+  const div = document.getElementById('rapport-relocation');
+  const content = document.getElementById('relocation-content');
 
-  const blob = new Blob([txt], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `Devis_EPI_${locataire.replace(' ','_')}_${date.replace(/\//g,'-')}.txt`;
-  a.click();
-  showToast('📥 Devis téléchargé !');
+  if (!rapport) {
+    content.innerHTML = '<div style="padding:20px;color:var(--texte-leger)">Aucune donnée de relocation disponible. Relancez l'analyse.</div>';
+    div.style.display = 'block';
+    return;
+  }
+
+  const noteColors = { 1: '#2e7d32', 2: '#558b2f', 3: '#f57c00', 4: '#e53935', 5: '#b71c1c' };
+  const noteLabels = { 1: 'Neuve', 2: 'Bon état', 3: 'Rafraîchissement', 4: 'Réfection nécessaire', 5: 'Urgente' };
+  const nettoyageColors = { 'propre': '#2e7d32', 'à nettoyer': '#f57c00', 'sale': '#e53935' };
+
+  let html = '';
+
+  if (rapport.pieces && rapport.pieces.length > 0) {
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px">';
+    rapport.pieces.forEach(piece => {
+      const noteColor = noteColors[piece.peinture_note] || '#5a6070';
+      const noteLabel = noteLabels[piece.peinture_note] || '—';
+      const nettoyageColor = nettoyageColors[(piece.nettoyage||'').toLowerCase()] || '#5a6070';
+      html += `
+        <div style="background:white;border-radius:12px;border:1px solid rgba(26,60,110,0.1);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
+          <div style="background:var(--bleu);color:white;padding:12px 16px;font-weight:700">${piece.nom}</div>
+          <div style="padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <span style="font-size:13px;color:var(--texte-leger)">🎨 Peinture</span>
+              <span style="background:${noteColor};color:white;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">${noteLabel}</span>
+            </div>
+            ${piece.peinture_commentaire ? `<div style="font-size:12px;color:var(--texte-leger);margin-bottom:12px;font-style:italic">${piece.peinture_commentaire}</div>` : ''}
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <span style="font-size:13px;color:var(--texte-leger)">🧹 Nettoyage</span>
+              <span style="background:${nettoyageColor};color:white;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">${piece.nettoyage || '—'}</span>
+            </div>
+            ${piece.elements_remplacer && piece.elements_remplacer.length > 0 ? `
+              <div style="font-size:12px;color:var(--texte-leger);margin-bottom:4px">🔧 À remplacer :</div>
+              <ul style="list-style:none;padding:0">${piece.elements_remplacer.map(e => `<li style="font-size:13px;color:var(--rouge);padding:2px 0">• ${e}</li>`).join('')}</ul>
+            ` : ''}
+          </div>
+        </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (rapport.nettoyage_general) {
+    html += `<div style="background:#fff8e1;border-radius:10px;padding:16px;margin-bottom:16px;border-left:4px solid #f57c00">
+      <div style="font-weight:700;color:#f57c00;margin-bottom:6px">🧹 Nettoyage général</div>
+      <div style="font-size:14px">${rapport.nettoyage_general}</div>
+    </div>`;
+  }
+
+  if (rapport.travaux_bailleur && rapport.travaux_bailleur.length > 0) {
+    html += `<div style="background:#e8f5e9;border-radius:10px;padding:16px;border-left:4px solid #2e7d32">
+      <div style="font-weight:700;color:#2e7d32;margin-bottom:8px">🔧 Autres travaux à prévoir</div>
+      <ul style="list-style:none;padding:0">${rapport.travaux_bailleur.map(t => `<li style="font-size:14px;padding:3px 0">• ${t}</li>`).join('')}</ul>
+    </div>`;
+  }
+
+  content.innerHTML = html || '<div style="padding:20px;color:var(--texte-leger)">Aucune donnée disponible.</div>';
+  div.style.display = 'block';
+  div.scrollIntoView({ behavior: 'smooth' });
+}
+
+function downloadRelocationPDF() {
+  const rapport = window.rapportRelocation;
+  const adresse = document.getElementById('dp-adresse').value;
+  const dateAujourdhui = new Date().toLocaleDateString('fr-FR');
+
+  if (!rapport) { showToast('Aucune donnée disponible'); return; }
+
+  const noteLabels = { 1:'⭐⭐⭐⭐⭐ Neuve', 2:'⭐⭐⭐⭐ Bon état', 3:'⭐⭐⭐ Rafraîchissement', 4:'⭐⭐ Réfection', 5:'⭐ Urgente' };
+
+  let lignesPieces = (rapport.pieces || []).map(p => `
+    <tr>
+      <td style="padding:10px 8px;border-bottom:1px solid #e8eef7;font-weight:600">${p.nom}</td>
+      <td style="padding:10px 8px;border-bottom:1px solid #e8eef7">${noteLabels[p.peinture_note] || '—'}<br><span style="font-size:11px;color:#5a6070">${p.peinture_commentaire||''}</span></td>
+      <td style="padding:10px 8px;border-bottom:1px solid #e8eef7;text-transform:capitalize">${p.nettoyage||'—'}<br><span style="font-size:11px;color:#5a6070">${p.nettoyage_commentaire||''}</span></td>
+      <td style="padding:10px 8px;border-bottom:1px solid #e8eef7;color:#c62828">${(p.elements_remplacer||[]).join(', ')||'—'}</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+  <title>Rapport Relocation — EPI</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a2e; }
+    .header { background: linear-gradient(135deg, #1a3c6e, #0d2548); padding: 36px 48px; color: white; display:flex; justify-content:space-between; align-items:center; }
+    .logo { font-family: Georgia, serif; font-size: 26px; font-weight: 700; }
+    .logo-sub { font-size: 11px; opacity: 0.6; margin-top:4px; }
+    .doc-info { text-align:right; }
+    .doc-info h1 { font-size:20px; color:#c9a84c; }
+    .doc-info p { font-size:12px; opacity:0.7; margin-top:4px; }
+    .content { padding: 36px 48px; }
+    .section-title { font-size:13px; font-weight:700; color:#1a3c6e; letter-spacing:1px; text-transform:uppercase; border-bottom:2px solid #1a3c6e; padding-bottom:8px; margin-bottom:16px; margin-top:28px; }
+    table { width:100%; border-collapse:collapse; }
+    thead th { background:#1a3c6e; color:white; padding:12px 8px; text-align:left; font-size:12px; }
+    .footer { border-top:2px solid #1a3c6e; padding:20px 48px; display:flex; justify-content:space-between; margin-top:40px; }
+    @media print { body { -webkit-print-color-adjust: exact; } }
+  </style>
+  </head><body>
+  <div class="header">
+    <div><div class="logo">EPI</div><div class="logo-sub">Expertises Immobilières Paris</div></div>
+    <div class="doc-info"><h1>RAPPORT DE RELOCATION</h1><p>Établi le ${dateAujourdhui} — ${adresse}</p></div>
+  </div>
+  <div class="content">
+    <div class="section-title">État par pièce</div>
+    <table>
+      <thead><tr><th>Pièce</th><th>Peinture</th><th>Nettoyage</th><th>Éléments à remplacer</th></tr></thead>
+      <tbody>${lignesPieces}</tbody>
+    </table>
+    ${rapport.nettoyage_general ? `<div class="section-title">Nettoyage général</div><p style="font-size:14px;color:#5a6070">${rapport.nettoyage_general}</p>` : ''}
+    ${rapport.travaux_bailleur && rapport.travaux_bailleur.length > 0 ? `
+      <div class="section-title">Autres travaux à prévoir</div>
+      <ul style="list-style:none">${rapport.travaux_bailleur.map(t=>`<li style="padding:4px 0;font-size:14px">• ${t}</li>`).join('')}</ul>
+    ` : ''}
+  </div>
+  <div class="footer">
+    <div><strong style="font-family:Georgia,serif;font-size:16px;color:#1a3c6e">EPI Expertises</strong><br><span style="font-size:12px;color:#5a6070">15 Rue George Sand, 75016 Paris</span></div>
+    <div style="text-align:right;font-size:12px;color:#5a6070">contact@epi-gs.com<br>06 74 07 61 24</div>
+  </div>
+  </body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  setTimeout(() => win.print(), 500);
+  showToast('📄 Rapport PDF ouvert !');
 }
 
 function copyDevis() {
