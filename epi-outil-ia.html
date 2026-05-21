@@ -556,26 +556,39 @@ Retourne UNIQUEMENT un objet JSON valide (sans texte avant ni après, sans balis
   }
 }
 
-RÈGLE FONDAMENTALE — VÉTUSTÉ :
+RÈGLE ABSOLUE N°1 — PAS D'AGGRAVATION = NON IMPUTABLE :
+Compare systématiquement les observations de l'entrée et de la sortie pour chaque élément.
+Un élément est "imputable" UNIQUEMENT si la situation s'est AGGRAVÉE par rapport à l'entrée.
+Cas non imputables — à classer en "usure_normale" (charge bailleur) :
+  * État identique à l'entrée et à la sortie (mêmes défauts, mêmes descriptions)
+  * Observations/remarques identiques ou quasi-identiques entre entrée et sortie, même si la note d'état a changé (ex: "usé" → "mauvais" mais avec les mêmes remarques rédigées) → les remarques font foi, pas la note
+  * Dégradation déjà présente à l'entrée et non aggravée à la sortie
+  * Problème mentionné à l'entrée et non renseigné à la sortie → bénéfice du doute, non imputable
+Exemples concrets :
+  * Entrée : "mauvais état avec traces et éclats" / Sortie : "usé avec traces et éclats" → remarques identiques → "usure_normale"
+  * Entrée : "trous rebouchés, fissures, joints moisis" / Sortie : "trous rebouchés, fissures, joints moisis" → identique → "usure_normale"
+  * Entrée : "fuites d'eau et tartre" / Sortie : non renseigné → "usure_normale"
+  * Entrée : "bon état" / Sortie : "trou dans le mur, rayure profonde" → aggravation → "imputable"
+
+RÈGLE ABSOLUE N°2 — VÉTUSTÉ :
 La vétusté (usure_normale) ne s'applique QUE si la durée d'occupation est supérieure ou égale à 10 ans.
-Calcule la durée d'occupation à partir des dates EDL ENTREE et EDL SORTIE fournies.
-Si la durée est inférieure à 10 ans, toute dégradation constatée est "imputable", quelle que soit la nature de l'élément.
+Calcule la durée entre DATE EDL ENTREE et DATE EDL SORTIE.
+Si durée < 10 ans : toute dégradation NOUVELLE et AGGRAVÉE est "imputable".
+Si durée >= 10 ans : les dégradations dues uniquement au temps peuvent être "usure_normale".
 
 RÈGLES DE QUALIFICATION :
-- "imputable" = dégradation à la charge du locataire. Sont TOUJOURS imputables, quelle que soit la durée d'occupation :
-  * Salissures, encrassement, traces de graisse, moisissures (défaut d'entretien courant, art. 7d loi 89-462)
-  * Joints sales, noircis ou moisis
-  * Trous, impacts, rayures, brûlures, éclats
-  * Éléments cassés ou détériorés par usage anormal
-  * Peintures dégradées si occupation < 10 ans
-- "usure_normale" = UNIQUEMENT si durée >= 10 ans ET dégradation due exclusivement au temps (décoloration lente, usure mécanique légère). Ne jamais qualifier en usure_normale : salissures, moisissures, joints encrassés.
+- "imputable" = dégradation NOUVELLE ou clairement AGGRAVÉE par rapport à l'entrée. Sont imputables si aggravés :
+  * Nouvelles salissures, encrassement, moisissures absentes à l'entrée (défaut d'entretien, art. 7d loi 89-462)
+  * Nouveaux trous, rayures, brûlures, éclats absents à l'entrée
+  * Éléments cassés ou détériorés de façon nouvelle
+- "usure_normale" = état identique ou non aggravé par rapport à l'entrée, OU vétusté si durée >= 10 ans
 - "amelioration" = amélioration apportée par le locataire
 - "disparu" = élément présent à l'entrée, absent à la sortie
 - "ok" = aucun changement notable
 
 Autres règles :
 - Tout le texte en français
-- N'inclure que les éléments avec une évolution notable
+- N'inclure que les éléments avec une évolution notable (pas les "ok")
 - JSON uniquement, rien d'autre`;
 }
 
@@ -618,19 +631,6 @@ function renderAnalysis(json, edle, edls) {
   let html = '';
 
   // ── SYNTHÈSE ──
-  const niveauClass = { BON: 'niveau-bon', MOYEN: 'niveau-moyen', 'DÉGRADÉ': 'niveau-degrade' }[synthese.niveau_global] || '';
-  html += `
-    <div class="comp-section">
-      <div class="comp-section-title">◆ Synthèse générale</div>
-      <div class="synthese-box">
-        <div class="synthese-niveau ${niveauClass}">État global : ${synthese.niveau_global || '—'}</div>
-        <div style="font-size:12px;color:#6a7a90;margin-bottom:10px">
-          ${synthese.nb_imputables || locataire.length} dégradation(s) à la charge du locataire &nbsp;·&nbsp;
-          ${synthese.nb_bailleur || bailleur.length} élément(s) à la charge du bailleur
-        </div>
-        <div>${synthese.resume || ''}</div>
-      </div>
-    </div>`;
 
   // ── TABLEAU LOCATAIRE ──
   html += `
