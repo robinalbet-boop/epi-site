@@ -15,7 +15,6 @@
     --gold-light: #e8c97a;
     --gold-dim: #8a6f30;
     --cream: #f5f0e8;
-    --cream-dim: #ddd6c8;
     --white: #ffffff;
     --error: #e05c5c;
     --success: #4caf82;
@@ -34,7 +33,6 @@
     line-height: 1.6;
   }
 
-  /* ── HEADER ── */
   header {
     border-bottom: 1px solid var(--border);
     padding: 18px 32px;
@@ -55,463 +53,186 @@
     font-family: 'DM Serif Display', serif;
     color: var(--gold);
     font-size: 16px;
-    letter-spacing: -0.5px;
   }
 
-  .header-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 18px;
-    color: var(--white);
-    letter-spacing: 0.3px;
-  }
+  .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); }
+  .header-sub { font-size: 11px; color: var(--gold-dim); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 1px; }
+  .header-badge { margin-left: auto; font-size: 10px; color: var(--gold); border: 1px solid var(--border); padding: 3px 10px; border-radius: 20px; letter-spacing: 1px; text-transform: uppercase; }
 
-  .header-sub {
-    font-size: 11px;
-    color: var(--gold-dim);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-top: 1px;
-  }
+  main { max-width: 980px; margin: 0 auto; padding: 32px 24px 80px; }
 
-  .header-badge {
-    margin-left: auto;
-    font-size: 10px;
-    color: var(--gold);
-    border: 1px solid var(--border);
-    padding: 3px 10px;
-    border-radius: 20px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  /* ── MAIN ── */
-  main {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 32px 24px 80px;
-  }
-
-  /* ── SECTION TITLE ── */
   .section-label {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 10px;
   }
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  /* ── SEARCH BOX ── */
-  .search-wrap {
-    position: relative;
-    margin-bottom: 8px;
-  }
-
+  .search-wrap { position: relative; margin-bottom: 8px; }
   .search-wrap input {
-    width: 100%;
-    background: var(--navy-mid);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 48px 14px 18px;
-    color: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 300;
-    outline: none;
-    transition: border-color 0.2s;
+    width: 100%; background: var(--navy-mid); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 48px 14px 18px;
+    color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 15px;
+    font-weight: 300; outline: none; transition: border-color 0.2s;
   }
-
   .search-wrap input::placeholder { color: #4a5a70; }
   .search-wrap input:focus { border-color: var(--gold-dim); }
+  .search-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--gold-dim); font-size: 16px; pointer-events: none; }
+  .search-hint { font-size: 11px; color: #4a5a70; margin-bottom: 20px; padding-left: 4px; }
+  .search-loading { font-size: 11px; color: var(--gold-dim); padding: 8px 4px; display: none; }
+  .search-loading.visible { display: block; }
 
-  .search-icon {
-    position: absolute;
-    right: 16px; top: 50%;
-    transform: translateY(-50%);
-    color: var(--gold-dim);
-    font-size: 16px;
-    pointer-events: none;
-  }
-
-  .search-hint {
-    font-size: 11px;
-    color: #4a5a70;
-    margin-bottom: 20px;
-    padding-left: 4px;
-  }
-
-  /* ── RESULTS LIST ── */
-  .results-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 28px;
-    min-height: 0;
-  }
+  .results-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
 
   .result-card {
-    background: var(--navy-mid);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 18px;
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 14px;
+    background: var(--navy-mid); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 18px; cursor: pointer;
+    transition: all 0.15s; display: flex; align-items: center; gap: 14px;
   }
-
   .result-card:hover { border-color: var(--gold-dim); background: var(--navy-light); }
   .result-card.selected-edle { border-color: var(--gold); background: rgba(201,168,76,0.08); }
   .result-card.selected-edls { border-color: #4caf82; background: rgba(76,175,130,0.08); }
 
-  .result-type-badge {
-    font-size: 10px;
-    font-family: 'DM Mono', monospace;
-    padding: 3px 8px;
-    border-radius: 4px;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
+  .result-type-badge { font-size: 10px; font-family: 'DM Mono', monospace; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px; white-space: nowrap; flex-shrink: 0; }
   .badge-edle { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
   .badge-edls { background: rgba(76,175,130,0.15); color: var(--success); border: 1px solid rgba(76,175,130,0.3); }
   .badge-draft { opacity: 0.5; }
 
   .result-info { flex: 1; min-width: 0; }
-
-  .result-address {
-    font-size: 13px;
-    color: var(--white);
-    font-weight: 400;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .result-meta {
-    font-size: 11px;
-    color: #4a6080;
-    margin-top: 2px;
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .result-meta span { display: flex; align-items: center; gap: 4px; }
-
-  .result-tenants {
-    font-size: 11px;
-    color: var(--gold-dim);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 160px;
-    flex-shrink: 0;
-  }
-
-  .result-select-indicator {
-    width: 20px; height: 20px;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px;
-    transition: all 0.15s;
-  }
-
+  .result-address { font-size: 13px; color: var(--white); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .result-meta { font-size: 11px; color: #4a6080; margin-top: 2px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .result-tenants { font-size: 11px; color: var(--gold-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; flex-shrink: 0; }
+  .result-select-indicator { width: 20px; height: 20px; border: 1px solid var(--border); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: all 0.15s; }
   .selected-edle .result-select-indicator { background: var(--gold); border-color: var(--gold); color: var(--navy); }
   .selected-edls .result-select-indicator { background: var(--success); border-color: var(--success); color: var(--navy); }
 
-  /* ── SELECTION SUMMARY ── */
-  .selection-summary {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 24px;
-  }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .dot-delivered { background: var(--success); }
+  .dot-draft { background: #4a5a70; }
+  .dot-finalized { background: var(--gold); }
 
-  .selection-slot {
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-    padding: 14px 18px;
-    min-height: 70px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
+  .selection-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .selection-slot { border: 1px dashed var(--border); border-radius: 8px; padding: 14px 18px; min-height: 70px; display: flex; flex-direction: column; gap: 4px; }
   .selection-slot.filled-edle { border-color: var(--gold); border-style: solid; background: rgba(201,168,76,0.05); }
   .selection-slot.filled-edls { border-color: var(--success); border-style: solid; background: rgba(76,175,130,0.05); }
-
-  .slot-label {
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: #4a5a70;
-  }
+  .slot-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #4a5a70; }
   .slot-label.edle-label { color: var(--gold); }
   .slot-label.edls-label { color: var(--success); }
+  .slot-value { font-size: 13px; color: var(--white); font-weight: 400; }
+  .slot-sub { font-size: 11px; color: #4a6080; }
 
-  .slot-value {
-    font-size: 13px;
-    color: var(--white);
-    font-weight: 400;
-  }
-
-  .slot-sub {
-    font-size: 11px;
-    color: #4a6080;
-  }
-
-  /* ── BUTTON ── */
   .btn-analyze {
-    width: 100%;
-    background: var(--gold);
-    color: var(--navy);
-    border: none;
-    border-radius: 8px;
-    padding: 16px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: background 0.2s, opacity 0.2s;
+    width: 100%; background: var(--gold); color: var(--navy);
+    border: none; border-radius: 8px; padding: 16px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    letter-spacing: 0.5px; cursor: pointer; transition: background 0.2s, opacity 0.2s;
     margin-bottom: 32px;
   }
-
   .btn-analyze:hover { background: var(--gold-light); }
   .btn-analyze:disabled { opacity: 0.3; cursor: not-allowed; }
 
-  /* ── LOADING ── */
-  .loading-state {
-    display: none;
-    text-align: center;
-    padding: 32px;
-    color: var(--gold-dim);
-  }
-
+  .loading-state { display: none; text-align: center; padding: 32px; color: var(--gold-dim); }
   .loading-state.visible { display: block; }
-
-  .spinner {
-    width: 28px; height: 28px;
-    border: 2px solid var(--border);
-    border-top-color: var(--gold);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 12px;
-  }
-
+  .spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── RESULT PANEL ── */
-  .result-panel {
-    display: none;
-    background: var(--navy-mid);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-
+  .result-panel { display: none; background: var(--navy-mid); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
   .result-panel.visible { display: block; }
 
-  .result-panel-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+  .result-panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .result-panel-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--white); }
+  .result-panel-sub { font-size: 11px; color: var(--gold-dim); margin-top: 2px; }
 
-  .result-panel-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 16px;
-    color: var(--white);
-  }
-
-  .result-panel-sub {
-    font-size: 11px;
-    color: var(--gold-dim);
-    margin-top: 2px;
-  }
-
-  .btn-copy {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--gold-dim);
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 11px;
-    cursor: pointer;
-    font-family: 'DM Mono', monospace;
-    transition: all 0.15s;
-    letter-spacing: 0.5px;
-  }
+  .btn-copy { background: transparent; border: 1px solid var(--border); color: var(--gold-dim); padding: 6px 14px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: 'DM Mono', monospace; transition: all 0.15s; letter-spacing: 0.5px; }
   .btn-copy:hover { border-color: var(--gold-dim); color: var(--gold); }
 
-  .result-content {
-    padding: 24px;
-    color: var(--cream);
-    max-height: 80vh;
-    overflow-y: auto;
-  }
+  .result-content { padding: 24px; color: var(--cream); max-height: 90vh; overflow-y: auto; }
 
-  /* ── TABLEAU COMPARAISON ── */
-  .comp-section {
-    margin-bottom: 28px;
-  }
+  /* ── TABLEAUX COMPARATIF ── */
+  .comp-section { margin-bottom: 28px; }
+  .comp-section-title { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--white); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
 
-  .comp-section-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 15px;
-    color: var(--white);
-    margin-bottom: 10px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .comp-section-icon {
-    font-size: 14px;
-  }
-
-  .comp-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12.5px;
-  }
-
-  .comp-table th {
-    text-align: left;
-    padding: 8px 12px;
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    font-weight: 500;
-    border-bottom: 1px solid var(--border);
-    font-family: 'DM Mono', monospace;
-  }
-
-  .comp-table td {
-    padding: 9px 12px;
-    border-bottom: 1px solid rgba(201,168,76,0.08);
-    vertical-align: top;
-    line-height: 1.5;
-  }
-
+  .comp-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .comp-table th { text-align: left; padding: 8px 12px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold-dim); font-weight: 500; border-bottom: 1px solid var(--border); font-family: 'DM Mono', monospace; }
+  .comp-table td { padding: 9px 12px; border-bottom: 1px solid rgba(201,168,76,0.08); vertical-align: middle; line-height: 1.5; }
   .comp-table tr:last-child td { border-bottom: none; }
 
-  /* Couleurs par niveau */
-  .row-red td { background: rgba(224,92,92,0.12); }
+  .row-red td { background: rgba(224,92,92,0.10); }
   .row-red td:first-child { border-left: 3px solid var(--error); }
-
-  .row-orange td { background: rgba(224,160,60,0.10); }
+  .row-orange td { background: rgba(224,160,60,0.08); }
   .row-orange td:first-child { border-left: 3px solid #e0a03c; }
-
-  .row-green td { background: rgba(76,175,130,0.08); }
+  .row-green td { background: rgba(76,175,130,0.06); }
   .row-green td:first-child { border-left: 3px solid var(--success); }
-
   .row-neutral td { background: transparent; }
   .row-neutral td:first-child { border-left: 3px solid transparent; }
 
-  .tag-imputable {
-    display: inline-block;
-    font-size: 9px;
-    padding: 2px 7px;
-    border-radius: 3px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    font-family: 'DM Mono', monospace;
-    font-weight: 500;
-  }
-
+  .tag-qual { display: inline-block; font-size: 9px; padding: 2px 7px; border-radius: 3px; letter-spacing: 0.5px; text-transform: uppercase; font-family: 'DM Mono', monospace; font-weight: 500; white-space: nowrap; }
   .tag-red { background: rgba(224,92,92,0.2); color: #e05c5c; border: 1px solid rgba(224,92,92,0.3); }
   .tag-orange { background: rgba(224,160,60,0.2); color: #e0a03c; border: 1px solid rgba(224,160,60,0.3); }
   .tag-green { background: rgba(76,175,130,0.2); color: var(--success); border: 1px solid rgba(76,175,130,0.3); }
   .tag-gray { background: rgba(255,255,255,0.06); color: #6a7a90; border: 1px solid rgba(255,255,255,0.1); }
 
-  .synthese-box {
-    background: var(--navy-light);
-    border: 1px solid var(--border);
+  /* ── CASES À COCHER ── */
+  .check-cell { width: 32px; text-align: center; }
+  .check-cell input[type="checkbox"] {
+    width: 16px; height: 16px; cursor: pointer;
+    accent-color: var(--error);
+    border-radius: 3px;
+  }
+  .check-cell-bailleur input[type="checkbox"] { accent-color: #e0a03c; }
+
+  /* ── BANDEAU SÉLECTION ── */
+  .selection-hint {
+    background: rgba(224,92,92,0.08);
+    border: 1px solid rgba(224,92,92,0.2);
     border-radius: 8px;
-    padding: 16px 20px;
-    font-size: 13px;
-    line-height: 1.7;
-    color: var(--cream);
+    padding: 12px 18px;
+    font-size: 12px;
+    color: #e07070;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .selection-hint-icon { font-size: 16px; flex-shrink: 0; }
+
+  .selection-hint-bailleur {
+    background: rgba(224,160,60,0.08);
+    border: 1px solid rgba(224,160,60,0.2);
+    color: #c8903a;
   }
 
-  .synthese-niveau {
-    display: inline-block;
-    font-family: 'DM Serif Display', serif;
-    font-size: 18px;
-    margin-bottom: 10px;
+  /* ── BOUTON VALIDER ── */
+  .btn-valider {
+    width: 100%; background: var(--error); color: var(--white);
+    border: none; border-radius: 8px; padding: 14px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: background 0.2s; margin-top: 16px;
+    letter-spacing: 0.3px;
   }
+  .btn-valider:hover { background: #c84a4a; }
+  .btn-valider:disabled { opacity: 0.4; cursor: not-allowed; }
 
+  /* ── SYNTHÈSE ── */
+  .synthese-box { background: var(--navy-light); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; font-size: 13px; line-height: 1.7; color: var(--cream); }
+  .synthese-niveau { display: inline-block; font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 8px; }
   .niveau-bon { color: var(--success); }
   .niveau-moyen { color: #e0a03c; }
   .niveau-degrade { color: var(--error); }
 
-  /* ── EMPTY / ERROR ── */
-  .empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #4a5a70;
-    font-size: 13px;
-    display: none;
-  }
+  /* ── TABLEAU BAILLEUR ── */
+  .bailleur-section { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .bailleur-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: #e0a03c; margin-bottom: 6px; }
+  .bailleur-subtitle { font-size: 12px; color: #6a7a90; margin-bottom: 14px; }
 
+  .error-msg { background: rgba(224,92,92,0.1); border: 1px solid rgba(224,92,92,0.3); border-radius: 8px; padding: 12px 16px; color: var(--error); font-size: 12px; margin-bottom: 16px; display: none; }
+  .error-msg.visible { display: block; }
+  .empty-state { text-align: center; padding: 40px 20px; color: #4a5a70; font-size: 13px; display: none; }
   .empty-state.visible { display: block; }
 
-  .error-msg {
-    background: rgba(224,92,92,0.1);
-    border: 1px solid rgba(224,92,92,0.3);
-    border-radius: 8px;
-    padding: 12px 16px;
-    color: var(--error);
-    font-size: 12px;
-    margin-bottom: 16px;
-    display: none;
-  }
-
-  .error-msg.visible { display: block; }
-
-  /* ── STATUS DOT ── */
-  .status-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-  .dot-delivered { background: var(--success); }
-  .dot-draft { background: #4a5a70; }
-  .dot-finalized { background: var(--gold); }
-
-  /* ── SEARCH SPINNER ── */
-  .search-loading {
-    font-size: 11px;
-    color: var(--gold-dim);
-    padding: 8px 4px;
-    display: none;
-  }
-  .search-loading.visible { display: block; }
-
-  /* ── SCROLLBAR ── */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
 </style>
 </head>
 <body>
@@ -527,14 +248,12 @@
 
 <main>
 
-  <!-- ÉTAPE 1 : RECHERCHE -->
   <div class="section-label">01 — Recherche</div>
-
   <div class="search-wrap">
     <input type="text" id="searchInput" placeholder="Nom du locataire ou adresse du bien…" autocomplete="off">
     <span class="search-icon">⌕</span>
   </div>
-  <div class="search-hint">Saisir au moins 2 caractères · Recherche sur nom signataire et adresse</div>
+  <div class="search-hint">Saisir au moins 2 caractères · Recherche sur nom du locataire et adresse</div>
   <div class="search-loading" id="searchLoading">Recherche en cours…</div>
   <div class="error-msg" id="errorMsg"></div>
 
@@ -542,36 +261,29 @@
     <div class="empty-state visible" id="emptyState">Les rapports apparaîtront ici après votre recherche.</div>
   </div>
 
-  <!-- ÉTAPE 2 : SÉLECTION -->
   <div class="section-label">02 — Sélection</div>
-
   <div class="selection-summary">
     <div class="selection-slot" id="slotEdle">
-      <div class="slot-label edle-label">EDLE — État des lieux d'entrée</div>
+      <div class="slot-label edle-label">EDL Entrée</div>
       <div class="slot-value" id="slotEdleValue" style="color:#4a5a70">Non sélectionné</div>
       <div class="slot-sub" id="slotEdleSub"></div>
     </div>
     <div class="selection-slot" id="slotEdls">
-      <div class="slot-label edls-label">EDLS — État des lieux de sortie</div>
+      <div class="slot-label edls-label">EDL Sortie</div>
       <div class="slot-value" id="slotEdlsValue" style="color:#4a5a70">Non sélectionné</div>
       <div class="slot-sub" id="slotEdlsSub"></div>
     </div>
   </div>
 
-  <!-- ÉTAPE 3 : ANALYSE -->
   <div class="section-label">03 — Analyse IA</div>
-
-  <button class="btn-analyze" id="btnAnalyze" disabled>
-    Lancer la comparaison Claude IA
-  </button>
+  <button class="btn-analyze" id="btnAnalyze" disabled>Lancer la comparaison Claude IA</button>
 
   <div class="loading-state" id="loadingState">
     <div class="spinner"></div>
     <div>Récupération et analyse des rapports…</div>
-    <div style="font-size:11px;margin-top:6px;color:#4a5a70">Cela peut prendre 15–30 secondes</div>
+    <div style="font-size:11px;margin-top:6px;color:#4a5a70">Cela peut prendre 15 à 30 secondes</div>
   </div>
 
-  <!-- RÉSULTAT -->
   <div class="result-panel" id="resultPanel">
     <div class="result-panel-header">
       <div>
@@ -587,14 +299,12 @@
 
 <script>
 const PROXY_BASE = '/api';
-
-// ── STATE ──
 let selectedEdle = null;
 let selectedEdls = null;
 let searchTimeout = null;
 let reportCache = {};
+let lastAnalysis = null;
 
-// ── DOM ──
 const searchInput = document.getElementById('searchInput');
 const resultsList = document.getElementById('resultsList');
 const emptyState = document.getElementById('emptyState');
@@ -607,14 +317,31 @@ const resultContent = document.getElementById('resultContent');
 const resultPanelSub = document.getElementById('resultPanelSub');
 const btnCopy = document.getElementById('btnCopy');
 
-// ── SEARCH ──
+// ── TRADUCTIONS ──
+const ROOM_TYPES = {
+  entrance: 'Entrée', toilet: 'WC', bathroom: 'Salle de bain',
+  living_room: 'Séjour', kitchen: 'Cuisine', bedroom: 'Chambre',
+  balcony: 'Balcon', terrasse: 'Terrasse', cellar: 'Cave',
+  carpark: 'Parking', box: 'Box', garage: 'Garage', garden: 'Jardin',
+  laundry_room: 'Buanderie', hall: 'Hall', other: 'Autre',
+  private_office: 'Bureau', open_space: 'Espace ouvert',
+  meeting_room: 'Salle de réunion', shared_areas: 'Parties communes',
+};
+
+const CONDITIONS = {
+  excellent: 'Excellent', good: 'Bon', used: 'Usé',
+  poor: 'Mauvais', missing: 'Absent',
+};
+
+const CLEAN_STATES = { clean: 'Propre', to_clean: 'À nettoyer' };
+const OP_STATES = { working: 'Fonctionnel', not_working: 'Défaillant', not_tested: 'Non testé', unable_to_test: 'Inaccessible' };
+const STATUSES = { delivered: 'Remis', draft: 'Brouillon', finalized: 'Finalisé' };
+
+// ── RECHERCHE ──
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimeout);
   const term = searchInput.value.trim();
-  if (term.length < 2) {
-    showEmpty('Saisir au moins 2 caractères.');
-    return;
-  }
+  if (term.length < 2) { showEmpty('Saisir au moins 2 caractères.'); return; }
   searchTimeout = setTimeout(() => doSearch(term), 400);
 });
 
@@ -623,25 +350,15 @@ async function doSearch(term) {
   hideError();
   resultsList.querySelectorAll('.result-card').forEach(c => c.remove());
   emptyState.classList.remove('visible');
-
   try {
     const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=search&search_term=${encodeURIComponent(term)}`);
     const data = await res.json();
-
     searchLoading.classList.remove('visible');
-
     if (!res.ok) throw new Error(data.detail || data.error || 'Erreur API');
-
     const reports = data.data || [];
-    if (reports.length === 0) {
-      showEmpty('Aucun rapport trouvé pour cette recherche.');
-      return;
-    }
-
-    // Charger les signataires pour chaque rapport (en parallèle, limité)
+    if (reports.length === 0) { showEmpty('Aucun rapport trouvé pour cette recherche.'); return; }
     const enriched = await enrichWithSignatories(reports.slice(0, 20));
     renderResults(enriched);
-
   } catch (e) {
     searchLoading.classList.remove('visible');
     showError('Erreur de connexion à Nockee : ' + e.message);
@@ -650,62 +367,51 @@ async function doSearch(term) {
 }
 
 async function enrichWithSignatories(reports) {
-  const results = await Promise.allSettled(
-    reports.map(async r => {
-      try {
-        const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=get_signatories&inspection_report_id=${r.id}`);
-        const data = await res.json();
-        const signatories = (data.data || []).filter(s => s.type === 'tenant');
-        r._tenants = signatories.map(s => [s.first_name, s.last_name].filter(Boolean).join(' ')).filter(Boolean);
-      } catch {
-        r._tenants = [];
-      }
-      return r;
-    })
-  );
+  const results = await Promise.allSettled(reports.map(async r => {
+    try {
+      const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=get_signatories&inspection_report_id=${r.id}`);
+      const data = await res.json();
+      const sigs = (data.data || []).filter(s => s.type === 'tenant');
+      r._tenants = sigs.map(s => [s.first_name, s.last_name].filter(Boolean).join(' ')).filter(Boolean);
+    } catch { r._tenants = []; }
+    return r;
+  }));
   return results.map(r => r.status === 'fulfilled' ? r.value : r.reason);
 }
 
 function renderResults(reports) {
-  // Trier : EDLE d'abord, puis EDLS
   reports.sort((a, b) => {
-    const typeOrder = t => t === 'residential_lease_check_in' ? 0 : 1;
-    return typeOrder(a.type) - typeOrder(b.type);
+    const o = t => t === 'residential_lease_check_in' ? 0 : 1;
+    return o(a.type) - o(b.type);
   });
-
   reports.forEach(r => {
     const isEdle = r.type === 'residential_lease_check_in';
-    const isEdls = r.type === 'residential_lease_check_out';
     const isDraft = r.status === 'draft';
-
     const addr = formatAddress(r.property?.address);
     const date = r.date || r.check_in_date || r.created_at?.slice(0, 10) || '—';
     const tenants = r._tenants?.join(', ') || '';
+    const statusFr = STATUSES[r.status] || r.status;
 
     const card = document.createElement('div');
-    card.className = 'result-card' + (isDraft ? ' draft' : '');
+    card.className = 'result-card';
     card.dataset.id = r.id;
-    card.dataset.type = isEdle ? 'edle' : 'edls';
     card.innerHTML = `
       <span class="result-type-badge ${isEdle ? 'badge-edle' : 'badge-edls'}${isDraft ? ' badge-draft' : ''}">
-        ${isEdle ? 'EDLE' : 'EDLS'}
+        ${isEdle ? 'EDL Entrée' : 'EDL Sortie'}
       </span>
       <div class="result-info">
         <div class="result-address">${addr}</div>
         <div class="result-meta">
-          <span><span class="status-dot dot-${r.status}"></span> ${r.status}</span>
+          <span><span class="status-dot dot-${r.status}"></span> ${statusFr}</span>
           <span>📅 ${date}</span>
           ${r.property?.surface_area ? `<span>${r.property.surface_area} m²</span>` : ''}
         </div>
       </div>
       ${tenants ? `<div class="result-tenants">👤 ${tenants}</div>` : ''}
-      <div class="result-select-indicator" id="ind-${r.id}">✓</div>
+      <div class="result-select-indicator">✓</div>
     `;
-
     card.addEventListener('click', () => toggleSelect(r, card, isEdle ? 'edle' : 'edls'));
     resultsList.appendChild(card);
-
-    // Restaurer sélections visuelles si déjà sélectionnés
     if (selectedEdle?.id === r.id) card.classList.add('selected-edle');
     if (selectedEdls?.id === r.id) card.classList.add('selected-edls');
   });
@@ -714,31 +420,17 @@ function renderResults(reports) {
 function toggleSelect(report, card, type) {
   if (type === 'edle') {
     if (selectedEdle?.id === report.id) {
-      // Désélectionner
-      selectedEdle = null;
-      card.classList.remove('selected-edle');
-      updateSlot('edle', null);
+      selectedEdle = null; card.classList.remove('selected-edle'); updateSlot('edle', null);
     } else {
-      // Désélectionner ancien
-      if (selectedEdle) {
-        document.querySelector(`[data-id="${selectedEdle.id}"]`)?.classList.remove('selected-edle');
-      }
-      selectedEdle = report;
-      card.classList.add('selected-edle');
-      updateSlot('edle', report);
+      if (selectedEdle) document.querySelector(`[data-id="${selectedEdle.id}"]`)?.classList.remove('selected-edle');
+      selectedEdle = report; card.classList.add('selected-edle'); updateSlot('edle', report);
     }
   } else {
     if (selectedEdls?.id === report.id) {
-      selectedEdls = null;
-      card.classList.remove('selected-edls');
-      updateSlot('edls', null);
+      selectedEdls = null; card.classList.remove('selected-edls'); updateSlot('edls', null);
     } else {
-      if (selectedEdls) {
-        document.querySelector(`[data-id="${selectedEdls.id}"]`)?.classList.remove('selected-edls');
-      }
-      selectedEdls = report;
-      card.classList.add('selected-edls');
-      updateSlot('edls', report);
+      if (selectedEdls) document.querySelector(`[data-id="${selectedEdls.id}"]`)?.classList.remove('selected-edls');
+      selectedEdls = report; card.classList.add('selected-edls'); updateSlot('edls', report);
     }
   }
   updateAnalyzeButton();
@@ -748,12 +440,11 @@ function updateSlot(type, report) {
   const slot = document.getElementById(type === 'edle' ? 'slotEdle' : 'slotEdls');
   const val = document.getElementById(type === 'edle' ? 'slotEdleValue' : 'slotEdlsValue');
   const sub = document.getElementById(type === 'edle' ? 'slotEdleSub' : 'slotEdlsSub');
-
   if (report) {
     slot.className = 'selection-slot ' + (type === 'edle' ? 'filled-edle' : 'filled-edls');
     val.style.color = '';
     val.textContent = formatAddress(report.property?.address);
-    sub.textContent = (report.date || report.check_in_date || '—') + ' · ' + report.status;
+    sub.textContent = (report.date || report.check_in_date || '—') + ' · ' + (STATUSES[report.status] || report.status);
   } else {
     slot.className = 'selection-slot';
     val.style.color = '#4a5a70';
@@ -762,41 +453,31 @@ function updateSlot(type, report) {
   }
 }
 
-function updateAnalyzeButton() {
-  btnAnalyze.disabled = !(selectedEdle && selectedEdls);
-}
+function updateAnalyzeButton() { btnAnalyze.disabled = !(selectedEdle && selectedEdls); }
 
 // ── ANALYSE ──
 btnAnalyze.addEventListener('click', async () => {
   if (!selectedEdle || !selectedEdls) return;
-
   btnAnalyze.disabled = true;
   loadingState.classList.add('visible');
   resultPanel.classList.remove('visible');
   hideError();
-
   try {
-    // 1. Récupérer les deux rapports complets
     const [edleData, edlsData] = await Promise.all([
       fetchFullReport(selectedEdle.id),
       fetchFullReport(selectedEdls.id),
     ]);
-
-    // 2. Appeler Claude via le proxy existant
     const analysis = await callClaude(edleData, edlsData);
-
-    // 3. Afficher
+    lastAnalysis = { json: analysis, edle: edleData, edls: edlsData };
     loadingState.classList.remove('visible');
-    renderAnalysis(analysis);
-    resultPanelSub.textContent = `${formatAddress(selectedEdls.property?.address)} · EDLE ${selectedEdle.date || '?'} → EDLS ${selectedEdls.date || '?'}`;
+    renderAnalysis(analysis, edleData, edlsData);
+    resultPanelSub.textContent = `${formatAddress(selectedEdls.property?.address)} · Entrée ${selectedEdle.date || '?'} → Sortie ${selectedEdls.date || '?'}`;
     resultPanel.classList.add('visible');
     resultPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
   } catch (e) {
     loadingState.classList.remove('visible');
     showError('Erreur lors de l\'analyse : ' + e.message);
   }
-
   btnAnalyze.disabled = false;
 });
 
@@ -811,7 +492,6 @@ async function fetchFullReport(id) {
 
 async function callClaude(edle, edls) {
   const prompt = buildPrompt(edle, edls);
-
   const res = await fetch(`${PROXY_BASE}/claude-proxy`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -821,14 +501,11 @@ async function callClaude(edle, edls) {
       messages: [{ role: 'user', content: prompt }]
     })
   });
-
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || 'Erreur Claude');
   const text = data.content?.[0]?.text || '{}';
-
   try {
-    const clean = text.replace(/```json|```/g, '').trim();
-    return JSON.parse(clean);
+    return JSON.parse(text.replace(/```json|```/g, '').trim());
   } catch {
     return { erreur_parsing: text };
   }
@@ -847,155 +524,273 @@ function buildPrompt(edle, edls) {
 
 BIEN : ${addr}
 LOCATAIRE(S) : ${tenants}
-DATE EDLE : ${edle.date || edle.check_in_date || '?'}
-DATE EDLS : ${edls.date || '?'}
+DATE EDL ENTREE : ${edle.date || edle.check_in_date || '?'}
+DATE EDL SORTIE : ${edls.date || '?'}
 SURFACE : ${edls.property?.surface_area || '?'} m²
 MEUBLÉ : ${edls.property?.furnished ? 'Oui' : 'Non'}
 
-ÉTAT DES LIEUX D'ENTRÉE :
+EDL ENTRÉE :
 ${edleRooms}
 
-ÉTAT DES LIEUX DE SORTIE :
+EDL SORTIE :
 ${edlsRooms}
 
-MISSION : Compare ces deux états des lieux et retourne UNIQUEMENT un objet JSON valide, sans aucun texte avant ou après, avec cette structure exacte :
+Retourne UNIQUEMENT un objet JSON valide (sans texte avant ni après, sans balises markdown) avec cette structure :
 
 {
   "elements": [
     {
-      "piece": "nom de la pièce",
+      "piece": "nom de la pièce en français",
       "element": "nom de l'élément",
-      "etat_entree": "description courte",
-      "etat_sortie": "description courte",
-      "evolution": "description de l'évolution constatée",
-      "qualification": "imputable" | "usure_normale" | "amelioration" | "disparu" | "ok",
-      "commentaire": "analyse experte courte (1-2 phrases max)"
+      "etat_entree": "description courte en français",
+      "etat_sortie": "description courte en français",
+      "qualification": "imputable" ou "usure_normale" ou "amelioration" ou "disparu" ou "ok",
+      "commentaire": "analyse courte en français (1-2 phrases)"
     }
   ],
   "synthese": {
-    "niveau_global": "BON" | "MOYEN" | "DÉGRADÉ",
+    "niveau_global": "BON" ou "MOYEN" ou "DÉGRADÉ",
     "nb_imputables": 0,
-    "nb_usure": 0,
-    "resume": "texte de synthèse en 3-4 phrases"
+    "nb_bailleur": 0,
+    "resume": "texte de synthèse en français (3-4 phrases)"
   }
 }
 
-Règles :
-- "imputable" = dégradation dépassant l'usure normale, à la charge du locataire
-- "usure_normale" = vétusté légale selon grille ALUR
+RÈGLE FONDAMENTALE — VÉTUSTÉ :
+La vétusté (usure_normale) ne s'applique QUE si la durée d'occupation est supérieure ou égale à 10 ans.
+Calcule la durée d'occupation à partir des dates EDL ENTREE et EDL SORTIE fournies.
+Si la durée est inférieure à 10 ans, toute dégradation constatée est "imputable", quelle que soit la nature de l'élément.
+
+RÈGLES DE QUALIFICATION :
+- "imputable" = dégradation à la charge du locataire. Sont TOUJOURS imputables, quelle que soit la durée d'occupation :
+  * Salissures, encrassement, traces de graisse, moisissures (défaut d'entretien courant, art. 7d loi 89-462)
+  * Joints sales, noircis ou moisis
+  * Trous, impacts, rayures, brûlures, éclats
+  * Éléments cassés ou détériorés par usage anormal
+  * Peintures dégradées si occupation < 10 ans
+- "usure_normale" = UNIQUEMENT si durée >= 10 ans ET dégradation due exclusivement au temps (décoloration lente, usure mécanique légère). Ne jamais qualifier en usure_normale : salissures, moisissures, joints encrassés.
 - "amelioration" = amélioration apportée par le locataire
 - "disparu" = élément présent à l'entrée, absent à la sortie
-- "ok" = pas de changement notable
-- N'inclure que les éléments avec une évolution notable (pas les "ok" si plus de 10 éléments)
-- Retourne UNIQUEMENT le JSON, rien d'autre.`;
+- "ok" = aucun changement notable
+
+Autres règles :
+- Tout le texte en français
+- N'inclure que les éléments avec une évolution notable
+- JSON uniquement, rien d'autre`;
 }
 
 // ── RENDU TABLEAU ──
-function renderAnalysis(json) {
+function renderAnalysis(json, edle, edls) {
   if (json.erreur_parsing) {
-    resultContent.innerHTML = `<div style="white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:12px;color:var(--cream)">${json.erreur_parsing}</div>`;
+    resultContent.innerHTML = `<div style="white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:12px">${json.erreur_parsing}</div>`;
     return;
   }
-
-  const qualifConfig = {
-    imputable:     { label: 'Imputable locataire', tagClass: 'tag-red',    rowClass: 'row-red' },
-    disparu:       { label: 'Élément disparu',      tagClass: 'tag-red',    rowClass: 'row-red' },
-    usure_normale: { label: 'Usure normale',         tagClass: 'tag-orange', rowClass: 'row-orange' },
-    amelioration:  { label: 'Amélioration',          tagClass: 'tag-green',  rowClass: 'row-green' },
-    ok:            { label: 'OK',                    tagClass: 'tag-gray',   rowClass: 'row-neutral' },
-  };
 
   const elements = json.elements || [];
   const synthese = json.synthese || {};
 
+  // Séparer locataire vs bailleur
+  const locataire = elements.filter(e => e.qualification === 'imputable' || e.qualification === 'disparu');
+  const bailleur   = elements.filter(e => e.qualification === 'usure_normale' || e.qualification === 'ok');
+  const amelio     = elements.filter(e => e.qualification === 'amelioration');
+
+  const qualifConfig = {
+    imputable:     { label: 'Imputable locataire', tagClass: 'tag-red',    rowClass: 'row-red' },
+    disparu:       { label: 'Élément disparu',      tagClass: 'tag-red',    rowClass: 'row-red' },
+    usure_normale: { label: 'Usure / bailleur',     tagClass: 'tag-orange', rowClass: 'row-orange' },
+    amelioration:  { label: 'Amélioration',          tagClass: 'tag-green',  rowClass: 'row-green' },
+    ok:            { label: 'Sans changement',        tagClass: 'tag-gray',   rowClass: 'row-neutral' },
+  };
+
   // Grouper par pièce
-  const byPiece = {};
-  elements.forEach(el => {
-    const p = el.piece || 'Général';
-    if (!byPiece[p]) byPiece[p] = [];
-    byPiece[p].push(el);
-  });
+  function groupByPiece(arr) {
+    const g = {};
+    arr.forEach(el => { const p = el.piece || 'Général'; if (!g[p]) g[p] = []; g[p].push(el); });
+    return g;
+  }
+
+  const addr = formatAddress(selectedEdls?.property?.address || {});
+  const tenantName = (edls.signatories || [])
+    .filter(s => s.type === 'tenant')
+    .map(s => [s.first_name, s.last_name].filter(Boolean).join(' '))
+    .join(', ') || 'Locataire';
 
   let html = '';
 
-  // Niveau global
+  // ── SYNTHÈSE ──
   const niveauClass = { BON: 'niveau-bon', MOYEN: 'niveau-moyen', 'DÉGRADÉ': 'niveau-degrade' }[synthese.niveau_global] || '';
   html += `
     <div class="comp-section">
-      <div class="comp-section-title"><span class="comp-section-icon">◆</span> Synthèse</div>
+      <div class="comp-section-title">◆ Synthèse générale</div>
       <div class="synthese-box">
         <div class="synthese-niveau ${niveauClass}">État global : ${synthese.niveau_global || '—'}</div>
         <div style="font-size:12px;color:#6a7a90;margin-bottom:10px">
-          ${synthese.nb_imputables || 0} dégradation(s) imputable(s) · ${synthese.nb_usure || 0} relevant de l'usure normale
+          ${synthese.nb_imputables || locataire.length} dégradation(s) à la charge du locataire &nbsp;·&nbsp;
+          ${synthese.nb_bailleur || bailleur.length} élément(s) à la charge du bailleur
         </div>
         <div>${synthese.resume || ''}</div>
       </div>
     </div>`;
 
-  // Tableau par pièce
-  Object.entries(byPiece).forEach(([piece, els]) => {
-    html += `
-      <div class="comp-section">
-        <div class="comp-section-title"><span class="comp-section-icon">▸</span> ${piece}</div>
-        <table class="comp-table">
-          <thead>
-            <tr>
-              <th>Élément</th>
-              <th>À l'entrée</th>
-              <th>À la sortie</th>
-              <th>Qualification</th>
-              <th>Commentaire</th>
-            </tr>
-          </thead>
-          <tbody>`;
+  // ── TABLEAU LOCATAIRE ──
+  html += `
+    <div class="comp-section">
+      <div class="comp-section-title" style="color:var(--error)">▸ Dégradations imputables au locataire</div>
+      <div class="selection-hint">
+        <span class="selection-hint-icon">☑</span>
+        <span>Cochez les dégradations que vous souhaitez faire chiffrer, puis cliquez sur <strong>Envoyer pour chiffrage</strong> en bas de page.</span>
+      </div>`;
 
-    els.forEach(el => {
-      const cfg = qualifConfig[el.qualification] || qualifConfig.ok;
+  if (locataire.length === 0) {
+    html += `<div style="color:#4a5a70;font-size:13px;padding:12px 0">Aucune dégradation imputable au locataire identifiée.</div>`;
+  } else {
+    const byPiece = groupByPiece(locataire);
+    Object.entries(byPiece).forEach(([piece, els]) => {
       html += `
-            <tr class="${cfg.rowClass}">
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#6a7a90;margin-bottom:6px">▸ ${piece}</div>
+        <table class="comp-table">
+          <thead><tr>
+            <th class="check-cell">Chiffrer</th>
+            <th>Élément</th><th>À l'entrée</th><th>À la sortie</th><th>Qualification</th><th>Commentaire</th>
+          </tr></thead>
+          <tbody>`;
+      els.forEach((el, i) => {
+        const cfg = qualifConfig[el.qualification] || qualifConfig.imputable;
+        const uid = `loc_${piece}_${i}`.replace(/\s/g,'_');
+        html += `
+            <tr class="${cfg.rowClass}" data-uid="${uid}">
+              <td class="check-cell"><input type="checkbox" class="chk-locataire" data-piece="${el.piece}" data-element="${el.element}" data-entree="${el.etat_entree||''}" data-sortie="${el.etat_sortie||''}" data-commentaire="${el.commentaire||''}"></td>
               <td><strong>${el.element || '—'}</strong></td>
               <td>${el.etat_entree || '—'}</td>
               <td>${el.etat_sortie || '—'}</td>
-              <td><span class="tag-imputable ${cfg.tagClass}">${cfg.label}</span></td>
+              <td><span class="tag-qual ${cfg.tagClass}">${cfg.label}</span></td>
               <td style="color:#a0b0c0;font-size:12px">${el.commentaire || ''}</td>
             </tr>`;
+      });
+      html += `</tbody></table></div>`;
     });
+  }
 
-    html += `
-          </tbody>
-        </table>
+  // Améliorations
+  if (amelio.length > 0) {
+    html += `<div style="margin-top:12px">
+      <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#4caf82;margin-bottom:6px">▸ Améliorations apportées par le locataire</div>
+      <table class="comp-table"><thead><tr><th>Élément</th><th>Détail</th><th>Commentaire</th></tr></thead><tbody>`;
+    amelio.forEach(el => {
+      html += `<tr class="row-green"><td><strong>${el.element||'—'}</strong></td><td>${el.etat_sortie||'—'}</td><td style="color:#a0b0c0;font-size:12px">${el.commentaire||''}</td></tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+
+  html += `</div>`; // fin section locataire
+
+  // ── BOUTON VALIDER LOCATAIRE ──
+  html += `
+    <div style="margin-bottom:36px">
+      <button class="btn-valider" id="btnValiderLocataire">
+        ✉ Envoyer les dégradations sélectionnées pour chiffrage
+      </button>
+    </div>`;
+
+  // ── TABLEAU BAILLEUR ──
+  html += `
+    <div class="bailleur-section">
+      <div class="bailleur-title">▸ Remises en état à la charge du bailleur</div>
+      <div class="bailleur-subtitle">Éléments relevant de l'usure normale ou de la vétusté — non retenus sur le dépôt de garantie mais pouvant nécessiter des travaux.</div>
+      <div class="selection-hint selection-hint-bailleur">
+        <span class="selection-hint-icon">☑</span>
+        <span>Cochez les éléments pour lesquels vous souhaitez demander un chiffrage de remise en état bailleur.</span>
       </div>`;
-  });
+
+  if (bailleur.length === 0) {
+    html += `<div style="color:#4a5a70;font-size:13px;padding:12px 0">Aucun élément à la charge du bailleur identifié.</div>`;
+  } else {
+    const byPiece2 = groupByPiece(bailleur);
+    Object.entries(byPiece2).forEach(([piece, els]) => {
+      html += `
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#6a7a90;margin-bottom:6px">▸ ${piece}</div>
+        <table class="comp-table">
+          <thead><tr>
+            <th class="check-cell check-cell-bailleur">Chiffrer</th>
+            <th>Élément</th><th>À l'entrée</th><th>À la sortie</th><th>Commentaire</th>
+          </tr></thead>
+          <tbody>`;
+      els.forEach((el, i) => {
+        html += `
+            <tr class="row-orange">
+              <td class="check-cell check-cell-bailleur"><input type="checkbox" class="chk-bailleur" data-piece="${el.piece}" data-element="${el.element}" data-entree="${el.etat_entree||''}" data-sortie="${el.etat_sortie||''}" data-commentaire="${el.commentaire||''}"></td>
+              <td><strong>${el.element || '—'}</strong></td>
+              <td>${el.etat_entree || '—'}</td>
+              <td>${el.etat_sortie || '—'}</td>
+              <td style="color:#a0b0c0;font-size:12px">${el.commentaire || ''}</td>
+            </tr>`;
+      });
+      html += `</tbody></table></div>`;
+    });
+  }
+
+  html += `
+      <button class="btn-valider" id="btnValiderBailleur" style="background:#e0a03c;margin-top:8px">
+        ✉ Envoyer les remises en état bailleur pour chiffrage
+      </button>
+    </div>`;
 
   resultContent.innerHTML = html;
+
+  // ── ÉVÉNEMENTS BOUTONS MAIL ──
+  const addrStr = addr;
+  const tenantStr = tenantName;
+
+  document.getElementById('btnValiderLocataire')?.addEventListener('click', () => {
+    const checked = [...document.querySelectorAll('.chk-locataire:checked')];
+    if (checked.length === 0) { alert('Veuillez cocher au moins une dégradation.'); return; }
+    const lignes = checked.map(c =>
+      `• ${c.dataset.piece} — ${c.dataset.element}\n  Entrée : ${c.dataset.entree}\n  Sortie : ${c.dataset.sortie}\n  Note : ${c.dataset.commentaire}`
+    ).join('\n\n');
+    const body = `Bonjour,\n\nVeuillez trouver ci-dessous le détail des dégradations imputables au locataire pour le bien situé au ${addrStr} (locataire : ${tenantStr}), pour chiffrage.\n\n━━ PARTIE LOCATAIRE ━━\n\n${lignes}\n\nCordialement,\nEPI Expertises Immobilières`;
+    const mailto = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage dégradations locataire — ' + addrStr + ' — ' + tenantStr)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
+  });
+
+  document.getElementById('btnValiderBailleur')?.addEventListener('click', () => {
+    const checked = [...document.querySelectorAll('.chk-bailleur:checked')];
+    if (checked.length === 0) { alert('Veuillez cocher au moins un élément.'); return; }
+    const lignes = checked.map(c =>
+      `• ${c.dataset.piece} — ${c.dataset.element}\n  Entrée : ${c.dataset.entree}\n  Sortie : ${c.dataset.sortie}\n  Note : ${c.dataset.commentaire}`
+    ).join('\n\n');
+    const body = `Bonjour,\n\nVeuillez trouver ci-dessous le détail des remises en état à la charge du bailleur pour le bien situé au ${addrStr} (locataire : ${tenantStr}), pour chiffrage.\n\n━━ PARTIE BAILLEUR ━━\n\n${lignes}\n\nCordialement,\nEPI Expertises Immobilières`;
+    const mailto = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage remise en état bailleur — ' + addrStr + ' — ' + tenantStr)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
+  });
 }
 
+// ── EXTRACTION PIÈCES ──
 function extractRooms(report) {
   const rooms = report.rooms || [];
-  if (rooms.length === 0) return '(Données de pièces non disponibles — rapport importé)';
-
+  if (rooms.length === 0) return '(Données non disponibles — rapport importé)';
   return rooms.map(room => {
+    const typeFr = ROOM_TYPES[room.type] || room.type || 'Pièce';
+    const name = room.name ? ` "${room.name}"` : '';
     const elements = room.elements || [];
     const elemStr = elements.map(el => {
       const parts = [`  • ${el.name || '?'}`];
-      if (el.condition) parts.push(`état: ${el.condition}`);
-      if (el.cleanliness_state) parts.push(`propreté: ${el.cleanliness_state}`);
-      if (el.operating_state) parts.push(`fonctionnement: ${el.operating_state}`);
+      if (el.condition) parts.push(`état: ${CONDITIONS[el.condition] || el.condition}`);
+      if (el.cleanliness_state) parts.push(`propreté: ${CLEAN_STATES[el.cleanliness_state] || el.cleanliness_state}`);
+      if (el.operating_state) parts.push(`fonctionnement: ${OP_STATES[el.operating_state] || el.operating_state}`);
       if (el.defects?.length) parts.push(`défauts: ${el.defects.join(', ')}`);
-      if (el.materials?.length) parts.push(`matériaux: ${el.materials.join(', ')}`);
       if (el.comment) parts.push(`obs: ${el.comment}`);
       return parts.join(' | ');
     }).join('\n');
-
-    return `[${room.type?.toUpperCase() || 'PIÈCE'} — ${room.name || ''}]\n${elemStr || '  (aucun élément)'}`;
+    return `[${typeFr}${name}]\n${elemStr || '  (aucun élément)'}`;
   }).join('\n\n');
 }
 
 // ── UTILS ──
 function formatAddress(addr) {
   if (!addr) return 'Adresse inconnue';
-  const parts = [addr.line_1, addr.line_2, addr.postal_code, addr.city].filter(Boolean);
-  return parts.join(', ');
+  return [addr.line_1, addr.line_2, addr.postal_code, addr.city].filter(Boolean).join(', ');
 }
 
 function showEmpty(msg) {
@@ -1004,16 +799,9 @@ function showEmpty(msg) {
   emptyState.classList.add('visible');
 }
 
-function showError(msg) {
-  errorMsg.textContent = msg;
-  errorMsg.classList.add('visible');
-}
+function showError(msg) { errorMsg.textContent = msg; errorMsg.classList.add('visible'); }
+function hideError() { errorMsg.classList.remove('visible'); }
 
-function hideError() {
-  errorMsg.classList.remove('visible');
-}
-
-// ── COPY ──
 btnCopy.addEventListener('click', () => {
   navigator.clipboard.writeText(resultContent.innerText);
   btnCopy.textContent = 'Copié ✓';
