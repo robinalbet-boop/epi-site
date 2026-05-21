@@ -361,14 +361,108 @@
 
   .result-content {
     padding: 24px;
-    white-space: pre-wrap;
-    font-family: 'DM Mono', monospace;
-    font-size: 12.5px;
-    line-height: 1.8;
     color: var(--cream);
-    max-height: 70vh;
+    max-height: 80vh;
     overflow-y: auto;
   }
+
+  /* ── TABLEAU COMPARAISON ── */
+  .comp-section {
+    margin-bottom: 28px;
+  }
+
+  .comp-section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 15px;
+    color: var(--white);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .comp-section-icon {
+    font-size: 14px;
+  }
+
+  .comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+
+  .comp-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    font-weight: 500;
+    border-bottom: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .comp-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .comp-table tr:last-child td { border-bottom: none; }
+
+  /* Couleurs par niveau */
+  .row-red td { background: rgba(224,92,92,0.12); }
+  .row-red td:first-child { border-left: 3px solid var(--error); }
+
+  .row-orange td { background: rgba(224,160,60,0.10); }
+  .row-orange td:first-child { border-left: 3px solid #e0a03c; }
+
+  .row-green td { background: rgba(76,175,130,0.08); }
+  .row-green td:first-child { border-left: 3px solid var(--success); }
+
+  .row-neutral td { background: transparent; }
+  .row-neutral td:first-child { border-left: 3px solid transparent; }
+
+  .tag-imputable {
+    display: inline-block;
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+  }
+
+  .tag-red { background: rgba(224,92,92,0.2); color: #e05c5c; border: 1px solid rgba(224,92,92,0.3); }
+  .tag-orange { background: rgba(224,160,60,0.2); color: #e0a03c; border: 1px solid rgba(224,160,60,0.3); }
+  .tag-green { background: rgba(76,175,130,0.2); color: var(--success); border: 1px solid rgba(76,175,130,0.3); }
+  .tag-gray { background: rgba(255,255,255,0.06); color: #6a7a90; border: 1px solid rgba(255,255,255,0.1); }
+
+  .synthese-box {
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--cream);
+  }
+
+  .synthese-niveau {
+    display: inline-block;
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  .niveau-bon { color: var(--success); }
+  .niveau-moyen { color: #e0a03c; }
+  .niveau-degrade { color: var(--error); }
 
   /* ── EMPTY / ERROR ── */
   .empty-state {
@@ -693,7 +787,7 @@ btnAnalyze.addEventListener('click', async () => {
 
     // 3. Afficher
     loadingState.classList.remove('visible');
-    resultContent.textContent = analysis;
+    renderAnalysis(analysis);
     resultPanelSub.textContent = `${formatAddress(selectedEdls.property?.address)} · EDLE ${selectedEdle.date || '?'} → EDLS ${selectedEdls.date || '?'}`;
     resultPanel.classList.add('visible');
     resultPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -730,23 +824,26 @@ async function callClaude(edle, edls) {
 
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || 'Erreur Claude');
-  return data.content?.[0]?.text || 'Pas de réponse';
+  const text = data.content?.[0]?.text || '{}';
+
+  try {
+    const clean = text.replace(/```json|```/g, '').trim();
+    return JSON.parse(clean);
+  } catch {
+    return { erreur_parsing: text };
+  }
 }
 
 function buildPrompt(edle, edls) {
   const addr = formatAddress(edls.property?.address);
-
-  // Extraire pièces et éléments
   const edleRooms = extractRooms(edle);
   const edlsRooms = extractRooms(edls);
-
-  // Signataires locataires
   const tenants = (edls.signatories || [])
     .filter(s => s.type === 'tenant')
     .map(s => [s.first_name, s.last_name].filter(Boolean).join(' '))
     .join(', ') || 'Non renseigné';
 
-  return `Tu es expert en états des lieux immobiliers en France, spécialisé dans l'application de la loi ALUR et du décret du 30 mars 2016.
+  return `Tu es expert en états des lieux immobiliers en France, spécialisé dans la loi ALUR et le décret du 30 mars 2016.
 
 BIEN : ${addr}
 LOCATAIRE(S) : ${tenants}
@@ -755,42 +852,122 @@ DATE EDLS : ${edls.date || '?'}
 SURFACE : ${edls.property?.surface_area || '?'} m²
 MEUBLÉ : ${edls.property?.furnished ? 'Oui' : 'Non'}
 
-═══════════════════════════════════════
-ÉTAT DES LIEUX D'ENTRÉE (EDLE)
-═══════════════════════════════════════
+ÉTAT DES LIEUX D'ENTRÉE :
 ${edleRooms}
 
-═══════════════════════════════════════
-ÉTAT DES LIEUX DE SORTIE (EDLS)
-═══════════════════════════════════════
+ÉTAT DES LIEUX DE SORTIE :
 ${edlsRooms}
 
-═══════════════════════════════════════
-MISSION
-═══════════════════════════════════════
+MISSION : Compare ces deux états des lieux et retourne UNIQUEMENT un objet JSON valide, sans aucun texte avant ou après, avec cette structure exacte :
 
-Effectue une comparaison experte et exhaustive entre ces deux états des lieux. Pour chaque pièce et chaque élément :
+{
+  "elements": [
+    {
+      "piece": "nom de la pièce",
+      "element": "nom de l'élément",
+      "etat_entree": "description courte",
+      "etat_sortie": "description courte",
+      "evolution": "description de l'évolution constatée",
+      "qualification": "imputable" | "usure_normale" | "amelioration" | "disparu" | "ok",
+      "commentaire": "analyse experte courte (1-2 phrases max)"
+    }
+  ],
+  "synthese": {
+    "niveau_global": "BON" | "MOYEN" | "DÉGRADÉ",
+    "nb_imputables": 0,
+    "nb_usure": 0,
+    "resume": "texte de synthèse en 3-4 phrases"
+  }
+}
 
-1. DÉGRADATIONS IMPUTABLES AU LOCATAIRE
-   - Identifie toute dégradation dépassant l'usure normale
-   - Précise l'élément concerné, la nature de la dégradation, et l'évolution constatée
-   - Évalue si la dégradation est imputable selon la loi ALUR
-   - Note les cas AMBIGUS (usure vs dégradation) avec ton analyse
+Règles :
+- "imputable" = dégradation dépassant l'usure normale, à la charge du locataire
+- "usure_normale" = vétusté légale selon grille ALUR
+- "amelioration" = amélioration apportée par le locataire
+- "disparu" = élément présent à l'entrée, absent à la sortie
+- "ok" = pas de changement notable
+- N'inclure que les éléments avec une évolution notable (pas les "ok" si plus de 10 éléments)
+- Retourne UNIQUEMENT le JSON, rien d'autre.`;
+}
 
-2. USURE NORMALE
-   - Identifie les évolutions relevant de la vétusté légale (grille de vétusté ALUR)
+// ── RENDU TABLEAU ──
+function renderAnalysis(json) {
+  if (json.erreur_parsing) {
+    resultContent.innerHTML = `<div style="white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:12px;color:var(--cream)">${json.erreur_parsing}</div>`;
+    return;
+  }
 
-3. ÉLÉMENTS DISPARUS OU DÉGRADÉS
-   - Éléments présents à l'entrée mais absents ou endommagés à la sortie
+  const qualifConfig = {
+    imputable:     { label: 'Imputable locataire', tagClass: 'tag-red',    rowClass: 'row-red' },
+    disparu:       { label: 'Élément disparu',      tagClass: 'tag-red',    rowClass: 'row-red' },
+    usure_normale: { label: 'Usure normale',         tagClass: 'tag-orange', rowClass: 'row-orange' },
+    amelioration:  { label: 'Amélioration',          tagClass: 'tag-green',  rowClass: 'row-green' },
+    ok:            { label: 'OK',                    tagClass: 'tag-gray',   rowClass: 'row-neutral' },
+  };
 
-4. AMÉLIORATIONS / ÉLÉMENTS AJOUTÉS
-   - Toute amélioration apportée par le locataire
+  const elements = json.elements || [];
+  const synthese = json.synthese || {};
 
-5. SYNTHÈSE
-   - Résumé des dégradations imputables prioritaires
-   - Niveau global de l'état de sortie : BON / MOYEN / DÉGRADÉ
+  // Grouper par pièce
+  const byPiece = {};
+  elements.forEach(el => {
+    const p = el.piece || 'Général';
+    if (!byPiece[p]) byPiece[p] = [];
+    byPiece[p].push(el);
+  });
 
-Sois précis, factuel et utilise le vocabulaire professionnel de l'état des lieux. Structure ta réponse avec des séparateurs clairs.`;
+  let html = '';
+
+  // Niveau global
+  const niveauClass = { BON: 'niveau-bon', MOYEN: 'niveau-moyen', 'DÉGRADÉ': 'niveau-degrade' }[synthese.niveau_global] || '';
+  html += `
+    <div class="comp-section">
+      <div class="comp-section-title"><span class="comp-section-icon">◆</span> Synthèse</div>
+      <div class="synthese-box">
+        <div class="synthese-niveau ${niveauClass}">État global : ${synthese.niveau_global || '—'}</div>
+        <div style="font-size:12px;color:#6a7a90;margin-bottom:10px">
+          ${synthese.nb_imputables || 0} dégradation(s) imputable(s) · ${synthese.nb_usure || 0} relevant de l'usure normale
+        </div>
+        <div>${synthese.resume || ''}</div>
+      </div>
+    </div>`;
+
+  // Tableau par pièce
+  Object.entries(byPiece).forEach(([piece, els]) => {
+    html += `
+      <div class="comp-section">
+        <div class="comp-section-title"><span class="comp-section-icon">▸</span> ${piece}</div>
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Élément</th>
+              <th>À l'entrée</th>
+              <th>À la sortie</th>
+              <th>Qualification</th>
+              <th>Commentaire</th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+    els.forEach(el => {
+      const cfg = qualifConfig[el.qualification] || qualifConfig.ok;
+      html += `
+            <tr class="${cfg.rowClass}">
+              <td><strong>${el.element || '—'}</strong></td>
+              <td>${el.etat_entree || '—'}</td>
+              <td>${el.etat_sortie || '—'}</td>
+              <td><span class="tag-imputable ${cfg.tagClass}">${cfg.label}</span></td>
+              <td style="color:#a0b0c0;font-size:12px">${el.commentaire || ''}</td>
+            </tr>`;
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </div>`;
+  });
+
+  resultContent.innerHTML = html;
 }
 
 function extractRooms(report) {
@@ -838,7 +1015,7 @@ function hideError() {
 
 // ── COPY ──
 btnCopy.addEventListener('click', () => {
-  navigator.clipboard.writeText(resultContent.textContent);
+  navigator.clipboard.writeText(resultContent.innerText);
   btnCopy.textContent = 'Copié ✓';
   setTimeout(() => btnCopy.textContent = 'Copier', 2000);
 });
