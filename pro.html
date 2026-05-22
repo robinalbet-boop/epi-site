@@ -335,6 +335,86 @@
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── COMPARATIF STYLES ── */
+  .search-wrap { position: relative; margin-bottom: 8px; }
+  .search-wrap input { width: 100%; background: var(--navy-mid); border: 1px solid var(--border); border-radius: 8px; padding: 14px 48px 14px 18px; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 300; outline: none; transition: border-color 0.2s; }
+  .search-wrap input::placeholder { color: #4a5a70; }
+  .search-wrap input:focus { border-color: var(--gold-dim); }
+  .search-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--gold-dim); font-size: 16px; pointer-events: none; }
+  .search-hint { font-size: 11px; color: #4a5a70; margin-bottom: 12px; padding-left: 4px; }
+  .search-loading { font-size: 11px; color: var(--gold-dim); padding: 6px 4px; display: none; }
+  .search-loading.visible { display: block; }
+  .results-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .result-card { background: var(--navy-mid); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 12px; }
+  .result-card:hover { border-color: var(--gold-dim); background: var(--navy-light); }
+  .result-card.selected-edle { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+  .result-card.selected-edls { border-color: #4caf82; background: rgba(76,175,130,0.08); }
+  .result-type-badge { font-size: 10px; font-family: 'DM Mono', monospace; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px; white-space: nowrap; flex-shrink: 0; }
+  .badge-edle { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+  .badge-edls { background: rgba(76,175,130,0.15); color: var(--success); border: 1px solid rgba(76,175,130,0.3); }
+  .result-info { flex: 1; min-width: 0; }
+  .result-address { font-size: 13px; color: var(--white); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .result-meta { font-size: 11px; color: #4a6080; margin-top: 2px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .result-tenants { font-size: 11px; color: var(--gold-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; flex-shrink: 0; }
+  .result-select-indicator { width: 18px; height: 18px; border: 1px solid var(--border); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; transition: all 0.15s; }
+  .selected-edle .result-select-indicator { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+  .selected-edls .result-select-indicator { background: var(--success); border-color: var(--success); color: var(--navy); }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .dot-delivered { background: var(--success); }
+  .dot-draft { background: #4a5a70; }
+  .dot-finalized { background: var(--gold); }
+  .selection-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .selection-slot { border: 1px dashed var(--border); border-radius: 8px; padding: 12px 16px; min-height: 60px; display: flex; flex-direction: column; gap: 4px; }
+  .selection-slot.filled-edle { border-color: var(--gold); border-style: solid; background: rgba(201,168,76,0.05); }
+  .selection-slot.filled-edls { border-color: var(--success); border-style: solid; background: rgba(76,175,130,0.05); }
+  .slot-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #4a5a70; }
+  .slot-label.edle-label { color: var(--gold); }
+  .slot-label.edls-label { color: var(--success); }
+  .slot-value { font-size: 13px; color: var(--white); font-weight: 400; }
+  .slot-sub { font-size: 11px; color: #4a6080; }
+  .loading-state { display: none; text-align: center; padding: 24px; color: var(--gold-dim); }
+  .loading-state.visible { display: block; }
+  .result-panel { display: none; background: var(--navy-mid); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .result-panel.visible { display: block; }
+  .result-panel-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .result-panel-title { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--white); }
+  .result-panel-sub { font-size: 11px; color: var(--gold-dim); margin-top: 2px; }
+  .btn-copy { background: transparent; border: 1px solid var(--border); color: var(--gold-dim); padding: 5px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: 'DM Mono', monospace; transition: all 0.15s; }
+  .btn-copy:hover { border-color: var(--gold-dim); color: var(--gold); }
+  .result-content { padding: 20px; color: var(--cream); max-height: 75vh; overflow-y: auto; }
+  .comp-section { margin-bottom: 24px; }
+  .comp-section-title { font-family: 'DM Serif Display', serif; font-size: 14px; color: var(--white); margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .comp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .comp-table th { text-align: left; padding: 7px 10px; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold-dim); font-weight: 500; border-bottom: 1px solid var(--border); font-family: 'DM Mono', monospace; }
+  .comp-table td { padding: 8px 10px; border-bottom: 1px solid rgba(201,168,76,0.06); vertical-align: middle; line-height: 1.4; }
+  .comp-table tr:last-child td { border-bottom: none; }
+  .row-red td { background: rgba(224,92,92,0.10); }
+  .row-red td:first-child { border-left: 3px solid var(--error); }
+  .row-orange td { background: rgba(224,160,60,0.08); }
+  .row-orange td:first-child { border-left: 3px solid #e0a03c; }
+  .row-green td { background: rgba(76,175,130,0.06); }
+  .row-green td:first-child { border-left: 3px solid var(--success); }
+  .row-neutral td { background: transparent; }
+  .row-neutral td:first-child { border-left: 3px solid transparent; }
+  .tag-qual { display: inline-block; font-size: 9px; padding: 2px 6px; border-radius: 3px; letter-spacing: 0.5px; text-transform: uppercase; font-family: 'DM Mono', monospace; font-weight: 500; white-space: nowrap; }
+  .tag-red { background: rgba(224,92,92,0.2); color: #e05c5c; border: 1px solid rgba(224,92,92,0.3); }
+  .tag-orange { background: rgba(224,160,60,0.2); color: #e0a03c; border: 1px solid rgba(224,160,60,0.3); }
+  .tag-green { background: rgba(76,175,130,0.2); color: var(--success); border: 1px solid rgba(76,175,130,0.3); }
+  .tag-gray { background: rgba(255,255,255,0.06); color: #6a7a90; border: 1px solid rgba(255,255,255,0.1); }
+  .check-cell { width: 32px; text-align: center; }
+  .check-cell input[type="checkbox"] { width: 15px; height: 15px; cursor: pointer; accent-color: var(--error); }
+  .check-cell-bailleur input[type="checkbox"] { accent-color: #e0a03c; }
+  .selection-hint { background: rgba(224,92,92,0.08); border: 1px solid rgba(224,92,92,0.2); border-radius: 8px; padding: 10px 16px; font-size: 11px; color: #e07070; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .selection-hint-bailleur { background: rgba(224,160,60,0.08); border: 1px solid rgba(224,160,60,0.2); color: #c8903a; }
+  .btn-valider { width: 100%; background: var(--error); color: var(--white); border: none; border-radius: 8px; padding: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.2s; margin-top: 12px; }
+  .btn-valider:hover { background: #c84a4a; }
+  .synthese-box { background: var(--navy-light); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; font-size: 12px; line-height: 1.6; color: var(--cream); }
+  .bailleur-section { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .bailleur-title { font-family: 'DM Serif Display', serif; font-size: 15px; color: #e0a03c; margin-bottom: 4px; }
+  .bailleur-subtitle { font-size: 11px; color: #6a7a90; margin-bottom: 12px; }
+  .empty-state { text-align: center; padding: 30px 20px; color: #4a5a70; font-size: 13px; display: none; }
+  .empty-state.visible { display: block; }
 </style>
 </head>
 <body>
@@ -554,9 +634,54 @@
         <span>ℹ️</span>
         <span>Seuls les rapports associés à votre organisation sont accessibles. Recherchez par adresse ou nom de locataire.</span>
       </div>
-      <div style="background:var(--navy-mid);border:1px solid var(--border);border-radius:10px;padding:32px;text-align:center;color:#4a5a70;font-size:13px">
-        L'outil comparatif est chargé ici — il affichera uniquement vos biens.<br>
-        <span style="font-size:11px;margin-top:8px;display:block">(Intégration en cours)</span>
+
+      <!-- RECHERCHE -->
+      <div class="search-wrap">
+        <input type="text" id="compSearchInput" placeholder="Nom du locataire ou adresse du bien…" autocomplete="off">
+        <span class="search-icon">⌕</span>
+      </div>
+      <div class="search-hint">Saisir au moins 2 caractères · Recherche sur nom du locataire et adresse</div>
+      <div class="search-loading" id="compSearchLoading">Recherche en cours…</div>
+      <div class="error-msg" id="compErrorMsg"></div>
+      <div class="results-list" id="compResultsList">
+        <div class="empty-state visible" id="compEmptyState">Les rapports apparaîtront ici après votre recherche.</div>
+      </div>
+
+      <!-- SÉLECTION -->
+      <div class="section-label" style="margin-top:16px">Sélection</div>
+      <div class="selection-summary">
+        <div class="selection-slot" id="compSlotEdle">
+          <div class="slot-label edle-label">EDL Entrée</div>
+          <div class="slot-value" id="compSlotEdleValue" style="color:#4a5a70">Non sélectionné</div>
+          <div class="slot-sub" id="compSlotEdleSub"></div>
+        </div>
+        <div class="selection-slot" id="compSlotEdls">
+          <div class="slot-label edls-label">EDL Sortie</div>
+          <div class="slot-value" id="compSlotEdlsValue" style="color:#4a5a70">Non sélectionné</div>
+          <div class="slot-sub" id="compSlotEdlsSub"></div>
+        </div>
+      </div>
+
+      <!-- ANALYSE -->
+      <div class="section-label">Analyse IA</div>
+      <button class="btn-submit" id="compBtnAnalyze" disabled style="width:100%;margin-bottom:24px">Lancer la comparaison Claude IA</button>
+
+      <div class="loading-state" id="compLoadingState">
+        <div class="spinner"></div>
+        <div>Récupération et analyse des rapports…</div>
+        <div style="font-size:11px;margin-top:6px;color:#4a5a70">Cela peut prendre 15 à 30 secondes</div>
+      </div>
+
+      <!-- RÉSULTAT -->
+      <div class="result-panel" id="compResultPanel">
+        <div class="result-panel-header">
+          <div>
+            <div class="result-panel-title">Rapport de comparaison</div>
+            <div class="result-panel-sub" id="compResultPanelSub"></div>
+          </div>
+          <button class="btn-copy" id="compBtnCopy">Copier</button>
+        </div>
+        <div class="result-content" id="compResultContent"></div>
       </div>
     </div>
 
@@ -746,6 +871,312 @@ function formatDate(dateStr) {
   const [y, m, d] = dateStr.split('-');
   return `${d}/${m}/${y}`;
 }
+
+// ══════════════════════════════════════
+// ── COMPARATIF EDL ──
+// ══════════════════════════════════════
+
+const ROOM_TYPES = {
+  entrance: 'Entrée', toilet: 'WC', bathroom: 'Salle de bain',
+  living_room: 'Séjour', kitchen: 'Cuisine', bedroom: 'Chambre',
+  balcony: 'Balcon', terrasse: 'Terrasse', cellar: 'Cave',
+  carpark: 'Parking', box: 'Box', garage: 'Garage', garden: 'Jardin',
+  laundry_room: 'Buanderie', hall: 'Hall', other: 'Autre',
+  private_office: 'Bureau', open_space: 'Espace ouvert',
+  meeting_room: 'Salle de réunion', shared_areas: 'Parties communes',
+};
+const CONDITIONS = { excellent: 'Excellent', good: 'Bon', used: 'Usé', poor: 'Mauvais', missing: 'Absent' };
+const CLEAN_STATES = { clean: 'Propre', to_clean: 'À nettoyer' };
+const OP_STATES = { working: 'Fonctionnel', not_working: 'Défaillant', not_tested: 'Non testé', unable_to_test: 'Inaccessible' };
+const STATUSES_FR = { delivered: 'Remis', draft: 'Brouillon', finalized: 'Finalisé' };
+
+let compSelectedEdle = null;
+let compSelectedEdls = null;
+let compSearchTimeout = null;
+let compReportCache = {};
+
+const compSearchInput = document.getElementById('compSearchInput');
+const compResultsList = document.getElementById('compResultsList');
+const compEmptyState = document.getElementById('compEmptyState');
+const compSearchLoading = document.getElementById('compSearchLoading');
+const compErrorMsg = document.getElementById('compErrorMsg');
+const compBtnAnalyze = document.getElementById('compBtnAnalyze');
+const compLoadingState = document.getElementById('compLoadingState');
+const compResultPanel = document.getElementById('compResultPanel');
+const compResultContent = document.getElementById('compResultContent');
+const compResultPanelSub = document.getElementById('compResultPanelSub');
+const compBtnCopy = document.getElementById('compBtnCopy');
+
+compSearchInput.addEventListener('input', () => {
+  clearTimeout(compSearchTimeout);
+  const term = compSearchInput.value.trim();
+  if (term.length < 2) { compShowEmpty('Saisir au moins 2 caractères.'); return; }
+  compSearchTimeout = setTimeout(() => compDoSearch(term), 400);
+});
+
+async function compDoSearch(term) {
+  compSearchLoading.classList.add('visible');
+  compErrorMsg.classList.remove('visible');
+  compResultsList.querySelectorAll('.result-card').forEach(c => c.remove());
+  compEmptyState.classList.remove('visible');
+  try {
+    const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=search&search_term=${encodeURIComponent(term)}`);
+    const data = await res.json();
+    compSearchLoading.classList.remove('visible');
+    if (!res.ok) throw new Error(data.detail || data.error || 'Erreur API');
+    const reports = data.data || [];
+    if (reports.length === 0) { compShowEmpty('Aucun rapport trouvé.'); return; }
+    const enriched = await compEnrichWithSignatories(reports.slice(0, 20));
+    compRenderResults(enriched);
+  } catch (e) {
+    compSearchLoading.classList.remove('visible');
+    compErrorMsg.textContent = 'Erreur : ' + e.message;
+    compErrorMsg.classList.add('visible');
+    compShowEmpty('');
+  }
+}
+
+async function compEnrichWithSignatories(reports) {
+  const results = await Promise.allSettled(reports.map(async r => {
+    try {
+      const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=get_signatories&inspection_report_id=${r.id}`);
+      const data = await res.json();
+      r._tenants = (data.data || []).filter(s => s.type === 'tenant').map(s => [s.first_name, s.last_name].filter(Boolean).join(' ')).filter(Boolean);
+    } catch { r._tenants = []; }
+    return r;
+  }));
+  return results.map(r => r.status === 'fulfilled' ? r.value : r.reason);
+}
+
+function compRenderResults(reports) {
+  reports.sort((a, b) => (a.type === 'residential_lease_check_in' ? 0 : 1) - (b.type === 'residential_lease_check_in' ? 0 : 1));
+  reports.forEach(r => {
+    const isEdle = r.type === 'residential_lease_check_in';
+    const addr = compFormatAddress(r.property?.address);
+    const date = r.date || r.check_in_date || r.created_at?.slice(0, 10) || '—';
+    const tenants = r._tenants?.join(', ') || '';
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.dataset.id = r.id;
+    card.innerHTML = `
+      <span class="result-type-badge ${isEdle ? 'badge-edle' : 'badge-edls'}">${isEdle ? 'EDL Entrée' : 'EDL Sortie'}</span>
+      <div class="result-info">
+        <div class="result-address">${addr}</div>
+        <div class="result-meta">
+          <span><span class="status-dot dot-${r.status}"></span> ${STATUSES_FR[r.status] || r.status}</span>
+          <span>📅 ${date}</span>
+          ${r.property?.surface_area ? `<span>${r.property.surface_area} m²</span>` : ''}
+        </div>
+      </div>
+      ${tenants ? `<div class="result-tenants">👤 ${tenants}</div>` : ''}
+      <div class="result-select-indicator">✓</div>`;
+    card.addEventListener('click', () => compToggleSelect(r, card, isEdle ? 'edle' : 'edls'));
+    compResultsList.appendChild(card);
+    if (compSelectedEdle?.id === r.id) card.classList.add('selected-edle');
+    if (compSelectedEdls?.id === r.id) card.classList.add('selected-edls');
+  });
+}
+
+function compToggleSelect(report, card, type) {
+  if (type === 'edle') {
+    if (compSelectedEdle?.id === report.id) { compSelectedEdle = null; card.classList.remove('selected-edle'); compUpdateSlot('edle', null); }
+    else { if (compSelectedEdle) document.querySelector(`[data-id="${compSelectedEdle.id}"]`)?.classList.remove('selected-edle'); compSelectedEdle = report; card.classList.add('selected-edle'); compUpdateSlot('edle', report); }
+  } else {
+    if (compSelectedEdls?.id === report.id) { compSelectedEdls = null; card.classList.remove('selected-edls'); compUpdateSlot('edls', null); }
+    else { if (compSelectedEdls) document.querySelector(`[data-id="${compSelectedEdls.id}"]`)?.classList.remove('selected-edls'); compSelectedEdls = report; card.classList.add('selected-edls'); compUpdateSlot('edls', report); }
+  }
+  compBtnAnalyze.disabled = !(compSelectedEdle && compSelectedEdls);
+}
+
+function compUpdateSlot(type, report) {
+  const slot = document.getElementById(type === 'edle' ? 'compSlotEdle' : 'compSlotEdls');
+  const val = document.getElementById(type === 'edle' ? 'compSlotEdleValue' : 'compSlotEdlsValue');
+  const sub = document.getElementById(type === 'edle' ? 'compSlotEdleSub' : 'compSlotEdlsSub');
+  if (report) {
+    slot.className = 'selection-slot ' + (type === 'edle' ? 'filled-edle' : 'filled-edls');
+    val.style.color = ''; val.textContent = compFormatAddress(report.property?.address);
+    sub.textContent = (report.date || report.check_in_date || '—') + ' · ' + (STATUSES_FR[report.status] || report.status);
+  } else {
+    slot.className = 'selection-slot'; val.style.color = '#4a5a70'; val.textContent = 'Non sélectionné'; sub.textContent = '';
+  }
+}
+
+compBtnAnalyze.addEventListener('click', async () => {
+  if (!compSelectedEdle || !compSelectedEdls) return;
+  compBtnAnalyze.disabled = true;
+  compLoadingState.classList.add('visible');
+  compResultPanel.classList.remove('visible');
+  compErrorMsg.classList.remove('visible');
+  try {
+    const [edleData, edlsData] = await Promise.all([compFetchReport(compSelectedEdle.id), compFetchReport(compSelectedEdls.id)]);
+    const analysis = await compCallClaude(edleData, edlsData);
+    compLoadingState.classList.remove('visible');
+    compRenderAnalysis(analysis, edleData, edlsData);
+    compResultPanelSub.textContent = `${compFormatAddress(compSelectedEdls.property?.address)} · Entrée ${compSelectedEdle.date || '?'} → Sortie ${compSelectedEdls.date || '?'}`;
+    compResultPanel.classList.add('visible');
+    compResultPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    compLoadingState.classList.remove('visible');
+    compErrorMsg.textContent = 'Erreur : ' + e.message;
+    compErrorMsg.classList.add('visible');
+  }
+  compBtnAnalyze.disabled = false;
+});
+
+async function compFetchReport(id) {
+  if (compReportCache[id]) return compReportCache[id];
+  const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=get_report&inspection_report_id=${id}`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.detail || data.error || 'Erreur récupération');
+  compReportCache[id] = data;
+  return data;
+}
+
+async function compCallClaude(edle, edls) {
+  const addr = compFormatAddress(edls.property?.address);
+  const tenants = (edls.signatories || []).filter(s => s.type === 'tenant').map(s => [s.first_name, s.last_name].filter(Boolean).join(' ')).join(', ') || 'Non renseigné';
+  const edleRooms = compExtractRooms(edle);
+  const edlsRooms = compExtractRooms(edls);
+
+  const prompt = `Tu es expert en états des lieux immobiliers en France, spécialisé dans la loi ALUR et le décret du 30 mars 2016.
+
+BIEN : ${addr}
+LOCATAIRE(S) : ${tenants}
+DATE EDL ENTREE : ${edle.date || edle.check_in_date || '?'}
+DATE EDL SORTIE : ${edls.date || '?'}
+SURFACE : ${edls.property?.surface_area || '?'} m²
+MEUBLÉ : ${edls.property?.furnished ? 'Oui' : 'Non'}
+
+EDL ENTRÉE :
+${edleRooms}
+
+EDL SORTIE :
+${edlsRooms}
+
+RÈGLE ABSOLUE N°1 — PAS D'AGGRAVATION = NON IMPUTABLE :
+Un élément est "imputable" UNIQUEMENT si la situation s'est AGGRAVÉE par rapport à l'entrée. Si les observations sont identiques ou quasi-identiques entre entrée et sortie (même si la note a changé), qualifier en "usure_normale". Si problème mentionné à l'entrée et non renseigné à la sortie → "usure_normale".
+
+RÈGLE ABSOLUE N°2 — VÉTUSTÉ :
+La vétusté (usure_normale) ne s'applique QUE si la durée d'occupation >= 10 ans. Si durée < 10 ans : toute dégradation NOUVELLE est "imputable". Sont TOUJOURS imputables quelle que soit la durée : salissures, moisissures nouvelles, joints nouveaux sales, trous/rayures/brûlures nouveaux.
+
+Retourne UNIQUEMENT un JSON valide :
+{"elements":[{"piece":"...","element":"...","etat_entree":"...","etat_sortie":"...","qualification":"imputable|usure_normale|amelioration|disparu|ok","commentaire":"..."}],"synthese":{"niveau_global":"BON|MOYEN|DÉGRADÉ","nb_imputables":0,"nb_bailleur":0,"resume":"..."}}`;
+
+  const res = await fetch(`${PROXY_BASE}/claude-proxy`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: 'claude-haiku-4-5', max_tokens: 4000, messages: [{ role: 'user', content: prompt }] })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error?.message || 'Erreur Claude');
+  const text = data.content?.[0]?.text || '{}';
+  try { const clean = text.replace(/^```json\s*/,'').replace(/```\s*$/,'').trim(); return JSON.parse(clean); }
+  catch { return { erreur_parsing: text }; }
+}
+
+function compRenderAnalysis(json, edle, edls) {
+  if (json.erreur_parsing) { compResultContent.innerHTML = `<div style="white-space:pre-wrap;font-size:12px">${json.erreur_parsing}</div>`; return; }
+  const elements = json.elements || [];
+  const locataire = elements.filter(e => e.qualification === 'imputable' || e.qualification === 'disparu');
+  const bailleur = elements.filter(e => e.qualification === 'usure_normale' || e.qualification === 'ok');
+  const amelio = elements.filter(e => e.qualification === 'amelioration');
+  const qualifConfig = {
+    imputable: { label: 'Imputable locataire', tagClass: 'tag-red', rowClass: 'row-red' },
+    disparu: { label: 'Élément disparu', tagClass: 'tag-red', rowClass: 'row-red' },
+    usure_normale: { label: 'Usure / bailleur', tagClass: 'tag-orange', rowClass: 'row-orange' },
+    amelioration: { label: 'Amélioration', tagClass: 'tag-green', rowClass: 'row-green' },
+    ok: { label: 'Sans changement', tagClass: 'tag-gray', rowClass: 'row-neutral' },
+  };
+  function groupByPiece(arr) { const g = {}; arr.forEach(el => { const p = el.piece || 'Général'; if (!g[p]) g[p] = []; g[p].push(el); }); return g; }
+  const addr = compFormatAddress(compSelectedEdls?.property?.address || {});
+  const tenantName = (edls.signatories || []).filter(s => s.type === 'tenant').map(s => [s.first_name, s.last_name].filter(Boolean).join(' ')).join(', ') || 'Locataire';
+  let html = '';
+  // Section locataire
+  html += `<div class="comp-section"><div class="comp-section-title" style="color:var(--error)">▸ Dégradations imputables au locataire</div>`;
+  html += `<div class="selection-hint"><span>☑</span><span>Cochez les dégradations à faire chiffrer, puis cliquez sur <strong>Envoyer pour chiffrage</strong>.</span></div>`;
+  if (locataire.length === 0) { html += `<div style="color:#4a5a70;font-size:12px;padding:10px 0">Aucune dégradation imputable identifiée.</div>`; }
+  else {
+    Object.entries(groupByPiece(locataire)).forEach(([piece, els]) => {
+      html += `<div style="margin-bottom:14px"><div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#6a7a90;margin-bottom:5px">▸ ${piece}</div><table class="comp-table"><thead><tr><th class="check-cell">✓</th><th>Élément</th><th>Entrée</th><th>Sortie</th><th>Qualification</th><th>Commentaire</th></tr></thead><tbody>`;
+      els.forEach((el, i) => {
+        const cfg = qualifConfig[el.qualification] || qualifConfig.imputable;
+        html += `<tr class="${cfg.rowClass}"><td class="check-cell"><input type="checkbox" class="chk-loc" data-piece="${el.piece}" data-element="${el.element}" data-entree="${el.etat_entree||''}" data-sortie="${el.etat_sortie||''}" data-commentaire="${el.commentaire||''}"></td><td><strong>${el.element||'—'}</strong></td><td>${el.etat_entree||'—'}</td><td>${el.etat_sortie||'—'}</td><td><span class="tag-qual ${cfg.tagClass}">${cfg.label}</span></td><td style="color:#a0b0c0;font-size:11px">${el.commentaire||''}</td></tr>`;
+      });
+      html += `</tbody></table></div>`;
+    });
+  }
+  if (amelio.length > 0) {
+    html += `<div style="margin-top:10px"><div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#4caf82;margin-bottom:5px">▸ Améliorations</div><table class="comp-table"><thead><tr><th>Élément</th><th>Détail</th><th>Commentaire</th></tr></thead><tbody>`;
+    amelio.forEach(el => { html += `<tr class="row-green"><td><strong>${el.element||'—'}</strong></td><td>${el.etat_sortie||'—'}</td><td style="color:#a0b0c0;font-size:11px">${el.commentaire||''}</td></tr>`; });
+    html += `</tbody></table></div>`;
+  }
+  html += `</div>`;
+  html += `<div style="margin-bottom:28px"><button class="btn-valider" id="compBtnValLoc">✉ Envoyer les dégradations sélectionnées pour chiffrage</button></div>`;
+  // Section bailleur
+  html += `<div class="bailleur-section"><div class="bailleur-title">▸ Remises en état à la charge du bailleur</div><div class="bailleur-subtitle">Éléments relevant de l'usure normale — non retenus sur le dépôt de garantie.</div>`;
+  html += `<div class="selection-hint selection-hint-bailleur"><span>☑</span><span>Cochez les éléments pour lesquels vous souhaitez demander un chiffrage bailleur.</span></div>`;
+  if (bailleur.length === 0) { html += `<div style="color:#4a5a70;font-size:12px;padding:10px 0">Aucun élément à la charge du bailleur identifié.</div>`; }
+  else {
+    Object.entries(groupByPiece(bailleur)).forEach(([piece, els]) => {
+      html += `<div style="margin-bottom:14px"><div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#6a7a90;margin-bottom:5px">▸ ${piece}</div><table class="comp-table"><thead><tr><th class="check-cell check-cell-bailleur">✓</th><th>Élément</th><th>Entrée</th><th>Sortie</th><th>Commentaire</th></tr></thead><tbody>`;
+      els.forEach(el => { html += `<tr class="row-orange"><td class="check-cell check-cell-bailleur"><input type="checkbox" class="chk-bail" data-piece="${el.piece}" data-element="${el.element}" data-entree="${el.etat_entree||''}" data-sortie="${el.etat_sortie||''}" data-commentaire="${el.commentaire||''}"></td><td><strong>${el.element||'—'}</strong></td><td>${el.etat_entree||'—'}</td><td>${el.etat_sortie||'—'}</td><td style="color:#a0b0c0;font-size:11px">${el.commentaire||''}</td></tr>`; });
+      html += `</tbody></table></div>`;
+    });
+  }
+  html += `<button class="btn-valider" id="compBtnValBail" style="background:#e0a03c;margin-top:8px">✉ Envoyer les remises en état bailleur pour chiffrage</button></div>`;
+  compResultContent.innerHTML = html;
+  // Mail locataire
+  document.getElementById('compBtnValLoc')?.addEventListener('click', () => {
+    const checked = [...document.querySelectorAll('.chk-loc:checked')];
+    if (checked.length === 0) { alert('Veuillez cocher au moins une dégradation.'); return; }
+    const lignes = checked.map(c => '• ' + c.dataset.piece + ' — ' + c.dataset.element + '\n  Entrée : ' + c.dataset.entree + '\n  Sortie : ' + c.dataset.sortie + '\n  Note : ' + c.dataset.commentaire).join('\n\n');
+    const body = 'Bonjour,\n\nVeuillez trouver ci-dessous le détail des dégradations imputables au locataire pour le bien situé au ' + addr + ' (locataire : ' + tenantName + '), pour chiffrage.\n\n━━ PARTIE LOCATAIRE ━━\n\n' + lignes + '\n\nCordialement,\nEPI Expertises Immobilières';
+    window.location.href = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage dégradations locataire — ' + addr + ' — ' + tenantName)}&body=${encodeURIComponent(body)}`;
+  });
+  // Mail bailleur
+  document.getElementById('compBtnValBail')?.addEventListener('click', () => {
+    const checked = [...document.querySelectorAll('.chk-bail:checked')];
+    if (checked.length === 0) { alert('Veuillez cocher au moins un élément.'); return; }
+    const lignes = checked.map(c => '• ' + c.dataset.piece + ' — ' + c.dataset.element + '\n  Entrée : ' + c.dataset.entree + '\n  Sortie : ' + c.dataset.sortie + '\n  Note : ' + c.dataset.commentaire).join('\n\n');
+    const body = 'Bonjour,\n\nVeuillez trouver ci-dessous le détail des remises en état à la charge du bailleur pour le bien situé au ' + addr + ' (locataire : ' + tenantName + '), pour chiffrage.\n\n━━ PARTIE BAILLEUR ━━\n\n' + lignes + '\n\nCordialement,\nEPI Expertises Immobilières';
+    window.location.href = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage remise en état bailleur — ' + addr + ' — ' + tenantName)}&body=${encodeURIComponent(body)}`;
+  });
+}
+
+function compExtractRooms(report) {
+  const rooms = report.rooms || [];
+  if (rooms.length === 0) return '(Données non disponibles — rapport importé)';
+  return rooms.map(room => {
+    const typeFr = ROOM_TYPES[room.type] || room.type || 'Pièce';
+    const elements = room.elements || [];
+    const elemStr = elements.map(el => {
+      const parts = [`  • ${el.name || '?'}`];
+      if (el.condition) parts.push(`état: ${CONDITIONS[el.condition] || el.condition}`);
+      if (el.cleanliness_state) parts.push(`propreté: ${CLEAN_STATES[el.cleanliness_state] || el.cleanliness_state}`);
+      if (el.operating_state) parts.push(`fonctionnement: ${OP_STATES[el.operating_state] || el.operating_state}`);
+      if (el.defects?.length) parts.push(`défauts: ${el.defects.join(', ')}`);
+      if (el.comment) parts.push(`obs: ${el.comment}`);
+      return parts.join(' | ');
+    }).join('\n');
+    return '[' + typeFr + (room.name ? ' — ' + room.name : '') + ']\n' + (elemStr || '  (aucun élément)');
+  }).join('\n\n');
+}
+
+function compFormatAddress(addr) {
+  if (!addr) return 'Adresse inconnue';
+  return [addr.line_1, addr.line_2, addr.postal_code, addr.city].filter(Boolean).join(', ');
+}
+
+function compShowEmpty(msg) {
+  compResultsList.querySelectorAll('.result-card').forEach(c => c.remove());
+  compEmptyState.textContent = msg;
+  compEmptyState.classList.add('visible');
+}
+
+compBtnCopy.addEventListener('click', () => {
+  navigator.clipboard.writeText(compResultContent.innerText);
+  compBtnCopy.textContent = 'Copié ✓';
+  setTimeout(() => compBtnCopy.textContent = 'Copier', 2000);
+});
 </script>
 </body>
 </html>
