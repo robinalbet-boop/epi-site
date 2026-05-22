@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -11,15 +10,15 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Clé API Nockee manquante' });
   }
 
-  // ── VÉRIFICATION CLIENT AUTORISÉ ──
-  const body = req.method === 'POST' ? req.body : {};
+  const reqBody = req.method === 'POST' ? req.body : {};
   const query = req.query || {};
-  const action = body.action || query.action;
+  const action = reqBody.action || query.action;
 
+  // ── VÉRIFICATION CLIENT AUTORISÉ ──
   if (action === 'check_client') {
     const clientsRaw = process.env.CLIENTS_AUTORISES || '';
     const clients = clientsRaw.split(',').map(c => c.trim().toUpperCase());
-    const nom = (body.nom || query.nom || '').trim().toUpperCase();
+    const nom = (reqBody.nom || query.nom || '').trim().toUpperCase();
     const found = clients.find(c => c === nom || nom.includes(c) || c.includes(nom));
     return res.status(200).json({ autorise: !!found, nom: found || null });
   }
@@ -27,43 +26,28 @@ export default async function handler(req, res) {
   const BASE_URL = 'https://api.nockee.eu/v2';
 
   try {
-    // Routing selon l'action demandée
-    const { action, search_term, inspection_report_id, source_id } = req.method === 'POST'
-      ? req.body
-      : req.query;
+    const search_term = reqBody.search_term || query.search_term;
+    const inspection_report_id = reqBody.inspection_report_id || query.inspection_report_id;
+    const source_id = reqBody.source_id || query.source_id;
 
-    let url, method = 'GET', body = null;
+    let url, method = 'GET', fetchBody = null;
 
     if (action === 'search') {
-      // Recherche par nom signataire ET adresse
-      const params = new URLSearchParams({
-        limit: '20',
-        search_fields: 'signatory_name',
-        search_fields: 'address',
-      });
-      if (search_term) params.set('search_term', search_term);
-      // On ajoute les deux search_fields manuellement (URLSearchParams écrase les doublons)
-      const urlStr = `${BASE_URL}/inspection_reports?limit=20&search_fields=signatory_name&search_fields=address${search_term ? '&search_term=' + encodeURIComponent(search_term) : ''}`;
-      url = urlStr;
+      url = `${BASE_URL}/inspection_reports?limit=20&search_fields=signatory_name&search_fields=address${search_term ? '&search_term=' + encodeURIComponent(search_term) : ''}`;
 
     } else if (action === 'get_report') {
-      // Récupérer un rapport complet avec pièces et éléments
       url = `${BASE_URL}/inspection_reports/${inspection_report_id}?expand=rooms&expand=rooms__elements&expand=signatories&expand=keys&expand=meters`;
 
     } else if (action === 'compare') {
-      // Comparer deux rapports via l'API Nockee native
       url = `${BASE_URL}/inspection_reports/${inspection_report_id}/compare`;
       method = 'POST';
-      body = JSON.stringify({ source: { inspection_report: source_id }, output_format: 'json' });
+      fetchBody = JSON.stringify({ source: { inspection_report: source_id }, output_format: 'json' });
 
     } else if (action === 'get_signatories') {
       url = `${BASE_URL}/inspection_report_signatories?inspection_report=${inspection_report_id}`;
 
     } else if (action === 'create_report') {
-      // Créer un rapport depuis le formulaire client
-      const { type, scheduled_at, display_name, address, proprietaire, locataire, email_locataire, observations, client } = req.body;
-
-      // Parser l'adresse (format "4 rue X, 92200 Ville")
+      const { type, scheduled_at, display_name, address, observations } = reqBody;
       const addrParts = (address || '').split(',');
       const line1 = (addrParts[0] || '').trim();
       const cityPart = (addrParts[1] || '').trim();
@@ -73,7 +57,7 @@ export default async function handler(req, res) {
 
       url = `${BASE_URL}/inspection_reports`;
       method = 'POST';
-      body = JSON.stringify({
+      fetchBody = JSON.stringify({
         type,
         scheduled_at,
         display_name,
@@ -95,7 +79,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
     };
-    if (body) fetchOptions.body = body;
+    if (fetchBody) fetchOptions.body = fetchBody;
 
     const response = await fetch(url, fetchOptions);
     const data = await response.json();
