@@ -383,17 +383,30 @@
       </div>
       <div class="form-grid">
         <div class="form-group">
-          <label class="form-label">Heure souhaitée</label>
-          <input type="time" class="form-input" id="edlHeure" value="10:00">
-        </div>
-        <div class="form-group">
           <label class="form-label">Type de bien</label>
           <select class="form-select" id="edlBienType">
-            <option value="flat">Appartement</option>
-            <option value="house">Maison</option>
-            <option value="office">Bureau</option>
-            <option value="other">Autre</option>
+            <option value="T1 Vide">T1 Vide</option>
+            <option value="T1 Meublé">T1 Meublé</option>
+            <option value="T2 Vide">T2 Vide</option>
+            <option value="T2 Meublé">T2 Meublé</option>
+            <option value="T3 Vide">T3 Vide</option>
+            <option value="T3 Meublé">T3 Meublé</option>
+            <option value="T4 Vide">T4 Vide</option>
+            <option value="T4 Meublé">T4 Meublé</option>
+            <option value="T5 Vide">T5 Vide</option>
+            <option value="T5 Meublé">T5 Meublé</option>
+            <option value="Studio Vide">Studio Vide</option>
+            <option value="Studio Meublé">Studio Meublé</option>
+            <option value="Maison Vide">Maison Vide</option>
+            <option value="Maison Meublée">Maison Meublée</option>
+            <option value="Local commercial">Local commercial</option>
+            <option value="Bureau">Bureau</option>
+            <option value="Autre">Autre</option>
           </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date souhaitée</label>
+          <input type="date" class="form-input" id="edlDate2">
         </div>
       </div>
       <div class="form-grid full">
@@ -638,7 +651,7 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwaymhTqFw5_ydB
 async function submitEdl() {
   const type = document.getElementById('edlType').value;
   const date = document.getElementById('edlDate').value;
-  const heure = document.getElementById('edlHeure').value;
+  const typeBien = document.getElementById('edlBienType').value;
   const adresse = document.getElementById('edlAdresse').value.trim();
   const proprietaire = document.getElementById('edlProprietaire').value.trim();
   const locataire = document.getElementById('edlLocataire').value.trim();
@@ -646,8 +659,8 @@ async function submitEdl() {
   const telLocataire = document.getElementById('edlTelLocataire').value.trim();
   const observations = document.getElementById('edlObservations').value.trim();
 
-  if (!date || !adresse || !locataire) {
-    alert("Veuillez renseigner au minimum la date, l'adresse et le nom du locataire.");
+  if (!adresse || !locataire) {
+    alert("Veuillez renseigner au minimum l'adresse et le nom du locataire.");
     return;
   }
 
@@ -665,21 +678,23 @@ async function submitEdl() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         client: currentClient,
-        type,
+        type: typeFr,
+        type_bien: typeBien,
         address: adresse,
         proprietaire,
         locataire,
         email_locataire: emailLocataire,
         tel_locataire: telLocataire,
         date,
-        heure,
         observations,
       })
     });
 
     document.getElementById('edlConfirmDetail').innerHTML =
-      'Demande <strong>' + displayName + '</strong> enregistrée pour le <strong>' + formatDate(date) + ' à ' + heure + '</strong>.<br>' +
+      'Demande <strong>' + displayName + '</strong> enregistrée' +
+      (date ? ' pour le <strong>' + formatDate(date) + '</strong>' : '') + '.<br>' +
       'Adresse : ' + adresse + '<br>' +
+      'Type de bien : ' + typeBien + '<br>' +
       'Un mail de confirmation a été envoyé à EPI.' +
       (observations ? '<br>Note : ' + observations : '');
     document.getElementById('edlConfirm').classList.add('visible');
