@@ -917,73 +917,178 @@ Retourne UNIQUEMENT un JSON valide :
 }
 
 function compRenderAnalysis(json, edle, edls) {
-  if (json.erreur_parsing) { compResultContent.innerHTML = `<div style="white-space:pre-wrap;font-size:12px">${json.erreur_parsing}</div>`; return; }
+  if (json.erreur_parsing) {
+    compResultContent.innerHTML = `<div style="white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:12px">${json.erreur_parsing}</div>`;
+    return;
+  }
+
   const elements = json.elements || [];
+  const synthese = json.synthese || {};
+
+  // Séparer locataire vs bailleur
   const locataire = elements.filter(e => e.qualification === 'imputable' || e.qualification === 'disparu');
-  const bailleur = elements.filter(e => e.qualification === 'usure_normale' || e.qualification === 'ok');
-  const amelio = elements.filter(e => e.qualification === 'amelioration');
+  const bailleur   = elements.filter(e => e.qualification === 'usure_normale' || e.qualification === 'ok');
+  const amelio     = elements.filter(e => e.qualification === 'amelioration');
+
   const qualifConfig = {
-    imputable: { label: 'Imputable locataire', tagClass: 'tag-red', rowClass: 'row-red' },
-    disparu: { label: 'Élément disparu', tagClass: 'tag-red', rowClass: 'row-red' },
-    usure_normale: { label: 'Usure / bailleur', tagClass: 'tag-orange', rowClass: 'row-orange' },
-    amelioration: { label: 'Amélioration', tagClass: 'tag-green', rowClass: 'row-green' },
-    ok: { label: 'Sans changement', tagClass: 'tag-gray', rowClass: 'row-neutral' },
+    imputable:     { label: 'Imputable locataire', tagClass: 'tag-red',    rowClass: 'row-red' },
+    disparu:       { label: 'Élément disparu',      tagClass: 'tag-red',    rowClass: 'row-red' },
+    usure_normale: { label: 'Usure / bailleur',     tagClass: 'tag-orange', rowClass: 'row-orange' },
+    amelioration:  { label: 'Amélioration',          tagClass: 'tag-green',  rowClass: 'row-green' },
+    ok:            { label: 'Sans changement',        tagClass: 'tag-gray',   rowClass: 'row-neutral' },
   };
-  function groupByPiece(arr) { const g = {}; arr.forEach(el => { const p = el.piece || 'Général'; if (!g[p]) g[p] = []; g[p].push(el); }); return g; }
+
+  // Grouper par pièce
+  function groupByPiece(arr) {
+    const g = {};
+    arr.forEach(el => { const p = el.piece || 'Général'; if (!g[p]) g[p] = []; g[p].push(el); });
+    return g;
+  }
+
   const addr = compFormatAddress(compSelectedEdls?.property?.address || {});
-  const tenantName = (edls.signatories || []).filter(s => s.type === 'tenant').map(s => [s.first_name, s.last_name].filter(Boolean).join(' ')).join(', ') || 'Locataire';
+  const tenantName = (edls.signatories || [])
+    .filter(s => s.type === 'tenant')
+    .map(s => [s.first_name, s.last_name].filter(Boolean).join(' '))
+    .join(', ') || 'Locataire';
+
   let html = '';
-  // Section locataire
-  html += `<div class="comp-section"><div class="comp-section-title" style="color:var(--error)">▸ Dégradations imputables au locataire</div>`;
-  html += `<div class="selection-hint"><span>☑</span><span>Cochez les dégradations à faire chiffrer, puis cliquez sur <strong>Envoyer pour chiffrage</strong>.</span></div>`;
-  if (locataire.length === 0) { html += `<div style="color:#4a5a70;font-size:12px;padding:10px 0">Aucune dégradation imputable identifiée.</div>`; }
-  else {
-    Object.entries(groupByPiece(locataire)).forEach(([piece, els]) => {
-      html += `<div style="margin-bottom:14px"><div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#6a7a90;margin-bottom:5px">▸ ${piece}</div><table class="comp-table"><thead><tr><th class="check-cell">✓</th><th>Élément</th><th>Entrée</th><th>Sortie</th><th>Qualification</th><th>Commentaire</th></tr></thead><tbody>`;
+
+  // ── SYNTHÈSE ──
+
+  // ── TABLEAU LOCATAIRE ──
+  html += `
+    <div class="comp-section">
+      <div class="comp-section-title" style="color:var(--error)">▸ Dégradations imputables au locataire</div>
+      <div class="selection-hint">
+        <span class="selection-hint-icon">☑</span>
+        <span>Cochez les dégradations que vous souhaitez faire chiffrer, puis cliquez sur <strong>Envoyer pour chiffrage</strong> en bas de page.</span>
+      </div>`;
+
+  if (locataire.length === 0) {
+    html += `<div style="color:#4a5a70;font-size:13px;padding:12px 0">Aucune dégradation imputable au locataire identifiée.</div>`;
+  } else {
+    const byPiece = groupByPiece(locataire);
+    Object.entries(byPiece).forEach(([piece, els]) => {
+      html += `
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#6a7a90;margin-bottom:6px">▸ ${piece}</div>
+        <table class="comp-table">
+          <thead><tr>
+            <th class="check-cell">Chiffrer</th>
+            <th>Élément</th><th>À l'entrée</th><th>À la sortie</th><th>Qualification</th><th>Commentaire</th>
+          </tr></thead>
+          <tbody>`;
       els.forEach((el, i) => {
         const cfg = qualifConfig[el.qualification] || qualifConfig.imputable;
-        html += `<tr class="${cfg.rowClass}"><td class="check-cell"><input type="checkbox" class="chk-loc" data-piece="${el.piece}" data-element="${el.element}" data-entree="${el.etat_entree||''}" data-sortie="${el.etat_sortie||''}" data-commentaire="${el.commentaire||''}"></td><td><strong>${el.element||'—'}</strong></td><td>${el.etat_entree||'—'}</td><td>${el.etat_sortie||'—'}</td><td><span class="tag-qual ${cfg.tagClass}">${cfg.label}</span></td><td style="color:#a0b0c0;font-size:11px">${el.commentaire||''}</td></tr>`;
+        const uid = `loc_${piece}_${i}`.replace(/\s/g,'_');
+        html += `
+            <tr class="${cfg.rowClass}" data-uid="${uid}">
+              <td class="check-cell"><input type="checkbox" class="chk-loc" data-piece="${el.piece}" data-element="${el.element}" data-entree="${el.etat_entree||''}" data-sortie="${el.etat_sortie||''}" data-commentaire="${el.commentaire||''}"></td>
+              <td><strong>${el.element || '—'}</strong></td>
+              <td>${el.etat_entree || '—'}</td>
+              <td>${el.etat_sortie || '—'}</td>
+              <td><span class="tag-qual ${cfg.tagClass}">${cfg.label}</span></td>
+              <td style="color:#a0b0c0;font-size:12px">${el.commentaire || ''}</td>
+            </tr>`;
       });
       html += `</tbody></table></div>`;
     });
   }
+
+  // Améliorations
   if (amelio.length > 0) {
-    html += `<div style="margin-top:10px"><div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#4caf82;margin-bottom:5px">▸ Améliorations</div><table class="comp-table"><thead><tr><th>Élément</th><th>Détail</th><th>Commentaire</th></tr></thead><tbody>`;
-    amelio.forEach(el => { html += `<tr class="row-green"><td><strong>${el.element||'—'}</strong></td><td>${el.etat_sortie||'—'}</td><td style="color:#a0b0c0;font-size:11px">${el.commentaire||''}</td></tr>`; });
+    html += `<div style="margin-top:12px">
+      <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#4caf82;margin-bottom:6px">▸ Améliorations apportées par le locataire</div>
+      <table class="comp-table"><thead><tr><th>Élément</th><th>Détail</th><th>Commentaire</th></tr></thead><tbody>`;
+    amelio.forEach(el => {
+      html += `<tr class="row-green"><td><strong>${el.element||'—'}</strong></td><td>${el.etat_sortie||'—'}</td><td style="color:#a0b0c0;font-size:12px">${el.commentaire||''}</td></tr>`;
+    });
     html += `</tbody></table></div>`;
   }
-  html += `</div>`;
-  html += `<div style="margin-bottom:28px"><button class="btn-valider" id="compBtnValLoc">✉ Envoyer les dégradations sélectionnées pour chiffrage</button></div>`;
-  // Section bailleur
-  html += `<div class="bailleur-section"><div class="bailleur-title">▸ Remises en état à la charge du bailleur</div><div class="bailleur-subtitle">Éléments relevant de l'usure normale — non retenus sur le dépôt de garantie.</div>`;
-  html += `<div class="selection-hint selection-hint-bailleur"><span>☑</span><span>Cochez les éléments pour lesquels vous souhaitez demander un chiffrage bailleur.</span></div>`;
-  if (bailleur.length === 0) { html += `<div style="color:#4a5a70;font-size:12px;padding:10px 0">Aucun élément à la charge du bailleur identifié.</div>`; }
-  else {
-    Object.entries(groupByPiece(bailleur)).forEach(([piece, els]) => {
-      html += `<div style="margin-bottom:14px"><div style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#6a7a90;margin-bottom:5px">▸ ${piece}</div><table class="comp-table"><thead><tr><th class="check-cell check-cell-bailleur">✓</th><th>Élément</th><th>Entrée</th><th>Sortie</th><th>Commentaire</th></tr></thead><tbody>`;
-      els.forEach(el => { html += `<tr class="row-orange"><td class="check-cell check-cell-bailleur"><input type="checkbox" class="chk-bail" data-piece="${el.piece}" data-element="${el.element}" data-entree="${el.etat_entree||''}" data-sortie="${el.etat_sortie||''}" data-commentaire="${el.commentaire||''}"></td><td><strong>${el.element||'—'}</strong></td><td>${el.etat_entree||'—'}</td><td>${el.etat_sortie||'—'}</td><td style="color:#a0b0c0;font-size:11px">${el.commentaire||''}</td></tr>`; });
+
+  html += `</div>`; // fin section locataire
+
+  // ── BOUTON VALIDER LOCATAIRE ──
+  html += `
+    <div style="margin-bottom:36px">
+      <button class="btn-valider" id="compBtnValLoc">
+        ✉ Envoyer les dégradations sélectionnées pour chiffrage
+      </button>
+    </div>`;
+
+  // ── TABLEAU BAILLEUR ──
+  html += `
+    <div class="bailleur-section">
+      <div class="bailleur-title">▸ Remises en état à la charge du bailleur</div>
+      <div class="bailleur-subtitle">Éléments relevant de l'usure normale ou de la vétusté — non retenus sur le dépôt de garantie mais pouvant nécessiter des travaux.</div>
+      <div class="selection-hint selection-hint-bailleur">
+        <span class="selection-hint-icon">☑</span>
+        <span>Cochez les éléments pour lesquels vous souhaitez demander un chiffrage de remise en état bailleur.</span>
+      </div>`;
+
+  if (bailleur.length === 0) {
+    html += `<div style="color:#4a5a70;font-size:13px;padding:12px 0">Aucun élément à la charge du bailleur identifié.</div>`;
+  } else {
+    const byPiece2 = groupByPiece(bailleur);
+    Object.entries(byPiece2).forEach(([piece, els]) => {
+      html += `
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#6a7a90;margin-bottom:6px">▸ ${piece}</div>
+        <table class="comp-table">
+          <thead><tr>
+            <th class="check-cell check-cell-bailleur">Chiffrer</th>
+            <th>Élément</th><th>À l'entrée</th><th>À la sortie</th><th>Commentaire</th>
+          </tr></thead>
+          <tbody>`;
+      els.forEach((el, i) => {
+        html += `
+            <tr class="row-orange">
+              <td class="check-cell check-cell-bailleur"><input type="checkbox" class="chk-bail" data-piece="${el.piece}" data-element="${el.element}" data-entree="${el.etat_entree||''}" data-sortie="${el.etat_sortie||''}" data-commentaire="${el.commentaire||''}"></td>
+              <td><strong>${el.element || '—'}</strong></td>
+              <td>${el.etat_entree || '—'}</td>
+              <td>${el.etat_sortie || '—'}</td>
+              <td style="color:#a0b0c0;font-size:12px">${el.commentaire || ''}</td>
+            </tr>`;
+      });
       html += `</tbody></table></div>`;
     });
   }
-  html += `<button class="btn-valider" id="compBtnValBail" style="background:#e0a03c;margin-top:8px">✉ Envoyer les remises en état bailleur pour chiffrage</button></div>`;
+
+  html += `
+      <button class="btn-valider" id="compBtnValBail" style="background:#e0a03c;margin-top:8px">
+        ✉ Envoyer les remises en état bailleur pour chiffrage
+      </button>
+    </div>`;
+
   compResultContent.innerHTML = html;
-  // Mail locataire
+
+  // ── ÉVÉNEMENTS BOUTONS MAIL ──
+  const addrStr = addr;
+  const tenantStr = tenantName;
+
   document.getElementById('compBtnValLoc')?.addEventListener('click', () => {
     const checked = [...document.querySelectorAll('.chk-loc:checked')];
     if (checked.length === 0) { alert('Veuillez cocher au moins une dégradation.'); return; }
-    const lignes = checked.map(c => '• ' + c.dataset.piece + ' — ' + c.dataset.element + '\n  Entrée : ' + c.dataset.entree + '\n  Sortie : ' + c.dataset.sortie + '\n  Note : ' + c.dataset.commentaire).join('\n\n');
-    const body = 'Bonjour,\n\nVeuillez trouver ci-dessous le détail des dégradations imputables au locataire pour le bien situé au ' + addr + ' (locataire : ' + tenantName + '), pour chiffrage.\n\n━━ PARTIE LOCATAIRE ━━\n\n' + lignes + '\n\nCordialement,\nEPI Expertises Immobilières';
-    window.location.href = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage dégradations locataire — ' + addr + ' — ' + tenantName)}&body=${encodeURIComponent(body)}`;
+    const lignes = checked.map(c =>
+      `• ${c.dataset.piece} — ${c.dataset.element}\n  Entrée : ${c.dataset.entree}\n  Sortie : ${c.dataset.sortie}\n  Note : ${c.dataset.commentaire}`
+    ).join('\n\n');
+    const body = `Bonjour,\n\nVeuillez trouver ci-dessous le détail des dégradations imputables au locataire pour le bien situé au ${addrStr} (locataire : ${tenantStr}), pour chiffrage.\n\n━━ PARTIE LOCATAIRE ━━\n\n${lignes}\n\nCordialement,\nEPI Expertises Immobilières`;
+    const mailto = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage dégradations locataire — ' + addrStr + ' — ' + tenantStr)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
   });
-  // Mail bailleur
+
   document.getElementById('compBtnValBail')?.addEventListener('click', () => {
     const checked = [...document.querySelectorAll('.chk-bail:checked')];
     if (checked.length === 0) { alert('Veuillez cocher au moins un élément.'); return; }
-    const lignes = checked.map(c => '• ' + c.dataset.piece + ' — ' + c.dataset.element + '\n  Entrée : ' + c.dataset.entree + '\n  Sortie : ' + c.dataset.sortie + '\n  Note : ' + c.dataset.commentaire).join('\n\n');
-    const body = 'Bonjour,\n\nVeuillez trouver ci-dessous le détail des remises en état à la charge du bailleur pour le bien situé au ' + addr + ' (locataire : ' + tenantName + '), pour chiffrage.\n\n━━ PARTIE BAILLEUR ━━\n\n' + lignes + '\n\nCordialement,\nEPI Expertises Immobilières';
-    window.location.href = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage remise en état bailleur — ' + addr + ' — ' + tenantName)}&body=${encodeURIComponent(body)}`;
+    const lignes = checked.map(c =>
+      `• ${c.dataset.piece} — ${c.dataset.element}\n  Entrée : ${c.dataset.entree}\n  Sortie : ${c.dataset.sortie}\n  Note : ${c.dataset.commentaire}`
+    ).join('\n\n');
+    const body = `Bonjour,\n\nVeuillez trouver ci-dessous le détail des remises en état à la charge du bailleur pour le bien situé au ${addrStr} (locataire : ${tenantStr}), pour chiffrage.\n\n━━ PARTIE BAILLEUR ━━\n\n${lignes}\n\nCordialement,\nEPI Expertises Immobilières`;
+    const mailto = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage remise en état bailleur — ' + addrStr + ' — ' + tenantStr)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
   });
 }
+
 
 function compExtractRooms(report) {
   const rooms = report.rooms || [];
