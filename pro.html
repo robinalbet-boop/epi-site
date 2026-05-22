@@ -307,6 +307,22 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+  /* ── TABLEAU HISTORIQUE ── */
+  .hist-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .hist-table th { text-align: left; padding: 9px 12px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--bleu); font-weight: 600; border-bottom: 2px solid var(--border); background: var(--bleu-mid); white-space: nowrap; }
+  .hist-table td { padding: 10px 12px; border-bottom: 1px solid rgba(26,60,110,0.06); vertical-align: middle; font-size: 12.5px; }
+  .hist-table tr:hover td { background: var(--bleu-mid); }
+  .hist-table tr:last-child td { border-bottom: none; }
+
+  .statut-badge { display: inline-block; font-size: 10px; padding: 3px 9px; border-radius: 12px; font-weight: 600; white-space: nowrap; }
+  .statut-attente { background: #fef3c7; color: #d97706; border: 1px solid #fcd34d; }
+  .statut-confirme { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+  .statut-realise { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
+  .statut-facture { background: #f3e8ff; color: #7c3aed; border: 1px solid #c4b5fd; }
+
+  .btn-om { background: var(--bleu); color: white; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; white-space: nowrap; text-decoration: none; display: inline-block; }
+  .btn-om:hover { background: var(--bleu-clair); }
+
   .spinner-inline { width: 14px; height: 14px; border: 2px solid var(--bleu-pale); border-top-color: var(--bleu); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
 </style>
 </head>
@@ -360,6 +376,9 @@
     </div>
     <div class="pro-tab" onclick="showTab('comparatif')" id="tab-comparatif">
       <span class="pro-tab-icon">🔍</span> Comparatif EDL
+    </div>
+    <div class="pro-tab" onclick="showTab('historique')" id="tab-historique">
+      <span class="pro-tab-icon">📂</span> Mes demandes
     </div>
   </nav>
 
@@ -488,6 +507,36 @@
       <div class="confirm-box" id="diagConfirm">
         <div class="confirm-title">✓ Demande de diagnostic enregistrée</div>
         <div class="confirm-detail" id="diagConfirmDetail"></div>
+      </div>
+    </div>
+
+    <!-- ONGLET HISTORIQUE -->
+    <div class="tab-panel" id="panel-historique">
+      <div class="section-label">Mes demandes</div>
+      <div id="histLoadingMsg" style="text-align:center;padding:24px;color:var(--texte-leger)">
+        <div class="spinner" style="border-top-color:var(--bleu);border-color:var(--bleu-pale);margin:0 auto 12px"></div>
+        Chargement de vos demandes…
+      </div>
+      <div id="histEmpty" style="display:none;text-align:center;padding:40px;color:var(--texte-leger);font-size:13px">
+        Aucune demande enregistrée pour le moment.
+      </div>
+      <div id="histTable" style="display:none">
+        <table class="hist-table">
+          <thead>
+            <tr>
+              <th>Réf.</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Bien</th>
+              <th>Adresse</th>
+              <th>Locataire</th>
+              <th>Date RDV</th>
+              <th>Statut</th>
+              <th>Ordre de mission</th>
+            </tr>
+          </thead>
+          <tbody id="histBody"></tbody>
+        </table>
       </div>
     </div>
 
@@ -646,7 +695,7 @@ function selectDiag(el, type) {
 }
 
 // ── SOUMETTRE EDL ──
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwaymhTqFw5_ydBW49Fq0YACV8HrRAAc-CDbUa7oR0RYqtiOQ1QwzbfHj96Du8SIddA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzqKY7eDpgAMEAdGXZDPuLIslYEtqb5HH_UEElGFRVBAZmm7tTNagbGPPFvrXfyqAVx/exec';
 
 async function submitEdl() {
   const type = document.getElementById('edlType').value;
@@ -1159,6 +1208,90 @@ compBtnCopy.addEventListener('click', () => {
   compBtnCopy.textContent = 'Copié ✓';
   setTimeout(() => compBtnCopy.textContent = 'Copier', 2000);
 });
+
+// ══════════════════════════════════════
+// ── HISTORIQUE DES DEMANDES ──
+// ══════════════════════════════════════
+
+async function loadHistorique() {
+  const loadMsg = document.getElementById('histLoadingMsg');
+  const emptyMsg = document.getElementById('histEmpty');
+  const table = document.getElementById('histTable');
+  const tbody = document.getElementById('histBody');
+
+  loadMsg.style.display = 'block';
+  emptyMsg.style.display = 'none';
+  table.style.display = 'none';
+
+  try {
+    const url = APPS_SCRIPT_URL + '?client=' + encodeURIComponent(currentClient);
+    const res = await fetch(url);
+    const rows = await res.json();
+
+    loadMsg.style.display = 'none';
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      emptyMsg.style.display = 'block';
+      return;
+    }
+
+    tbody.innerHTML = '';
+    rows.forEach(r => {
+      const statut = r.statut || 'En attente';
+      const statutClass = {
+        'En attente': 'statut-attente',
+        'RDV confirmé': 'statut-confirme',
+        'Réalisé': 'statut-realise',
+        'Facturé': 'statut-facture',
+      }[statut] || 'statut-attente';
+
+      const dateRdv = r.date_rdv_confirme || r.date_rdv || '—';
+      const dateRdvFr = dateRdv && dateRdv.includes('-') ?
+        dateRdv.split('-').reverse().join('/') : dateRdv;
+
+      // Lien ordre de mission
+      const omParams = new URLSearchParams({
+        id: r.id || '',
+        client: r.client || '',
+        type: r.type || '',
+        type_bien: r.type_bien || '',
+        address: r.address || '',
+        proprietaire: r.proprietaire || '',
+        locataire: r.locataire || '',
+        date_rdv: r.date_rdv || '',
+        observations: r.observations || '',
+      });
+      const omUrl = '/ordre-mission-template.html?' + omParams.toString();
+
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td style="font-size:11px;color:#8a909e">' + (r.id || '—') + '</td>' +
+        '<td>' + (r.date || '—') + '</td>' +
+        '<td><strong>' + (r.type || '—') + '</strong></td>' +
+        '<td style="color:var(--texte-leger)">' + (r.type_bien || '—') + '</td>' +
+        '<td>' + (r.address || '—') + '</td>' +
+        '<td>' + (r.locataire || '—') + '</td>' +
+        '<td>' + dateRdvFr + '</td>' +
+        '<td><span class="statut-badge ' + statutClass + '">' + statut + '</span></td>' +
+        '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>';
+      tbody.appendChild(tr);
+    });
+
+    table.style.display = 'block';
+
+  } catch(e) {
+    loadMsg.style.display = 'none';
+    emptyMsg.textContent = 'Erreur de chargement : ' + e.message;
+    emptyMsg.style.display = 'block';
+  }
+}
+
+// Charger l'historique quand on clique sur l'onglet
+const origShowTab = showTab;
+function showTab(name) {
+  origShowTab(name);
+  if (name === 'historique' && currentClient) loadHistorique();
+}
 </script>
 </body>
 </html>
