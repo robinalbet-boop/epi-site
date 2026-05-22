@@ -633,6 +633,8 @@ function selectDiag(el, type) {
 }
 
 // ── SOUMETTRE EDL ──
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwaymhTqFw5_ydBW49Fq0YACV8HrRAAc-CDbUa7oR0RYqtiOQ1QwzbfHj96Du8SIddA/exec';
+
 async function submitEdl() {
   const type = document.getElementById('edlType').value;
   const date = document.getElementById('edlDate').value;
@@ -641,10 +643,11 @@ async function submitEdl() {
   const proprietaire = document.getElementById('edlProprietaire').value.trim();
   const locataire = document.getElementById('edlLocataire').value.trim();
   const emailLocataire = document.getElementById('edlEmailLocataire').value.trim();
+  const telLocataire = document.getElementById('edlTelLocataire').value.trim();
   const observations = document.getElementById('edlObservations').value.trim();
 
   if (!date || !adresse || !locataire) {
-    alert('Veuillez renseigner au minimum la date, l\'adresse et le nom du locataire.');
+    alert("Veuillez renseigner au minimum la date, l'adresse et le nom du locataire.");
     return;
   }
 
@@ -654,42 +657,48 @@ async function submitEdl() {
 
   try {
     const typeFr = type === 'residential_lease_check_in' ? 'EDLE' : 'EDLS';
-    const displayName = `${typeFr} - ${currentClient} - ${locataire}`;
-    const scheduledAt = `${date}T${heure}:00+02:00`;
+    const displayName = typeFr + ' - ' + currentClient + ' - ' + locataire;
 
-    // Créer sur Nockee
-    const nockeeRes = await fetch(`${PROXY_BASE}/nockee-proxy`, {
+    await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
+      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'create_report',
+        client: currentClient,
         type,
-        scheduled_at: scheduledAt,
-        display_name: displayName,
         address: adresse,
         proprietaire,
         locataire,
         email_locataire: emailLocataire,
+        tel_locataire: telLocataire,
+        date,
+        heure,
         observations,
-        client: currentClient,
       })
     });
 
     document.getElementById('edlConfirmDetail').innerHTML =
-      `Mission <strong>${displayName}</strong> créée pour le <strong>${formatDate(date)} à ${heure}</strong>.<br>` +
-      `Adresse : ${adresse}<br>` +
-      (observations ? `Note : ${observations}` : '');
+      'Demande <strong>' + displayName + '</strong> enregistrée pour le <strong>' + formatDate(date) + ' à ' + heure + '</strong>.<br>' +
+      'Adresse : ' + adresse + '<br>' +
+      'Un mail de confirmation a été envoyé à EPI.' +
+      (observations ? '<br>Note : ' + observations : '');
     document.getElementById('edlConfirm').classList.add('visible');
 
+    document.getElementById('edlAdresse').value = '';
+    document.getElementById('edlProprietaire').value = '';
+    document.getElementById('edlLocataire').value = '';
+    document.getElementById('edlEmailLocataire').value = '';
+    document.getElementById('edlTelLocataire').value = '';
+    document.getElementById('edlObservations').value = '';
+
   } catch (e) {
-    alert('Erreur lors de l\'envoi : ' + e.message);
+    alert('Erreur : ' + e.message);
   }
 
   btn.disabled = false;
   btn.textContent = 'Envoyer la demande';
 }
 
-// ── SOUMETTRE DIAGNOSTIC ──
 async function submitDiag() {
   const adresse = document.getElementById('diagAdresse').value.trim();
   const date = document.getElementById('diagDate').value;
