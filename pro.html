@@ -912,8 +912,18 @@ Retourne UNIQUEMENT un JSON valide :
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || 'Erreur Claude');
   const text = data.content?.[0]?.text || '{}';
-  try { const clean = text.replace(/^```json\s*/,'').replace(/```\s*$/,'').trim(); return JSON.parse(clean); }
-  catch { return { erreur_parsing: text }; }
+  try {
+    // Nettoyage robuste : supprimer toutes les balises markdown
+    let clean = text.trim();
+    clean = clean.replace(/^```json\s*/i, '').replace(/^```\s*/i, '');
+    clean = clean.replace(/\s*```$/i, '');
+    clean = clean.trim();
+    // Trouver le JSON entre { et }
+    const start = clean.indexOf('{');
+    const end = clean.lastIndexOf('}');
+    if (start >= 0 && end > start) clean = clean.slice(start, end + 1);
+    return JSON.parse(clean);
+  } catch(e) { return { erreur_parsing: text }; }
 }
 
 function compRenderAnalysis(json, edle, edls) {
