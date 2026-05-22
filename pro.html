@@ -685,6 +685,7 @@ function showTab(name) {
   document.querySelectorAll('.pro-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'historique' && currentClient) loadHistorique();
 }
 
 // ── DIAGNOSTIC TYPE ──
@@ -1286,12 +1287,7 @@ async function loadHistorique() {
   }
 }
 
-// Charger l'historique quand on clique sur l'onglet
-const origShowTab = showTab;
-function showTab(name) {
-  origShowTab(name);
-  if (name === 'historique' && currentClient) loadHistorique();
-}
+// Charger l'historique est géré directement dans showTab ci-dessous
 </script>
 </body>
 </html>
