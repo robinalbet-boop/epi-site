@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPI — Espace Professionnel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy-mid: #162236;
+    --navy-light: #1e3050;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: #8a6f30;
+    --cream: #f5f0e8;
+    --cream-dim: #ddd6c8;
+    --white: #ffffff;
+    --error: #e05c5c;
+    --success: #4caf82;
+    --border: rgba(201,168,76,0.2);
+    --border-hover: rgba(201,168,76,0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--navy);
+    color: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--navy);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo-mark {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--gold);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    color: var(--gold);
+    font-size: 16px;
+  }
+
+  .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); }
+  .header-sub { font-size: 11px; color: var(--gold-dim); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 1px; }
+
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .client-badge { font-size: 11px; color: var(--gold); border: 1px solid var(--border); padding: 4px 12px; border-radius: 20px; letter-spacing: 0.5px; display: none; }
+  .client-badge.visible { display: block; }
+  .btn-logout { background: transparent; border: 1px solid var(--border); color: #4a5a70; padding: 4px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; display: none; }
+  .btn-logout.visible { display: block; }
+  .btn-logout:hover { border-color: var(--error); color: var(--error); }
+
+  /* ── ÉCRAN LOGIN ── */
+  #screenLogin {
+    min-height: calc(100vh - 73px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 420px;
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+  }
+
+  .login-logo {
+    width: 56px; height: 56px;
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    color: var(--gold);
+    font-size: 22px;
+    margin: 0 auto 20px;
+  }
+
+  .login-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .login-sub {
+    font-size: 12px;
+    color: #4a5a70;
+    margin-bottom: 32px;
+  }
+
+  .login-field {
+    width: 100%;
+    background: var(--navy);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: center;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .login-field::placeholder { color: #4a5a70; letter-spacing: 0; }
+  .login-field:focus { border-color: var(--gold-dim); }
+
+  .btn-login {
+    width: 100%;
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .btn-login:hover { background: var(--gold-light); }
+  .btn-login:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .login-error {
+    font-size: 12px;
+    color: var(--error);
+    margin-top: 10px;
+    min-height: 18px;
+  }
+
+  .login-hint {
+    font-size: 11px;
+    color: #3a4a5a;
+    margin-top: 20px;
+  }
+
+  /* ── ÉCRAN PRO ── */
+  #screenPro { display: none; padding: 0; }
+  #screenPro.visible { display: block; }
+  #screenLogin { display: flex; }
+  #screenLogin.hidden { display: none; }
+
+  /* ── HERO BIENVENUE ── */
+  .pro-hero {
+    background: var(--navy-mid);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 40px;
+  }
+
+  .pro-welcome {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 6px;
+  }
+
+  .pro-client-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .pro-tagline {
+    font-size: 13px;
+    color: #4a6080;
+  }
+
+  /* ── NAVIGATION ONGLETS ── */
+  .pro-nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--navy-mid);
+    padding: 0 40px;
+  }
+
+  .pro-tab {
+    padding: 14px 24px;
+    font-size: 13px;
+    color: #4a6080;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .pro-tab:hover { color: var(--cream); }
+  .pro-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .pro-tab-icon { font-size: 16px; }
+
+  /* ── CONTENU ONGLETS ── */
+  .pro-content { max-width: 900px; margin: 0 auto; padding: 36px 24px 80px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── SECTION TITLE ── */
+  .section-label {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ── FORMULAIRE ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .form-grid.full { grid-template-columns: 1fr; }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-label { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold-dim); }
+
+  .form-input, .form-select, .form-textarea {
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .form-input::placeholder, .form-textarea::placeholder { color: #4a5a70; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--gold-dim); }
+  .form-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a6f30'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+  .form-select option { background: var(--navy-mid); }
+  .form-textarea { resize: vertical; min-height: 90px; }
+
+  .btn-submit {
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    border-radius: 8px;
+    padding: 14px 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    letter-spacing: 0.5px;
+    margin-top: 8px;
+  }
+  .btn-submit:hover { background: var(--gold-light); }
+  .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── CONFIRMATION ── */
+  .confirm-box {
+    background: rgba(76,175,130,0.08);
+    border: 1px solid rgba(76,175,130,0.3);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-top: 20px;
+    display: none;
+  }
+  .confirm-box.visible { display: block; }
+  .confirm-title { font-size: 14px; color: var(--success); font-weight: 500; margin-bottom: 6px; }
+  .confirm-detail { font-size: 12px; color: #4a7060; line-height: 1.7; }
+
+  /* ── COMPARATIF ── */
+  .comparatif-iframe-wrap {
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .comparatif-info {
+    background: rgba(201,168,76,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 12px;
+    color: var(--gold-dim);
+    margin-bottom: 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  /* ── DIAGNOSTIC ── */
+  .diag-types { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+
+  .diag-type-card {
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .diag-type-card:hover { border-color: var(--gold-dim); }
+  .diag-type-card.selected { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+  .diag-type-icon { font-size: 24px; margin-bottom: 8px; }
+  .diag-type-label { font-size: 12px; color: var(--cream); }
+
+  /* ── LOADING ── */
+  .spinner-inline { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">EPI</div>
+  <div>
+    <div class="header-title">Espace Professionnel</div>
+    <div class="header-sub">EPI Expertises Immobilières</div>
+  </div>
+  <div class="header-right">
+    <div class="client-badge" id="clientBadge"></div>
+    <button class="btn-logout" id="btnLogout" onclick="logout()">Déconnexion</button>
+  </div>
+</header>
+
+<!-- ── ÉCRAN LOGIN ── -->
+<div id="screenLogin">
+  <div class="login-box">
+    <div class="login-logo">EPI</div>
+    <div class="login-title">Espace Professionnel</div>
+    <div class="login-sub">Accès réservé aux partenaires et donneurs d'ordre</div>
+
+    <input type="text" class="login-field" id="loginInput"
+      placeholder="Nom de votre organisation"
+      autocomplete="organization"
+      onkeydown="if(event.key==='Enter') doLogin()">
+
+    <button class="btn-login" id="btnLogin" onclick="doLogin()">Accéder à mon espace</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-hint">Le mot de passe est le nom de votre organisation<br>tel qu'enregistré auprès d'EPI</div>
+  </div>
+</div>
+
+<!-- ── ÉCRAN PRO ── -->
+<div id="screenPro">
+  <div class="pro-hero">
+    <div class="pro-welcome">Bienvenue</div>
+    <div class="pro-client-name" id="proClientName"></div>
+    <div class="pro-tagline">Que souhaitez-vous faire aujourd'hui ?</div>
+  </div>
+
+  <nav class="pro-nav">
+    <div class="pro-tab active" onclick="showTab('edl')" id="tab-edl">
+      <span class="pro-tab-icon">📋</span> Commander un EDL
+    </div>
+    <div class="pro-tab" onclick="showTab('diag')" id="tab-diag">
+      <span class="pro-tab-icon">🔬</span> Commander un Diagnostic
+    </div>
+    <div class="pro-tab" onclick="showTab('comparatif')" id="tab-comparatif">
+      <span class="pro-tab-icon">🔍</span> Comparatif EDL
+    </div>
+  </nav>
+
+  <div class="pro-content">
+
+    <!-- ── ONGLET EDL ── -->
+    <div class="tab-panel active" id="panel-edl">
+      <div class="section-label">Demande d'état des lieux</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Type de mission</label>
+          <select class="form-select" id="edlType">
+            <option value="residential_lease_check_in">État des lieux d'entrée (EDLE)</option>
+            <option value="residential_lease_check_out">État des lieux de sortie (EDLS)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date souhaitée</label>
+          <input type="date" class="form-input" id="edlDate">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Heure souhaitée</label>
+          <input type="time" class="form-input" id="edlHeure" value="10:00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type de bien</label>
+          <select class="form-select" id="edlBienType">
+            <option value="flat">Appartement</option>
+            <option value="house">Maison</option>
+            <option value="office">Bureau</option>
+            <option value="other">Autre</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid full">
+        <div class="form-group">
+          <label class="form-label">Adresse du bien</label>
+          <input type="text" class="form-input" id="edlAdresse" placeholder="Ex : 4 rue de l'Église, 92200 Neuilly-sur-Seine">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nom du propriétaire</label>
+          <input type="text" class="form-input" id="edlProprietaire" placeholder="Nom complet">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nom du locataire</label>
+          <input type="text" class="form-input" id="edlLocataire" placeholder="Nom complet">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Email du locataire</label>
+          <input type="email" class="form-input" id="edlEmailLocataire" placeholder="locataire@email.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Téléphone du locataire</label>
+          <input type="tel" class="form-input" id="edlTelLocataire" placeholder="06 00 00 00 00">
+        </div>
+      </div>
+
+      <div class="form-grid full">
+        <div class="form-group">
+          <label class="form-label">Observations / Instructions</label>
+          <textarea class="form-textarea" id="edlObservations" placeholder="Clés chez le gardien, code d'entrée, remarques particulières…"></textarea>
+        </div>
+      </div>
+
+      <button class="btn-submit" id="btnEdlSubmit" onclick="submitEdl()">
+        Envoyer la demande
+      </button>
+
+      <div class="confirm-box" id="edlConfirm">
+        <div class="confirm-title">✓ Demande enregistrée</div>
+        <div class="confirm-detail" id="edlConfirmDetail"></div>
+      </div>
+    </div>
+
+    <!-- ── ONGLET DIAGNOSTIC ── -->
+    <div class="tab-panel" id="panel-diag">
+      <div class="section-label">Demande de diagnostic</div>
+
+      <div class="diag-types" id="diagTypes">
+        <div class="diag-type-card selected" onclick="selectDiag(this, 'DPE')">
+          <div class="diag-type-icon">⚡</div>
+          <div class="diag-type-label">DPE</div>
+        </div>
+        <div class="diag-type-card" onclick="selectDiag(this, 'Amiante')">
+          <div class="diag-type-icon">🏗️</div>
+          <div class="diag-type-label">Amiante</div>
+        </div>
+        <div class="diag-type-card" onclick="selectDiag(this, 'Plomb')">
+          <div class="diag-type-icon">🔩</div>
+          <div class="diag-type-label">Plomb (CREP)</div>
+        </div>
+        <div class="diag-type-card" onclick="selectDiag(this, 'Électricité')">
+          <div class="diag-type-icon">🔌</div>
+          <div class="diag-type-label">Électricité</div>
+        </div>
+        <div class="diag-type-card" onclick="selectDiag(this, 'Gaz')">
+          <div class="diag-type-icon">🔥</div>
+          <div class="diag-type-label">Gaz</div>
+        </div>
+        <div class="diag-type-card" onclick="selectDiag(this, 'Termites')">
+          <div class="diag-type-icon">🐛</div>
+          <div class="diag-type-label">Termites</div>
+        </div>
+        <div class="diag-type-card" onclick="selectDiag(this, 'Loi Carrez')">
+          <div class="diag-type-icon">📐</div>
+          <div class="diag-type-label">Loi Carrez</div>
+        </div>
+        <div class="diag-type-card" onclick="selectDiag(this, 'Loi Boutin')">
+          <div class="diag-type-icon">📏</div>
+          <div class="diag-type-label">Loi Boutin</div>
+        </div>
+        <div class="diag-type-card" onclick="selectDiag(this, 'Pack complet')">
+          <div class="diag-type-icon">📦</div>
+          <div class="diag-type-label">Pack complet</div>
+        </div>
+      </div>
+
+      <div class="form-grid full">
+        <div class="form-group">
+          <label class="form-label">Adresse du bien</label>
+          <input type="text" class="form-input" id="diagAdresse" placeholder="Ex : 86 rue Saint-Martin, 75004 Paris">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Date souhaitée</label>
+          <input type="date" class="form-input" id="diagDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Heure souhaitée</label>
+          <input type="time" class="form-input" id="diagHeure" value="10:00">
+        </div>
+      </div>
+
+      <div class="form-grid full">
+        <div class="form-group">
+          <label class="form-label">Observations</label>
+          <textarea class="form-textarea" id="diagObservations" placeholder="Informations complémentaires…"></textarea>
+        </div>
+      </div>
+
+      <button class="btn-submit" onclick="submitDiag()">Envoyer la demande</button>
+
+      <div class="confirm-box" id="diagConfirm">
+        <div class="confirm-title">✓ Demande de diagnostic enregistrée</div>
+        <div class="confirm-detail" id="diagConfirmDetail"></div>
+      </div>
+    </div>
+
+    <!-- ── ONGLET COMPARATIF ── -->
+    <div class="tab-panel" id="panel-comparatif">
+      <div class="section-label">Comparatif EDL</div>
+      <div class="comparatif-info">
+        <span>ℹ️</span>
+        <span>Seuls les rapports associés à votre organisation sont accessibles. Recherchez par adresse ou nom de locataire.</span>
+      </div>
+      <div style="background:var(--navy-mid);border:1px solid var(--border);border-radius:10px;padding:32px;text-align:center;color:#4a5a70;font-size:13px">
+        L'outil comparatif est chargé ici — il affichera uniquement vos biens.<br>
+        <span style="font-size:11px;margin-top:8px;display:block">(Intégration en cours)</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const PROXY_BASE = '/api';
+const NOCKEE_KEY = 'Uw5SReDnLWK99u3qcbtFEJzLPinvua7IMkF1DuTbBH8iEkNTVC';
+let currentClient = null;
+let selectedDiagType = 'DPE';
+
+// ── VÉRIFIER SESSION ──
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = sessionStorage.getItem('epi_client');
+  if (saved) {
+    currentClient = saved;
+    showPro(saved);
+  }
+  // Date minimale = aujourd'hui
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('edlDate').min = today;
+  document.getElementById('diagDate').min = today;
+});
+
+// ── LOGIN ──
+async function doLogin() {
+  const input = document.getElementById('loginInput');
+  const errEl = document.getElementById('loginError');
+  const btnLogin = document.getElementById('btnLogin');
+  const term = input.value.trim().toUpperCase();
+
+  if (term.length < 2) { errEl.textContent = 'Veuillez saisir le nom de votre organisation.'; return; }
+
+  btnLogin.disabled = true;
+  btnLogin.innerHTML = '<span class="spinner-inline"></span>Vérification…';
+  errEl.textContent = '';
+
+  try {
+    // Recherche dans Nockee par nom d'organisation (signataires)
+    const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=search&search_term=${encodeURIComponent(term)}`);
+    const data = await res.json();
+    const reports = data.data || [];
+
+    // Vérifier si le terme correspond à un signataire connu
+    const found = await checkOrganisation(term);
+
+    if (found) {
+      sessionStorage.setItem('epi_client', found);
+      currentClient = found;
+      showPro(found);
+    } else {
+      errEl.textContent = 'Organisation non reconnue. Contactez EPI pour obtenir un accès.';
+    }
+  } catch (e) {
+    errEl.textContent = 'Erreur de connexion. Réessayez.';
+  }
+
+  btnLogin.disabled = false;
+  btnLogin.textContent = 'Accéder à mon espace';
+}
+
+async function checkOrganisation(term) {
+  try {
+    const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=check_client&nom=${encodeURIComponent(term)}`);
+    const data = await res.json();
+    return data.autorise ? (data.nom || term) : null;
+  } catch {
+    return null;
+  }
+}
+
+function showPro(clientName) {
+  document.getElementById('screenLogin').classList.add('hidden');
+  document.getElementById('screenPro').classList.add('visible');
+  document.getElementById('proClientName').textContent = clientName;
+  document.getElementById('clientBadge').textContent = clientName;
+  document.getElementById('clientBadge').classList.add('visible');
+  document.getElementById('btnLogout').classList.add('visible');
+}
+
+function logout() {
+  sessionStorage.removeItem('epi_client');
+  currentClient = null;
+  document.getElementById('screenLogin').classList.remove('hidden');
+  document.getElementById('screenPro').classList.remove('visible');
+  document.getElementById('loginInput').value = '';
+  document.getElementById('loginError').textContent = '';
+  document.getElementById('clientBadge').classList.remove('visible');
+  document.getElementById('btnLogout').classList.remove('visible');
+}
+
+// ── ONGLETS ──
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.pro-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// ── DIAGNOSTIC TYPE ──
+function selectDiag(el, type) {
+  document.querySelectorAll('.diag-type-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedDiagType = type;
+}
+
+// ── SOUMETTRE EDL ──
+async function submitEdl() {
+  const type = document.getElementById('edlType').value;
+  const date = document.getElementById('edlDate').value;
+  const heure = document.getElementById('edlHeure').value;
+  const adresse = document.getElementById('edlAdresse').value.trim();
+  const proprietaire = document.getElementById('edlProprietaire').value.trim();
+  const locataire = document.getElementById('edlLocataire').value.trim();
+  const emailLocataire = document.getElementById('edlEmailLocataire').value.trim();
+  const observations = document.getElementById('edlObservations').value.trim();
+
+  if (!date || !adresse || !locataire) {
+    alert('Veuillez renseigner au minimum la date, l\'adresse et le nom du locataire.');
+    return;
+  }
+
+  const btn = document.getElementById('btnEdlSubmit');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-inline"></span>Envoi en cours…';
+
+  try {
+    const typeFr = type === 'residential_lease_check_in' ? 'EDLE' : 'EDLS';
+    const displayName = `${typeFr} - ${currentClient} - ${locataire}`;
+    const scheduledAt = `${date}T${heure}:00+02:00`;
+
+    // Créer sur Nockee
+    const nockeeRes = await fetch(`${PROXY_BASE}/nockee-proxy`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'create_report',
+        type,
+        scheduled_at: scheduledAt,
+        display_name: displayName,
+        address: adresse,
+        proprietaire,
+        locataire,
+        email_locataire: emailLocataire,
+        observations,
+        client: currentClient,
+      })
+    });
+
+    document.getElementById('edlConfirmDetail').innerHTML =
+      `Mission <strong>${displayName}</strong> créée pour le <strong>${formatDate(date)} à ${heure}</strong>.<br>` +
+      `Adresse : ${adresse}<br>` +
+      (observations ? `Note : ${observations}` : '');
+    document.getElementById('edlConfirm').classList.add('visible');
+
+  } catch (e) {
+    alert('Erreur lors de l\'envoi : ' + e.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Envoyer la demande';
+}
+
+// ── SOUMETTRE DIAGNOSTIC ──
+async function submitDiag() {
+  const adresse = document.getElementById('diagAdresse').value.trim();
+  const date = document.getElementById('diagDate').value;
+  const heure = document.getElementById('diagHeure').value;
+  const observations = document.getElementById('diagObservations').value.trim();
+
+  if (!adresse || !date) {
+    alert('Veuillez renseigner l\'adresse et la date souhaitée.');
+    return;
+  }
+
+  document.getElementById('diagConfirmDetail').innerHTML =
+    `Diagnostic <strong>${selectedDiagType}</strong> demandé pour le <strong>${formatDate(date)} à ${heure}</strong>.<br>` +
+    `Adresse : ${adresse}<br>` +
+    `Notre équipe vous confirmera le rendez-vous dans les plus brefs délais.`;
+  document.getElementById('diagConfirm').classList.add('visible');
+}
+
+// ── UTILS ──
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const [y, m, d] = dateStr.split('-');
+  return `${d}/${m}/${y}`;
+}
+</script>
+</body>
+</html>
