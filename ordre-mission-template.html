@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordre de Mission — EPI Expertises Immobilières</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300; font-size: 13px;
+    color: #1a1a2e; background: #f0f4fb; padding: 40px 20px;
+  }
+  .document { max-width: 794px; margin: 0 auto; background: white; box-shadow: 0 8px 40px rgba(26,60,110,0.12); }
+
+  .header {
+    background: #1a3c6e; padding: 28px 40px 22px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .logo-block { display: flex; align-items: center; gap: 16px; }
+  .logo-img { height: 60px; width: auto; filter: brightness(0) invert(1); }
+  .logo-text { color: white; }
+  .logo-name { font-family: 'Playfair Display', serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); display: block; margin-top: 4px; }
+
+  .doc-ref { text-align: right; color: white; }
+  .doc-type { font-family: 'Playfair Display', serif; font-size: 20px; color: #c9a84c; display: block; margin-bottom: 6px; }
+  .doc-num { font-family: 'DM Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.7); display: block; }
+  .doc-date { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; display: block; }
+
+  .gold-band { background: #c9a84c; height: 4px; }
+
+  .body { padding: 32px 40px; }
+
+  .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .partie-box { border: 1px solid rgba(26,60,110,0.12); border-radius: 8px; overflow: hidden; }
+  .partie-header { background: #e8eef7; padding: 7px 14px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: #1a3c6e; font-weight: 600; }
+  .partie-content { padding: 12px 14px; }
+  .partie-name { font-family: 'Playfair Display', serif; font-size: 15px; color: #1a3c6e; margin-bottom: 5px; }
+  .partie-detail { font-size: 12px; color: #5a6070; line-height: 1.7; }
+
+  .section-title {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: #c9a84c; font-weight: 700; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: rgba(201,168,76,0.3); }
+
+  .mission-box {
+    background: #f5f6fa; border-left: 4px solid #1a3c6e;
+    border-radius: 0 8px 8px 0; padding: 16px 20px; margin-bottom: 22px;
+  }
+  .mission-type {
+    display: inline-block; background: #1a3c6e; color: white;
+    font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 4px;
+    letter-spacing: 0.5px; margin-bottom: 14px;
+  }
+  .mission-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mission-field { }
+  .mission-field.full { grid-column: 1 / -1; }
+  .field-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #1a3c6e; font-weight: 600; margin-bottom: 3px; }
+  .field-value {
+    font-size: 13px; color: #1a1a2e; padding: 6px 10px;
+    background: white; border-radius: 4px; border: 1px solid rgba(26,60,110,0.1);
+    min-height: 30px;
+  }
+
+  .conditions {
+    background: #fdf6e3; border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 8px; padding: 14px 18px; margin-bottom: 22px;
+    font-size: 12px; color: #5a6070; line-height: 1.8;
+  }
+  .conditions strong { color: #1a3c6e; }
+
+  .signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 28px; }
+  .sign-label { font-size: 11px; font-weight: 600; color: #1a3c6e; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .sign-box {
+    border: 1px solid rgba(26,60,110,0.15); border-radius: 6px;
+    height: 80px; background: #f5f6fa;
+    display: flex; align-items: flex-end; padding: 8px 12px;
+  }
+  .sign-name { font-size: 11px; color: #aab0be; }
+
+  .mentions {
+    border-top: 1px solid rgba(26,60,110,0.1); padding-top: 16px;
+    font-size: 10px; color: #aab0be; line-height: 1.7;
+  }
+  .mentions strong { color: #5a6070; }
+
+  .footer {
+    background: #1a3c6e; padding: 12px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-text { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .footer-contact { font-size: 11px; color: rgba(255,255,255,0.7); }
+  .footer-contact span { color: #c9a84c; }
+
+  .print-btn {
+    position: fixed; bottom: 32px; right: 32px;
+    background: #1a3c6e; color: white; border: none; border-radius: 10px;
+    padding: 12px 24px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(26,60,110,0.3); transition: all 0.2s;
+  }
+  .print-btn:hover { background: #2a5298; transform: translateY(-2px); }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .document { box-shadow: none; }
+    .print-btn { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="document">
+
+  <div class="header">
+    <div class="logo-block">
+      <img src="data:image/png;base64,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" alt="EPI" class="logo-img">
+      <div class="logo-text">
+        <span class="logo-name">Expertises Immobilières</span>
+      </div>
+    </div>
+    <div class="doc-ref">
+      <span class="doc-type">Ordre de Mission</span>
+      <span class="doc-num" id="docNum">N° OM-2026-001</span>
+      <span class="doc-date" id="docDate">Paris, le 22 mai 2026</span>
+    </div>
+  </div>
+  <div class="gold-band"></div>
+
+  <div class="body">
+
+    <div class="parties">
+      <div class="partie-box">
+        <div class="partie-header">Donneur d'ordre</div>
+        <div class="partie-content">
+          <div class="partie-name" id="clientNom">—</div>
+          <div class="partie-detail" id="clientDetail">Partenaire EPI Expertises Immobilières</div>
+        </div>
+      </div>
+      <div class="partie-box">
+        <div class="partie-header">Prestataire</div>
+        <div class="partie-content">
+          <div class="partie-name">EPI Expertises Immobilières</div>
+          <div class="partie-detail">
+            15 Rue George Sand — 75016 Paris<br>
+            Tél : 06 74 07 61 24<br>
+            contact@epi-gs.com<br>
+            SIRET : 414 885 749 00031
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Détail de la mission</div>
+    <div class="mission-box">
+      <span class="mission-type" id="missionType">ÉTAT DES LIEUX D'ENTRÉE</span>
+      <div class="mission-grid">
+        <div class="mission-field full">
+          <div class="field-label">Adresse du bien</div>
+          <div class="field-value" id="missionAdresse">—</div>
+        </div>
+        <div class="mission-field">
+          <div class="field-label">Type de bien</div>
+          <div class="field-value" id="missionTypeBien">—</div>
+        </div>
+        <div class="mission-field">
+          <div class="field-label">Propriétaire</div>
+          <div class="field-value" id="missionProprietaire">—</div>
+        </div>
+        <div class="mission-field">
+          <div class="field-label">Locataire</div>
+          <div class="field-value" id="missionLocataire">—</div>
+        </div>
+        <div class="mission-field full">
+          <div class="field-label">Date d'intervention souhaitée</div>
+          <div class="field-value" id="missionDate">—</div>
+        </div>
+        <div class="mission-field full">
+          <div class="field-label">Observations / Instructions particulières</div>
+          <div class="field-value" id="missionObs" style="min-height:48px">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Conditions d'intervention</div>
+    <div class="conditions">
+      <strong>Tarification :</strong> Selon barème en vigueur communiqué au donneur d'ordre. La facture sera émise à l'issue de la mission.<br>
+      <strong>Délai de livraison :</strong> Le rapport d'état des lieux sera transmis par voie électronique le jour même de l'intervention ou au plus tard sous 24h.<br>
+      <strong>Annulation :</strong> Toute annulation doit être signalée au moins 48h à l'avance. En cas d'annulation tardive ou d'absence, des frais de déplacement pourront être facturés.
+    </div>
+
+    <div class="section-title">Validation</div>
+    <div class="signatures">
+      <div>
+        <div class="sign-label">Donneur d'ordre — Bon pour accord</div>
+        <div class="sign-box"><span class="sign-name">Signature et cachet</span></div>
+        <div style="font-size:11px;color:#aab0be;margin-top:6px">Date : ___________________</div>
+      </div>
+      <div>
+        <div class="sign-label">EPI Expertises Immobilières</div>
+        <div class="sign-box"><span class="sign-name">Robin ALBET — Gérant</span></div>
+        <div style="font-size:11px;color:#aab0be;margin-top:6px">Date : ___________________</div>
+      </div>
+    </div>
+
+    <div class="mentions">
+      <strong>Mentions légales :</strong> EPI Expertises Immobilières — SARL au capital de 1 000 € — Siège social : 15 Rue George Sand, 75016 Paris — SIRET : 414 885 749 00031 — APE : 6831Z — TVA intracommunautaire : FR 12 414885749 — Assurance Responsabilité Civile Professionnelle souscrite auprès de MAAF Assurances. Le présent ordre de mission constitue un engagement contractuel entre les parties signataires. Conformément à la loi n°89-462 du 6 juillet 1989 et au décret n°2016-382 du 30 mars 2016, l'état des lieux est établi de manière contradictoire et impartiale. Données personnelles traitées conformément au RGPD — DPO : contact@epi-gs.com.
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-text">EPI Expertises Immobilières · Paris & Île-de-France · Depuis 2015</div>
+    <div class="footer-contact"><span>06 74 07 61 24</span> · contact@epi-gs.com</div>
+  </div>
+
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨️ Imprimer / Télécharger PDF</button>
+
+<script>
+function loadMissionData() {
+  const params = new URLSearchParams(window.location.search);
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const num = 'OM-' + now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '-' + String(Math.floor(Math.random()*999)+1).padStart(3,'0');
+
+  document.getElementById('docNum').textContent = 'N° ' + (params.get('id') || num);
+  document.getElementById('docDate').textContent = 'Paris, le ' + dateStr;
+  document.getElementById('clientNom').textContent = params.get('client') || '—';
+  document.getElementById('missionType').textContent = params.get('type') === 'EDLS' ? "ÉTAT DES LIEUX DE SORTIE" : "ÉTAT DES LIEUX D'ENTRÉE";
+  document.getElementById('missionAdresse').textContent = params.get('address') || '—';
+  document.getElementById('missionTypeBien').textContent = params.get('type_bien') || '—';
+  document.getElementById('missionProprietaire').textContent = params.get('proprietaire') || '—';
+  document.getElementById('missionLocataire').textContent = params.get('locataire') || '—';
+  document.getElementById('missionObs').textContent = params.get('observations') || '—';
+
+  const date = params.get('date_rdv');
+  if (date && date !== '—' && date.includes('-')) {
+    const [y,m,d] = date.split('-');
+    document.getElementById('missionDate').textContent = d + '/' + m + '/' + y;
+  } else {
+    document.getElementById('missionDate').textContent = date || '—';
+  }
+}
+loadMissionData();
+</script>
+</body>
+</html>
