@@ -391,8 +391,8 @@
         <div class="form-group">
           <label class="form-label">Type de mission</label>
           <select class="form-select" id="edlType">
-            <option value="residential_lease_check_in">État des lieux d'entrée (EDLE)</option>
-            <option value="residential_lease_check_out">État des lieux de sortie (EDLS)</option>
+            <option value="EDLE">État des lieux d'entrée (EDLE)</option>
+            <option value="EDLS">État des lieux de sortie (EDLS)</option>
           </select>
         </div>
         <div class="form-group">
@@ -404,6 +404,8 @@
         <div class="form-group">
           <label class="form-label">Type de bien</label>
           <select class="form-select" id="edlBienType">
+            <option value="Studio Vide">Studio Vide</option>
+            <option value="Studio Meublé">Studio Meublé</option>
             <option value="T1 Vide">T1 Vide</option>
             <option value="T1 Meublé">T1 Meublé</option>
             <option value="T2 Vide">T2 Vide</option>
@@ -414,8 +416,6 @@
             <option value="T4 Meublé">T4 Meublé</option>
             <option value="T5 Vide">T5 Vide</option>
             <option value="T5 Meublé">T5 Meublé</option>
-            <option value="Studio Vide">Studio Vide</option>
-            <option value="Studio Meublé">Studio Meublé</option>
             <option value="Maison Vide">Maison Vide</option>
             <option value="Maison Meublée">Maison Meublée</option>
             <option value="Local commercial">Local commercial</option>
@@ -424,8 +424,8 @@
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Date souhaitée</label>
-          <input type="date" class="form-input" id="edlDate2">
+          <label class="form-label">Surface (m²)</label>
+          <input type="number" class="form-input" id="edlSurface" placeholder="Ex : 45">
         </div>
       </div>
       <div class="form-grid full">
@@ -436,18 +436,28 @@
       </div>
       <div class="form-grid">
         <div class="form-group">
+          <label class="form-label">Étage</label>
+          <input type="text" class="form-input" id="edlEtage" placeholder="Ex : 3ème droite">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Code immeuble</label>
+          <input type="text" class="form-input" id="edlCode" placeholder="Ex : A1234">
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
           <label class="form-label">Nom du propriétaire</label>
           <input type="text" class="form-input" id="edlProprietaire" placeholder="Nom complet">
         </div>
         <div class="form-group">
-          <label class="form-label">Nom du locataire</label>
+          <label class="form-label">Nom du locataire entrant</label>
           <input type="text" class="form-input" id="edlLocataire" placeholder="Nom complet">
         </div>
       </div>
       <div class="form-grid">
         <div class="form-group">
-          <label class="form-label">Email du locataire</label>
-          <input type="email" class="form-input" id="edlEmailLocataire" placeholder="locataire@email.com">
+          <label class="form-label">Nom de l'ancien locataire</label>
+          <input type="text" class="form-input" id="edlAncienLocataire" placeholder="Nom complet">
         </div>
         <div class="form-group">
           <label class="form-label">Téléphone du locataire</label>
@@ -456,8 +466,14 @@
       </div>
       <div class="form-grid full">
         <div class="form-group">
+          <label class="form-label">Email du locataire</label>
+          <input type="email" class="form-input" id="edlEmailLocataire" placeholder="locataire@email.com">
+        </div>
+      </div>
+      <div class="form-grid full">
+        <div class="form-group">
           <label class="form-label">Observations / Instructions</label>
-          <textarea class="form-textarea" id="edlObservations" placeholder="Clés chez le gardien, code d'entrée, remarques particulières…"></textarea>
+          <textarea class="form-textarea" id="edlObservations" placeholder="Clés chez le gardien, informations complémentaires…"></textarea>
         </div>
       </div>
       <button class="btn-submit" id="btnEdlSubmit" onclick="submitEdl()">Envoyer la demande</button>
@@ -702,9 +718,13 @@ async function submitEdl() {
   const type = document.getElementById('edlType').value;
   const date = document.getElementById('edlDate').value;
   const typeBien = document.getElementById('edlBienType').value;
+  const surface = document.getElementById('edlSurface').value.trim();
   const adresse = document.getElementById('edlAdresse').value.trim();
+  const etage = document.getElementById('edlEtage').value.trim();
+  const code = document.getElementById('edlCode').value.trim();
   const proprietaire = document.getElementById('edlProprietaire').value.trim();
   const locataire = document.getElementById('edlLocataire').value.trim();
+  const ancienLocataire = document.getElementById('edlAncienLocataire').value.trim();
   const emailLocataire = document.getElementById('edlEmailLocataire').value.trim();
   const telLocataire = document.getElementById('edlTelLocataire').value.trim();
   const observations = document.getElementById('edlObservations').value.trim();
@@ -719,8 +739,7 @@ async function submitEdl() {
   btn.innerHTML = '<span class="spinner-inline"></span>Envoi en cours…';
 
   try {
-    const typeFr = type === 'residential_lease_check_in' ? 'EDLE' : 'EDLS';
-    const displayName = typeFr + ' - ' + currentClient + ' - ' + locataire;
+    const displayName = type + ' - ' + currentClient + ' - ' + locataire;
 
     await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
@@ -728,11 +747,15 @@ async function submitEdl() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         client: currentClient,
-        type: typeFr,
+        type,
         type_bien: typeBien,
+        surface,
         address: adresse,
+        etage,
+        code_immeuble: code,
         proprietaire,
         locataire,
+        ancien_locataire: ancienLocataire,
         email_locataire: emailLocataire,
         tel_locataire: telLocataire,
         date,
@@ -743,18 +766,14 @@ async function submitEdl() {
     document.getElementById('edlConfirmDetail').innerHTML =
       'Demande <strong>' + displayName + '</strong> enregistrée' +
       (date ? ' pour le <strong>' + formatDate(date) + '</strong>' : '') + '.<br>' +
-      'Adresse : ' + adresse + '<br>' +
-      'Type de bien : ' + typeBien + '<br>' +
-      'Un mail de confirmation a été envoyé à EPI.' +
-      (observations ? '<br>Note : ' + observations : '');
+      'Adresse : ' + adresse + (etage ? ' — ' + etage : '') + '<br>' +
+      'Type : ' + typeBien + (surface ? ' — ' + surface + ' m²' : '') + '<br>' +
+      'Un mail de confirmation a été envoyé à EPI.';
     document.getElementById('edlConfirm').classList.add('visible');
 
-    document.getElementById('edlAdresse').value = '';
-    document.getElementById('edlProprietaire').value = '';
-    document.getElementById('edlLocataire').value = '';
-    document.getElementById('edlEmailLocataire').value = '';
-    document.getElementById('edlTelLocataire').value = '';
-    document.getElementById('edlObservations').value = '';
+    ['edlAdresse','edlEtage','edlCode','edlProprietaire','edlLocataire',
+     'edlAncienLocataire','edlEmailLocataire','edlTelLocataire','edlObservations','edlSurface']
+      .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
 
   } catch (e) {
     alert('Erreur : ' + e.message);
@@ -1256,9 +1275,13 @@ async function loadHistorique() {
         client: r.client || '',
         type: r.type || '',
         type_bien: r.type_bien || '',
+        surface: r.surface || '',
         address: r.address || '',
+        etage: r.etage || '',
+        code_immeuble: r.code_immeuble || '',
         proprietaire: r.proprietaire || '',
         locataire: r.locataire || '',
+        ancien_locataire: r.ancien_locataire || '',
         date_rdv: r.date_rdv || '',
         observations: r.observations || '',
       });
