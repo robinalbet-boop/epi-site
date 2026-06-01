@@ -513,13 +513,25 @@ async function callClaude(edle, edls) {
   try {
     let clean = text.trim();
     clean = clean.replace(/^```json\s*/i, '').replace(/^```\s*/i, '');
-    clean = clean.replace(/\s*```$/i, '');
-    clean = clean.trim();
+    clean = clean.replace(/\s*```\s*$/i, '').trim();
     const start = clean.indexOf('{');
     const end = clean.lastIndexOf('}');
     if (start >= 0 && end > start) clean = clean.slice(start, end + 1);
-    return JSON.parse(clean);
-  } catch(e) { return { erreur_parsing: text }; }
+    const parsed = JSON.parse(clean);
+    if (!parsed.elements && !parsed.erreur_parsing) throw new Error('invalide');
+    return parsed;
+  } catch(e) {
+    try {
+      const match = text.match(/"elements"\s*:\s*\[/);
+      if (match) {
+        const idx2 = text.indexOf('"elements"');
+        const partial = '{"elements":' + text.slice(idx2 + '"elements":'.length);
+        const end2 = partial.lastIndexOf(']}') + 2;
+        return JSON.parse(partial.slice(0, end2));
+      }
+    } catch(e2) {}
+    return { erreur_parsing: text };
+  }
 }
 
 function buildPrompt(edle, edls) {
