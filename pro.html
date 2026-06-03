@@ -1006,8 +1006,11 @@ Retourne UNIQUEMENT un JSON valide :
   if (!res.ok) throw new Error(data.error?.message || 'Erreur Claude');
   const text = data.content?.[0]?.text || '{}';
   try {
-    return JSON.parse(text);
+    const result = JSON.parse(text);
+    return result;
   } catch(e) {
+    // Afficher les 100 premiers caractères pour comprendre le problème
+    alert('Parse error: ' + e.message + '\nDébut texte: ' + text.substring(0, 100));
     return { erreur_parsing: text };
   }
 
