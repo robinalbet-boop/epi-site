@@ -1000,17 +1000,14 @@ Retourne UNIQUEMENT un JSON valide :
 
   const res = await fetch(`${PROXY_BASE}/claude-proxy`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: 'claude-opus-4-5', max_tokens: 4000, messages: [{ role: 'user', content: prompt }] })
+    body: JSON.stringify({ model: 'claude-opus-4-5', max_tokens: 8000, messages: [{ role: 'user', content: prompt }] })
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error?.message || 'Erreur Claude');
   const text = data.content?.[0]?.text || '{}';
   try {
-    const result = JSON.parse(text);
-    return result;
+    return JSON.parse(text);
   } catch(e) {
-    // Afficher les 100 premiers caractères pour comprendre le problème
-    alert('Parse error: ' + e.message + '\nDébut texte: ' + text.substring(0, 100));
     return { erreur_parsing: text };
   }
 
