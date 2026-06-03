@@ -16,11 +16,30 @@ export default async function handler(req, res) {
 
   // ── VÉRIFICATION CLIENT AUTORISÉ ──
   if (action === 'check_client') {
+    const mdp = (reqBody.mdp || query.mdp || '').trim();
+
+    // Nouvelle logique : mot de passe → organisation via CLIENTS_MAP
+    // Format : "MDP1:ORG1,MDP2:ORG2"
+    const clientsMap = process.env.CLIENTS_MAP || '';
+    if (mdp && clientsMap) {
+      const pairs = clientsMap.split(',').map(p => p.trim());
+      const found = pairs.find(p => {
+        const [key] = p.split(':');
+        return key.trim().toUpperCase() === mdp.toUpperCase();
+      });
+      if (found) {
+        const orgName = found.split(':').slice(1).join(':').trim();
+        return res.status(200).json({ autorise: true, nom: orgName });
+      }
+      return res.status(200).json({ autorise: false, nom: null });
+    }
+
+    // Fallback : ancienne logique par nom (CLIENTS_AUTORISES)
     const clientsRaw = process.env.CLIENTS_AUTORISES || '';
     const clients = clientsRaw.split(',').map(c => c.trim().toUpperCase());
     const nom = (reqBody.nom || query.nom || '').trim().toUpperCase();
-    const found = clients.find(c => c === nom || nom.includes(c) || c.includes(nom));
-    return res.status(200).json({ autorise: !!found, nom: found || null });
+    const found2 = clients.find(c => c === nom || nom.includes(c) || c.includes(nom));
+    return res.status(200).json({ autorise: !!found2, nom: found2 || null });
   }
 
   const BASE_URL = 'https://api.nockee.eu/v2';
