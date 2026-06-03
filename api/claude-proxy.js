@@ -4,9 +4,15 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY || process.env.CLE_API_ANTHROPIC;
+  // Chercher la clé sous tous les noms possibles
+  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY 
+    || process.env.CLE_API_ANTHROPIC
+    || process.env.ANTHROPIC_KEY;
+
   if (!ANTHROPIC_KEY) {
-    return res.status(500).json({ error: 'Clé API Anthropic manquante' });
+    // Lister les variables dispo pour déboguer
+    const vars = Object.keys(process.env).join(',');
+    return res.status(500).json({ error: 'Clé Anthropic manquante', vars_disponibles: vars });
   }
 
   try {
@@ -29,10 +35,9 @@ export default async function handler(req, res) {
     const data = await response.json();
     if (!response.ok) return res.status(response.status).json(data);
 
-    // Nettoyage robuste : extraire le JSON brut
+    // Extraire le JSON pur entre { et }
     if (data.content && data.content[0] && data.content[0].type === 'text') {
       const text = data.content[0].text;
-      // Trouver le premier { et le dernier } pour extraire le JSON pur
       const start = text.indexOf('{');
       const end = text.lastIndexOf('}');
       if (start >= 0 && end > start) {
@@ -43,7 +48,5 @@ export default async function handler(req, res) {
     return res.status(200).json(data);
 
   } catch (error) {
-    console.error('Claude proxy error:', error);
     return res.status(500).json({ error: error.message });
   }
-}
