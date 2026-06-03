@@ -1006,31 +1006,11 @@ Retourne UNIQUEMENT un JSON valide :
   if (!res.ok) throw new Error(data.error?.message || 'Erreur Claude');
   const text = data.content?.[0]?.text || '{}';
   try {
-    let clean = text.trim();
-    // Supprimer toutes les balises markdown
-    clean = clean.replace(/^```json\s*/i, '').replace(/^```\s*/i, '');
-    clean = clean.replace(/\s*```\s*$/i, '').trim();
-    // Extraire uniquement le JSON entre { et }
-    const start = clean.indexOf('{');
-    const end = clean.lastIndexOf('}');
-    if (start >= 0 && end > start) clean = clean.slice(start, end + 1);
-    const parsed = JSON.parse(clean);
-    // Vérifier que le JSON contient bien les clés attendues
-    if (!parsed.elements && !parsed.erreur_parsing) throw new Error('Structure invalide');
-    return parsed;
+    return JSON.parse(text);
   } catch(e) {
-    // Tentative de récupération : chercher un tableau elements
-    try {
-      const match = text.match(/"elements"\s*:\s*\[/);
-      if (match) {
-        const idx = text.indexOf(match[0]);
-        const partial = '{"elements":' + text.slice(idx + '"elements":'.length);
-        const end2 = partial.lastIndexOf(']}') + 2;
-        return JSON.parse(partial.slice(0, end2));
-      }
-    } catch(e2) {}
     return { erreur_parsing: text };
   }
+
 }
 
 function compRenderAnalysis(json, edle, edls) {
