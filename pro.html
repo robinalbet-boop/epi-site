@@ -587,7 +587,7 @@
         </div>
       </div>
       <div class="section-label">Analyse IA</div>
-      <button class="btn-submit" id="compBtnAnalyze" disabled style="width:100%;margin-bottom:24px">Lancer la comparaison Claude IA</button>
+      <button class="btn-submit" id="compBtnAnalyze" disabled style="width:100%;margin-bottom:24px">Lancer la comparaison</button>
       <div class="loading-state" id="compLoadingState">
         <div class="spinner"></div>
         <div>Récupération et analyse des rapports…</div>
@@ -996,7 +996,13 @@ RÈGLE ABSOLUE N°2 — VÉTUSTÉ :
 La vétusté (usure_normale) ne s'applique QUE si la durée d'occupation >= 10 ans. Si durée < 10 ans : toute dégradation NOUVELLE est "imputable". Sont TOUJOURS imputables quelle que soit la durée : salissures, moisissures nouvelles, joints nouveaux sales, trous/rayures/brûlures nouveaux.
 
 Retourne UNIQUEMENT un JSON valide :
-{"elements":[{"piece":"...","element":"...","etat_entree":"...","etat_sortie":"...","qualification":"imputable|usure_normale|amelioration|disparu|ok","commentaire":"..."}],"synthese":{"niveau_global":"BON|MOYEN|DÉGRADÉ","nb_imputables":0,"nb_bailleur":0,"resume":"..."}}`;
+{"elements":[{"piece":"...","element":"...","etat_entree":"...","etat_sortie":"...","qualification":"imputable|usure_normale|amelioration|disparu|ok","commentaire":"..."}],"synthese":{"niveau_global":"BON|MOYEN|DÉGRADÉ","nb_imputables":0,"nb_bailleur":0,"resume":"..."}}
+
+Règles de filtrage STRICTES pour usure_normale :
+- N\'inclure en usure_normale QUE les éléments nécessitant une vraie remise en état : joints à refaire, peinture en mauvais état, éléments cassés ou abîmés, détecteur de fumée absent/défaillant, éléments structurels dégradés.
+- Ne PAS inclure les simples passages de Excellent à Bon ou de Bon à Usé sans remarque particulière.
+- Ne jamais inclure les éléments qualifiés ok dans le JSON final.
+- Tout le texte en français, JSON uniquement.`;
 
   const res = await fetch(`${PROXY_BASE}/claude-proxy`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
