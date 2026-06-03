@@ -886,12 +886,22 @@ async function compEnrichWithSignatories(reports) {
         const name = (o.legal_name || [o.first_name, o.last_name].filter(Boolean).join(' ')).toUpperCase();
         return name.includes(clientUpper) || clientUpper.includes(name.split(' ')[0]);
       });
+      // Stocker l'adresse normalisée pour le matching des rapports importés
+      const addr = r.property?.address;
+      r._addrKey = addr ? (addr.line_1 || '').toUpperCase().replace(/\s+/g,'') + (addr.postal_code || '') : '';
     } catch { r._tenants = []; r._isOwner = false; }
     return r;
   }));
   const enriched = results.map(r => r.status === 'fulfilled' ? r.value : r.reason);
-  // Ne garder que les rapports où le client est bailleur
-  return enriched.filter(r => r._isOwner);
+  // Adresses des rapports natifs du client
+  const ownerAddrs = new Set(enriched.filter(r => r._isOwner && r._addrKey).map(r => r._addrKey));
+
+  // Inclure : rapports natifs du client OU rapports importés à même adresse
+  return enriched.filter(r => {
+    if (r._isOwner) return true;
+    if (r.imported && r._addrKey && ownerAddrs.has(r._addrKey)) return true;
+    return false;
+  });
 }
 
 function compRenderResults(reports) {
