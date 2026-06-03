@@ -282,7 +282,7 @@
   </div>
 
   <div class="section-label">03 — Analyse IA</div>
-  <button class="btn-analyze" id="btnAnalyze" disabled>Lancer la comparaison Claude IA</button>
+  <button class="btn-analyze" id="btnAnalyze" disabled>Lancer la comparaison</button>
 
   <div class="loading-state" id="loadingState">
     <div class="spinner"></div>
@@ -612,6 +612,8 @@ RÈGLES DE QUALIFICATION :
 Autres règles :
 - Tout le texte en français
 - N'inclure que les éléments avec une évolution notable (pas les "ok")
+- N'inclure en usure_normale QUE les éléments nécessitant une vraie remise en état : joints à refaire, peinture en mauvais état, éléments cassés ou abîmés, détecteur de fumée absent/défaillant. Ne PAS inclure les simples passages de Excellent à Bon sans remarque.
+- Ne jamais inclure les éléments qualifiés ok dans le JSON final.
 - JSON uniquement, rien d'autre`;
 }
 
