@@ -4,9 +4,9 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY
-    || process.env.CLE_API_ANTHROPIC
-    || process.env.ANTHROPIC_KEY;
+  const ANTHROPIC_KEY = process.env['CLÉ_API_ANTHROPIC']
+    || process.env.ANTHROPIC_API_KEY
+    || process.env.CLE_API_ANTHROPIC;
 
   if (!ANTHROPIC_KEY) {
     return res.status(500).json({ error: 'Clé Anthropic manquante' });
