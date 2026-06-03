@@ -350,12 +350,12 @@
     <div class="login-title">Espace Professionnel</div>
     <div class="login-sub">Accès réservé aux partenaires et donneurs d'ordre</div>
     <input type="text" class="login-field" id="loginInput"
-      placeholder="Nom de votre organisation"
-      autocomplete="organization"
+      placeholder="Mot de passe"
+      autocomplete="off" type="password"
       onkeydown="if(event.key==='Enter') doLogin()">
     <button class="btn-login" id="btnLogin" onclick="doLogin()">Accéder à mon espace</button>
     <div class="login-error" id="loginError"></div>
-    <div class="login-hint">Saisissez le nom de votre organisation<br>tel qu'enregistré auprès d'EPI</div>
+    <div class="login-hint">Saisissez votre mot de passe d'accès<br>communiqué par EPI Expertises Immobilières</div>
   </div>
 </div>
 
@@ -667,9 +667,9 @@ async function doLogin() {
 
 async function checkOrganisation(term) {
   try {
-    const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=check_client&nom=${encodeURIComponent(term)}`);
+    const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=check_client&mdp=${encodeURIComponent(term)}`);
     const data = await res.json();
-    return data.autorise ? (data.nom || term) : null;
+    return data.autorise ? data.nom : null;
   } catch {
     return null;
   }
@@ -877,11 +877,21 @@ async function compEnrichWithSignatories(reports) {
     try {
       const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=get_signatories&inspection_report_id=${r.id}`);
       const data = await res.json();
-      r._tenants = (data.data || []).filter(s => s.type === 'tenant').map(s => [s.first_name, s.last_name].filter(Boolean).join(' ')).filter(Boolean);
-    } catch { r._tenants = []; }
+      const sigs = data.data || [];
+      r._tenants = sigs.filter(s => s.type === 'tenant').map(s => [s.first_name, s.last_name].filter(Boolean).join(' ')).filter(Boolean);
+      // Vérifier si le client connecté est bailleur (owner) sur ce rapport
+      const owners = sigs.filter(s => s.type === 'owner');
+      const clientUpper = (currentClient || '').toUpperCase();
+      r._isOwner = owners.some(o => {
+        const name = (o.legal_name || [o.first_name, o.last_name].filter(Boolean).join(' ')).toUpperCase();
+        return name.includes(clientUpper) || clientUpper.includes(name.split(' ')[0]);
+      });
+    } catch { r._tenants = []; r._isOwner = false; }
     return r;
   }));
-  return results.map(r => r.status === 'fulfilled' ? r.value : r.reason);
+  const enriched = results.map(r => r.status === 'fulfilled' ? r.value : r.reason);
+  // Ne garder que les rapports où le client est bailleur
+  return enriched.filter(r => r._isOwner);
 }
 
 function compRenderResults(reports) {
