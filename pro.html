@@ -450,15 +450,11 @@
           <input type="text" class="form-input" id="edlProprietaire" placeholder="Nom complet">
         </div>
         <div class="form-group">
-          <label class="form-label">Nom du locataire entrant</label>
+          <label class="form-label">Nom du locataire</label>
           <input type="text" class="form-input" id="edlLocataire" placeholder="Nom complet">
         </div>
       </div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Nom de l'ancien locataire</label>
-          <input type="text" class="form-input" id="edlAncienLocataire" placeholder="Nom complet">
-        </div>
+      <div class="form-grid full">
         <div class="form-group">
           <label class="form-label">Téléphone du locataire</label>
           <input type="tel" class="form-input" id="edlTelLocataire" placeholder="06 00 00 00 00">
@@ -712,7 +708,7 @@ function selectDiag(el, type) {
 }
 
 // ── SOUMETTRE EDL ──
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzqKY7eDpgAMEAdGXZDPuLIslYEtqb5HH_UEElGFRVBAZmm7tTNagbGPPFvrXfyqAVx/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwPzjD0l1NBzKN921NbMziLG9qYVZOfRunvH4z24EvMxpgTua3Vmnn_GsGbC5JCFsq/exec';
 
 async function submitEdl() {
   const type = document.getElementById('edlType').value;
@@ -724,7 +720,6 @@ async function submitEdl() {
   const code = document.getElementById('edlCode').value.trim();
   const proprietaire = document.getElementById('edlProprietaire').value.trim();
   const locataire = document.getElementById('edlLocataire').value.trim();
-  const ancienLocataire = document.getElementById('edlAncienLocataire').value.trim();
   const emailLocataire = document.getElementById('edlEmailLocataire').value.trim();
   const telLocataire = document.getElementById('edlTelLocataire').value.trim();
   const observations = document.getElementById('edlObservations').value.trim();
@@ -755,7 +750,6 @@ async function submitEdl() {
         code_immeuble: code,
         proprietaire,
         locataire,
-        ancien_locataire: ancienLocataire,
         email_locataire: emailLocataire,
         tel_locataire: telLocataire,
         date,
@@ -772,7 +766,7 @@ async function submitEdl() {
     document.getElementById('edlConfirm').classList.add('visible');
 
     ['edlAdresse','edlEtage','edlCode','edlProprietaire','edlLocataire',
-     'edlAncienLocataire','edlEmailLocataire','edlTelLocataire','edlObservations','edlSurface']
+'edlEmailLocataire','edlTelLocataire','edlObservations','edlSurface']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
 
   } catch (e) {
@@ -1301,7 +1295,6 @@ async function loadHistorique() {
         code_immeuble: r.code_immeuble || '',
         proprietaire: r.proprietaire || '',
         locataire: r.locataire || '',
-        ancien_locataire: r.ancien_locataire || '',
         date_rdv: r.date_rdv || '',
         observations: r.observations || '',
       });
