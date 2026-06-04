@@ -55,9 +55,23 @@
   .print-btn:hover { background: #2a5298; transform: translateY(-2px); }
 
   @media print {
-    body { background: white; padding: 0; }
+    body { background: white; padding: 0; font-size: 11px; }
     .document { box-shadow: none; }
     .print-btn { display: none; }
+    .header { padding: 16px 28px; }
+    .body { padding: 16px 28px; }
+    .footer { padding: 8px 28px; }
+    .parties { margin-bottom: 12px; }
+    .mission-box { padding: 10px 14px; margin-bottom: 10px; }
+    .mission-grid { gap: 6px; }
+    .field-value { padding: 4px 8px; min-height: 22px; font-size: 11px; }
+    .field-label { font-size: 9px; }
+    .mentions { padding-top: 10px; font-size: 9px; }
+    .section-title { margin-bottom: 8px; }
+    .partie-content { padding: 8px 10px; }
+    .partie-name { font-size: 13px; margin-bottom: 3px; }
+    .partie-detail { font-size: 10px; }
+    .gold-band { height: 3px; }
   }
 </style>
 </head>
@@ -89,7 +103,6 @@
         <div class="partie-header">Donneur d'ordre</div>
         <div class="partie-content">
           <div class="partie-name" id="clientNom">—</div>
-          <div class="partie-detail">Partenaire EPI Expertises Immobilières</div>
         </div>
       </div>
       <div class="partie-box">
@@ -135,14 +148,10 @@
           <div class="field-value" id="missionProprietaire">—</div>
         </div>
         <div class="mission-field">
-          <div class="field-label">Locataire entrant</div>
+          <div class="field-label">Locataire</div>
           <div class="field-value" id="missionLocataire">—</div>
         </div>
-        <div class="mission-field full">
-          <div class="field-label">Ancien locataire</div>
-          <div class="field-value" id="missionAncienLocataire">—</div>
-        </div>
-        <div class="mission-field full">
+<div class="mission-field full">
           <div class="field-label">Date d'intervention souhaitée</div>
           <div class="field-value" id="missionDate">—</div>
         </div>
@@ -151,13 +160,6 @@
           <div class="field-value" id="missionObs" style="min-height:48px">—</div>
         </div>
       </div>
-    </div>
-
-    <div class="section-title">Conditions d'intervention</div>
-    <div class="conditions">
-      <strong>Tarification :</strong> Selon barème en vigueur communiqué au donneur d'ordre. La facture sera émise à l'issue de la mission.<br>
-      <strong>Délai de livraison :</strong> Le rapport sera transmis par voie électronique le jour même ou au plus tard sous 24h.<br>
-      <strong>Annulation :</strong> Toute annulation doit être signalée au moins 48h à l'avance. En cas d'annulation tardive ou d'absence, des frais de déplacement pourront être facturés.
     </div>
 
     <div class="mentions">
@@ -193,15 +195,20 @@ function loadMissionData() {
   document.getElementById("missionSurface").textContent = p.get("surface") ? p.get("surface") + " m²" : "—";
   document.getElementById("missionProprietaire").textContent = p.get("proprietaire") || "—";
   document.getElementById("missionLocataire").textContent = p.get("locataire") || "—";
-  document.getElementById("missionAncienLocataire").textContent = p.get("ancien_locataire") || "—";
   document.getElementById("missionObs").textContent = p.get("observations") || "—";
 
-  const date = p.get("date_rdv") || p.get("date");
-  if (date && date.includes("-")) {
-    const [y,m,d] = date.split("-");
-    document.getElementById("missionDate").textContent = d + "/" + m + "/" + y;
+  const date = p.get("date_rdv") || p.get("date") || "";
+  if (date) {
+    // Gérer ISO complet (2026-05-21T22:00:00.000Z) ou simple (2026-05-21)
+    const datePart = date.split("T")[0];
+    if (datePart && datePart.includes("-")) {
+      const parts = datePart.split("-");
+      document.getElementById("missionDate").textContent = parts[2] + "/" + parts[1] + "/" + parts[0];
+    } else {
+      document.getElementById("missionDate").textContent = date;
+    }
   } else {
-    document.getElementById("missionDate").textContent = date || "—";
+    document.getElementById("missionDate").textContent = "—";
   }
 }
 loadMissionData();
