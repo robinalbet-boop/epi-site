@@ -359,16 +359,6 @@
   </div>
 </div>
 
-<!-- MODALE ENVOI MAIL -->
-<div id="sendModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:2000;align-items:center;justify-content:center;">
-  <div style="background:white;border-radius:16px;padding:32px 28px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
-    <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--bleu);margin-bottom:6px">Envoyer pour chiffrage</div>
-    <div style="font-size:12px;color:var(--texte-leger);margin-bottom:24px">Choisissez votre application de messagerie</div>
-    <div id="sendModalButtons" style="display:flex;flex-direction:column;gap:10px;"></div>
-    <button onclick="document.getElementById('sendModal').style.display='none'" style="margin-top:16px;width:100%;background:var(--gris);border:1px solid var(--border);color:var(--texte-leger);border-radius:8px;padding:10px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;">Annuler</button>
-  </div>
-</div>
-
 <!-- ESPACE PRO -->
 <div id="screenPro">
   <div class="pro-hero">
@@ -722,7 +712,7 @@ function selectDiag(el, type) {
 }
 
 // ── SOUMETTRE EDL ──
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwW8S6_o8SMd69Qk4TYXng3mzL7z9eFfOPKRi_ZUBz_QeUkOXsmEpwH_5Kq3La1yaJd/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUR48XvlJi3546y3eLEgsPL68z31aM7zNoSDUYUCWLcvegtnmg1ukqlme2vcFYZKUZ/exec';
 
 async function submitEdl() {
   const type = document.getElementById('edlType').value;
@@ -1207,7 +1197,7 @@ function compRenderAnalysis(json, edle, edls) {
     ).join('\n\n');
     const body = `Bonjour,\n\nVeuillez trouver ci-dessous le détail des dégradations imputables au locataire pour le bien situé au ${addrStr} (locataire : ${tenantStr}), pour chiffrage.\n\n━━ PARTIE LOCATAIRE ━━\n\n${lignes}\n\nCordialement,\nEPI Expertises Immobilières`;
     const mailto = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage dégradations locataire — ' + addrStr + ' — ' + tenantStr)}&body=${encodeURIComponent(body)}`;
-    showSendModal('Chiffrage dégradations locataire — ' + addrStr + ' — ' + tenantStr, body);
+    window.location.href = mailto;
   });
 
   document.getElementById('compBtnValBail')?.addEventListener('click', () => {
@@ -1218,7 +1208,7 @@ function compRenderAnalysis(json, edle, edls) {
     ).join('\n\n');
     const body = `Bonjour,\n\nVeuillez trouver ci-dessous le détail des remises en état à la charge du bailleur pour le bien situé au ${addrStr} (locataire : ${tenantStr}), pour chiffrage.\n\n━━ PARTIE BAILLEUR ━━\n\n${lignes}\n\nCordialement,\nEPI Expertises Immobilières`;
     const mailto = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage remise en état bailleur — ' + addrStr + ' — ' + tenantStr)}&body=${encodeURIComponent(body)}`;
-    showSendModal('Chiffrage remise en état bailleur — ' + addrStr + ' — ' + tenantStr, body);
+    window.location.href = mailto;
   });
 }
 
@@ -1258,65 +1248,6 @@ compBtnCopy.addEventListener('click', () => {
   compBtnCopy.textContent = 'Copié ✓';
   setTimeout(() => compBtnCopy.textContent = 'Copier', 2000);
 });
-
-// ── MODALE ENVOI MAIL ──
-function showSendModal(subject, body) {
-  const modal = document.getElementById('sendModal');
-  const btns = document.getElementById('sendModalButtons');
-  const subjectEnc = encodeURIComponent(subject);
-  const bodyEnc = encodeURIComponent(body);
-  const dest = 'jmrservices75@gmail.com';
-
-  btns.innerHTML = '';
-
-  const options = [
-    {
-      label: '📧 Gmail',
-      icon: 'https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico',
-      url: `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(dest)}&su=${subjectEnc}&body=${bodyEnc}`,
-      bg: '#EA4335', color: 'white'
-    },
-    {
-      label: '📬 Outlook / Hotmail',
-      url: `https://outlook.live.com/mail/0/deeplink/compose?to=${encodeURIComponent(dest)}&subject=${subjectEnc}&body=${bodyEnc}`,
-      bg: '#0078D4', color: 'white'
-    },
-    {
-      label: '📮 Yahoo Mail',
-      url: `https://compose.mail.yahoo.com/?to=${encodeURIComponent(dest)}&subject=${subjectEnc}&body=${bodyEnc}`,
-      bg: '#6001D2', color: 'white'
-    },
-    {
-      label: '✉️ Application mail par défaut',
-      url: `mailto:${dest}?subject=${subjectEnc}&body=${bodyEnc}`,
-      bg: 'var(--bleu)', color: 'white'
-    },
-    {
-      label: '📋 Copier le message',
-      action: () => {
-        navigator.clipboard.writeText(subject + '\n\n' + body);
-        document.getElementById('sendModal').style.display = 'none';
-        alert('Message copié ! Collez-le dans votre application de messagerie.');
-      },
-      bg: 'var(--gris)', color: 'var(--texte)'
-    }
-  ];
-
-  options.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.textContent = opt.label;
-    btn.style.cssText = `width:100%;background:${opt.bg};color:${opt.color};border:none;border-radius:8px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-align:left;transition:opacity 0.15s;`;
-    btn.onmouseover = () => btn.style.opacity = '0.85';
-    btn.onmouseout = () => btn.style.opacity = '1';
-    btn.addEventListener('click', () => {
-      if (opt.action) { opt.action(); }
-      else { window.open(opt.url, '_blank'); document.getElementById('sendModal').style.display = 'none'; }
-    });
-    btns.appendChild(btn);
-  });
-
-  modal.style.display = 'flex';
-}
 
 // ══════════════════════════════════════
 // ── HISTORIQUE DES DEMANDES ──
