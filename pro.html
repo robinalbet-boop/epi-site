@@ -722,7 +722,7 @@ function selectDiag(el, type) {
 }
 
 // ── SOUMETTRE EDL ──
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUR48XvlJi3546y3eLEgsPL68z31aM7zNoSDUYUCWLcvegtnmg1ukqlme2vcFYZKUZ/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZyN63_0HH_vPyf4Dzo6oP3nJhGeF8fWTvoA_a_7HM05uM_vaNc0uyoyYhAoicsbjf/exec';
 
 async function submitEdl() {
   const type = document.getElementById('edlType').value;
@@ -1342,8 +1342,16 @@ async function loadHistorique() {
       }[statut] || 'statut-attente';
 
       const dateRdv = r.date_rdv_confirme || r.date_rdv || '—';
-      const dateRdvFr = dateRdv && dateRdv.includes('-') ?
-        dateRdv.split('-').reverse().join('/') : dateRdv;
+      function parseDateFr(d) {
+        if (!d || d === '—') return '—';
+        if (d.includes('T')) d = d.split('T')[0]; // ISO : 2026-05-17T22:00:00Z → 2026-05-17
+        if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+          const [y,m,day] = d.split('-');
+          return day + '/' + m + '/' + y;
+        }
+        return d;
+      }
+      const dateRdvFr = parseDateFr(dateRdv);
 
       // Lien ordre de mission
       const omParams = new URLSearchParams({
@@ -1366,7 +1374,7 @@ async function loadHistorique() {
       const tr = document.createElement('tr');
       tr.innerHTML =
         '<td style="font-size:11px;color:#8a909e">' + (r.id || '—') + '</td>' +
-        '<td>' + (r.date || '—') + '</td>' +
+        '<td>' + parseDateFr(r.date) + '</td>' +
         '<td><strong>' + (r.type || '—') + '</strong></td>' +
         '<td style="color:var(--texte-leger)">' + (r.type_bien || '—') + '</td>' +
         '<td>' + (r.address || '—') + '</td>' +
