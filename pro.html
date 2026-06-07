@@ -387,6 +387,25 @@
     <!-- ONGLET EDL -->
     <div class="tab-panel active" id="panel-edl">
       <div class="section-label">Demande d'état des lieux</div>
+
+      <!-- REMPLISSAGE AUTOMATIQUE -->
+      <div style="background:var(--bleu-pale);border:1.5px solid rgba(26,60,110,0.2);border-radius:10px;padding:16px 20px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--bleu)">✨ Remplissage automatique</div>
+            <div style="font-size:11px;color:var(--texte-leger);margin-top:2px">Collez les infos du locataire depuis votre logiciel — les champs se rempliront automatiquement</div>
+          </div>
+          <button onclick="toggleAutoFill()" id="btnAutoFill" style="background:var(--bleu);color:white;border:none;border-radius:8px;padding:8px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Coller les infos</button>
+        </div>
+        <div id="autoFillZone" style="display:none">
+          <textarea id="autoFillText" style="width:100%;min-height:100px;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--texte);resize:vertical;outline:none" placeholder="Collez ici n'importe quel texte contenant les infos du locataire&#10;&#10;Exemple :&#10;Locataire : MARTIN Jean — jean.martin@gmail.com — 06 12 34 56 78&#10;Bien : T3 Vide 65m², 12 rue de la Paix 75002 Paris, 2ème étage&#10;Bailleur : SCI DUPONT&#10;Date EDL : 15/07/2026"></textarea>
+          <div style="display:flex;gap:10px;margin-top:10px">
+            <button onclick="runAutoFill()" id="btnRunAutoFill" style="background:var(--or);color:white;border:none;border-radius:8px;padding:9px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Remplir les champs</button>
+            <button onclick="toggleAutoFill()" style="background:white;border:1.5px solid var(--border);color:var(--texte-leger);border-radius:8px;padding:9px 16px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">Annuler</button>
+          </div>
+          <div id="autoFillStatus" style="font-size:12px;margin-top:8px;color:var(--bleu);display:none"></div>
+        </div>
+      </div>
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">Type de mission</label>
@@ -1354,6 +1373,93 @@ async function loadHistorique() {
     emptyMsg.textContent = 'Erreur de chargement : ' + e.message;
     emptyMsg.style.display = 'block';
   }
+}
+
+// ── REMPLISSAGE AUTOMATIQUE ──
+function toggleAutoFill() {
+  const zone = document.getElementById('autoFillZone');
+  zone.style.display = zone.style.display === 'none' ? 'block' : 'none';
+  if (zone.style.display === 'block') {
+    document.getElementById('autoFillText').focus();
+  }
+}
+
+async function runAutoFill() {
+  const text = document.getElementById('autoFillText').value.trim();
+  if (!text) { alert('Veuillez coller du texte à analyser.'); return; }
+
+  const btn = document.getElementById('btnRunAutoFill');
+  const status = document.getElementById('autoFillStatus');
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyse en cours…';
+  status.style.display = 'block';
+  status.textContent = 'Claude analyse les informations…';
+
+  try {
+    const prompt = `Tu es un assistant spécialisé dans l'extraction d'informations immobilières.
+Analyse ce texte et extrais les informations suivantes en JSON.
+Si une information est absente, mets une chaîne vide "".
+Les dates doivent être au format YYYY-MM-DD.
+Le type doit être "EDLE" (entrée) ou "EDLS" (sortie).
+Le type_bien doit correspondre à : Studio Vide, Studio Meublé, T1 Vide, T1 Meublé, T2 Vide, T2 Meublé, T3 Vide, T3 Meublé, T4 Vide, T4 Meublé, T5 Vide, T5 Meublé, Maison Vide, Maison Meublée, Local commercial, Bureau, Autre.
+
+Texte à analyser :
+${text}
+
+Réponds UNIQUEMENT avec ce JSON :
+{
+  "type": "",
+  "date": "",
+  "type_bien": "",
+  "surface": "",
+  "adresse": "",
+  "etage": "",
+  "code_immeuble": "",
+  "proprietaire": "",
+  "locataire": "",
+  "email_locataire": "",
+  "tel_locataire": "",
+  "observations": ""
+}`;
+
+    const res = await fetch('/api/claude-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text_response = data.content?.[0]?.text || '{}';
+    const parsed = JSON.parse(text_response);
+
+    // Remplir les champs
+    if (parsed.type) document.getElementById('edlType').value = parsed.type;
+    if (parsed.date) document.getElementById('edlDate').value = parsed.date;
+    if (parsed.type_bien) document.getElementById('edlBienType').value = parsed.type_bien;
+    if (parsed.surface) document.getElementById('edlSurface').value = parsed.surface;
+    if (parsed.adresse) document.getElementById('edlAdresse').value = parsed.adresse;
+    if (parsed.etage) document.getElementById('edlEtage').value = parsed.etage;
+    if (parsed.code_immeuble) document.getElementById('edlCode').value = parsed.code_immeuble;
+    if (parsed.proprietaire) document.getElementById('edlProprietaire').value = parsed.proprietaire;
+    if (parsed.locataire) document.getElementById('edlLocataire').value = parsed.locataire;
+    if (parsed.email_locataire) document.getElementById('edlEmailLocataire').value = parsed.email_locataire;
+    if (parsed.tel_locataire) document.getElementById('edlTelLocataire').value = parsed.tel_locataire;
+    if (parsed.observations) document.getElementById('edlObservations').value = parsed.observations;
+
+    status.style.color = '#16a34a';
+    status.textContent = '✓ Champs remplis automatiquement — vérifiez et complétez si nécessaire';
+    document.getElementById('autoFillText').value = '';
+
+  } catch(e) {
+    status.style.color = '#e05c5c';
+    status.textContent = '✗ Erreur : ' + e.message;
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Remplir les champs';
 }
 
 // Charger l'historique est géré directement dans showTab ci-dessous
