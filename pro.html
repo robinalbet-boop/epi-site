@@ -1371,24 +1371,67 @@ async function loadRapportNockee(address, locataire, type, btn) {
   btn.textContent = '⏳ Recherche…';
 
   try {
-    // Chercher par adresse ou locataire
-    const searchTerm = locataire || address;
-    const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=search&search_term=${encodeURIComponent(searchTerm)}`);
-    const data = await res.json();
-    const reports = data.data || [];
-
-    // Filtrer par type et adresse approximative
     const typeNockee = type === 'EDLE' ? 'residential_lease_check_in' : 'residential_lease_check_out';
-    const addrKey = address.toUpperCase().replace(/\s+/g,'').substring(0, 15);
 
-    const match = reports.find(r => {
-      const rAddr = ((r.property?.address?.line_1 || '') + (r.property?.address?.postal_code || '')).toUpperCase().replace(/\s+/g,'');
-      return r.type === typeNockee && rAddr.includes(addrKey);
-    });
+    // Fonction de normalisation d'adresse pour comparaison souple
+    function normAddr(s) {
+      return (s||'').toUpperCase()
+        .replace(/[ÀÁÂÃ]/g,'A').replace(/[ÉÈÊË]/g,'E').replace(/[ÎÏÌÍ]/g,'I')
+        .replace(/[ÔÒÕÖ]/g,'O').replace(/[ÙÛÜÚ]/g,'U').replace(/Ç/g,'C')
+        .replace(/[^A-Z0-9]/g,'');
+    }
+
+    // Extraire le numéro et début de rue depuis l'adresse
+    function addrScore(sheetAddr, nockeeAddr) {
+      const a = normAddr(sheetAddr);
+      const b = normAddr(nockeeAddr);
+      // Chercher les 10 premiers caractères significatifs
+      const aKey = a.substring(0, 12);
+      const bKey = b.substring(0, 12);
+      if (a === b) return 3;
+      if (b.includes(aKey) || a.includes(bKey)) return 2;
+      // Comparer les chiffres (numéro de rue)
+      const aNum = (sheetAddr.match(/\d+/) || [''])[0];
+      const bNum = (nockeeAddr.match(/\d+/) || [''])[0];
+      if (aNum && aNum === bNum && normAddr(sheetAddr).substring(2,8) === normAddr(nockeeAddr).substring(2,8)) return 1;
+      return 0;
+    }
+
+    let match = null;
+
+    // 1. Chercher par nom de locataire
+    if (locataire && locataire.trim()) {
+      const lastName = locataire.trim().split(/\s+/).pop(); // Prendre le dernier mot (nom de famille)
+      const res1 = await fetch(`${PROXY_BASE}/nockee-proxy?action=search&search_term=${encodeURIComponent(lastName)}`);
+      const data1 = await res1.json();
+      const reports1 = (data1.data || []).filter(r => r.type === typeNockee);
+      // Scorer par adresse
+      const scored1 = reports1.map(r => ({
+        r, score: addrScore(address, (r.property?.address?.line_1||'') + ' ' + (r.property?.address?.postal_code||''))
+      })).filter(x => x.score > 0).sort((a,b) => b.score - a.score);
+      if (scored1.length > 0) match = scored1[0].r;
+    }
+
+    // 2. Si pas trouvé, chercher par numéro + début de rue
+    if (!match) {
+      const streetNum = (address.match(/^\d+/) || [''])[0];
+      const streetWords = address.replace(/^\d+\s*/,'').split(/\s+/).slice(0,2).join(' ');
+      const searchTerm2 = (streetNum + ' ' + streetWords).trim();
+      if (searchTerm2.length > 2) {
+        const res2 = await fetch(`${PROXY_BASE}/nockee-proxy?action=search&search_term=${encodeURIComponent(searchTerm2)}`);
+        const data2 = await res2.json();
+        const reports2 = (data2.data || []).filter(r => r.type === typeNockee);
+        const scored2 = reports2.map(r => ({
+          r, score: addrScore(address, (r.property?.address?.line_1||'') + ' ' + (r.property?.address?.postal_code||''))
+        })).filter(x => x.score > 0).sort((a,b) => b.score - a.score);
+        if (scored2.length > 0) match = scored2[0].r;
+      }
+    }
 
     if (!match) {
       btn.textContent = '❌ Non trouvé';
       btn.style.background = '#e05c5c';
+      btn.disabled = false;
       return;
     }
 
