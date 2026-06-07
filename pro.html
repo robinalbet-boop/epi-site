@@ -1286,9 +1286,26 @@ async function loadHistorique() {
         'Facturé': 'statut-facture',
       }[statut] || 'statut-attente';
 
+      function parseDateFr(d) {
+        if (!d || d === '—' || d === '') return '—';
+        d = String(d).trim();
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(d)) return d; // déjà DD/MM/YYYY
+        if (d.includes('T')) d = d.split('T')[0]; // ISO complet
+        if (/^\d{4}-\d{2}-\d{2}$/.test(d)) { // YYYY-MM-DD
+          const [y,m,day] = d.split('-');
+          return day + '/' + m + '/' + y;
+        }
+        // Format JS Date toString : "Mon May 18 2026 00:00:00 GMT..."
+        const jsDate = new Date(d);
+        if (!isNaN(jsDate.getTime())) {
+          return String(jsDate.getDate()).padStart(2,'0') + '/' +
+                 String(jsDate.getMonth()+1).padStart(2,'0') + '/' +
+                 jsDate.getFullYear();
+        }
+        return d;
+      }
       const dateRdv = r.date_rdv_confirme || r.date_rdv || '—';
-      const dateRdvFr = dateRdv && dateRdv.includes('-') ?
-        dateRdv.split('-').reverse().join('/') : dateRdv;
+      const dateRdvFr = parseDateFr(dateRdv);
 
       // Lien ordre de mission
       const omParams = new URLSearchParams({
@@ -1311,7 +1328,7 @@ async function loadHistorique() {
       const tr = document.createElement('tr');
       tr.innerHTML =
         '<td style="font-size:11px;color:#8a909e">' + (r.id || '—') + '</td>' +
-        '<td>' + (r.date || '—') + '</td>' +
+        '<td>' + parseDateFr(r.date) + '</td>' +
         '<td><strong>' + (r.type || '—') + '</strong></td>' +
         '<td style="color:var(--texte-leger)">' + (r.type_bien || '—') + '</td>' +
         '<td>' + (r.address || '—') + '</td>' +
@@ -1384,12 +1401,12 @@ async function loadRapportNockee(address, locataire, type, btn) {
                    report.links?.pdf || report.links?.download;
 
     if (pdfUrl) {
-      // PDF trouvé — bouton de téléchargement direct
-      btn.parentElement.innerHTML = `<a href="${pdfUrl}" target="_blank" class="btn-om" style="background:#16a34a">📥 Télécharger PDF</a>`;
+      // PDF direct disponible
+      btn.parentElement.innerHTML = '<a href="' + pdfUrl + '" target="_blank" class="btn-om" style="background:#16a34a">📥 Télécharger PDF</a>';
     } else {
-      // Pas de PDF direct — lien vers le rapport Nockee
-      const nockeeUrl = `https://app.nockee.io/reports/${match.id}`;
-      btn.parentElement.innerHTML = `<a href="${nockeeUrl}" target="_blank" class="btn-om" style="background:#2a5298">🔗 Voir sur Nockee</a>`;
+      // Lien vers l'interface web Nockee
+      const nockeeUrl = 'https://app.nockee.fr/inspection-report/' + match.id;
+      btn.parentElement.innerHTML = '<a href="' + nockeeUrl + '" target="_blank" class="btn-om" style="background:#2a5298">🔗 Voir le rapport</a>';
     }
 
   } catch(e) {
