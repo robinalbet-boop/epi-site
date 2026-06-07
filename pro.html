@@ -1396,17 +1396,20 @@ async function loadRapportNockee(address, locataire, type, btn) {
     const res2 = await fetch(`${PROXY_BASE}/nockee-proxy?action=get_report&inspection_report_id=${match.id}`);
     const report = await res2.json();
 
-    // Chercher l'URL du PDF dans la réponse
-    const pdfUrl = report.pdf_url || report.report_pdf_url || report.download_url || 
-                   report.links?.pdf || report.links?.download;
+    // Champs PDF retournés par l'API Nockee
+    const reportData = report.data || report;
+    const pdfUrl = reportData.inspection_report_pdf;
+    const reportUrl = reportData.report_url;
 
     if (pdfUrl) {
-      // PDF direct disponible
-      btn.parentElement.innerHTML = '<a href="' + pdfUrl + '" target="_blank" class="btn-om" style="background:#16a34a">📥 Télécharger PDF</a>';
+      btn.parentElement.innerHTML =
+        '<a href="' + pdfUrl + '" target="_blank" class="btn-om" style="background:#16a34a">📥 Télécharger PDF</a>';
+    } else if (reportUrl) {
+      btn.parentElement.innerHTML =
+        '<a href="' + reportUrl + '" target="_blank" class="btn-om" style="background:#2a5298">🔗 Voir le rapport</a>';
     } else {
-      // Lien vers l'interface web Nockee
-      const nockeeUrl = 'https://app.nockee.fr/inspection-report/' + match.id;
-      btn.parentElement.innerHTML = '<a href="' + nockeeUrl + '" target="_blank" class="btn-om" style="background:#2a5298">🔗 Voir le rapport</a>';
+      btn.parentElement.innerHTML =
+        '<span style="font-size:11px;color:#5a6070">Non disponible</span>';
     }
 
   } catch(e) {
