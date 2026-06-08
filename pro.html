@@ -473,6 +473,16 @@
           <input type="text" class="form-input" id="edlLocataire" placeholder="Nom complet">
         </div>
       </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nom du gestionnaire</label>
+          <input type="text" class="form-input" id="edlGestionnaire" placeholder="Nom complet">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email du gestionnaire</label>
+          <input type="email" class="form-input" id="edlEmailGestionnaire" placeholder="gestionnaire@cabinet.fr">
+        </div>
+      </div>
       <div class="form-grid full">
         <div class="form-group">
           <label class="form-label">Téléphone du locataire</label>
@@ -771,6 +781,8 @@ async function submitEdl() {
         locataire,
         email_locataire: emailLocataire,
         tel_locataire: telLocataire,
+        gestionnaire: document.getElementById('edlGestionnaire').value.trim(),
+        email_gestionnaire: document.getElementById('edlEmailGestionnaire').value.trim(),
         date,
         observations,
       })
@@ -785,7 +797,8 @@ async function submitEdl() {
     document.getElementById('edlConfirm').classList.add('visible');
 
     ['edlAdresse','edlEtage','edlCode','edlProprietaire','edlLocataire',
-'edlEmailLocataire','edlTelLocataire','edlObservations','edlSurface']
+'edlEmailLocataire','edlTelLocataire','edlObservations','edlSurface',
+     'edlGestionnaire','edlEmailGestionnaire']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
 
   } catch (e) {
