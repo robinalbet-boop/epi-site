@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Création rapport Nockee — EPI</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: #1a3c6e; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .card { background: white; border-radius: 16px; padding: 40px 36px; max-width: 480px; width: 100%; text-align: center; box-shadow: 0 24px 64px rgba(0,0,0,0.2); }
+  .logo { width: 56px; height: 56px; background: #1a3c6e; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; color: white; font-size: 18px; font-weight: 700; margin: 0 auto 20px; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 22px; color: #1a3c6e; margin-bottom: 8px; }
+  .subtitle { font-size: 13px; color: #5a6070; margin-bottom: 28px; }
+  .info-box { background: #f0f4fb; border-radius: 10px; padding: 16px 18px; text-align: left; margin-bottom: 24px; }
+  .info-row { display: flex; gap: 10px; padding: 5px 0; font-size: 13px; color: #1a1a2e; border-bottom: 1px solid rgba(26,60,110,0.08); }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { color: #5a6070; min-width: 100px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; padding-top: 1px; }
+  .spinner { width: 36px; height: 36px; border: 3px solid #e8eef7; border-top-color: #1a3c6e; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .status { font-size: 14px; color: #1a3c6e; font-weight: 600; margin-bottom: 8px; }
+  .status-sub { font-size: 12px; color: #5a6070; }
+  .btn { display: inline-block; background: #1a3c6e; color: white; border: none; border-radius: 10px; padding: 13px 28px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; margin-top: 16px; transition: background 0.2s; }
+  .btn:hover { background: #2a5298; }
+  .btn-or { background: #c9a84c; }
+  .btn-or:hover { background: #dbb85a; }
+  .success-icon { font-size: 48px; margin-bottom: 12px; }
+  .error-icon { font-size: 48px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="logo">EPI</div>
+  <h1>Création rapport Nockee</h1>
+  <div class="subtitle" id="subtitle">Vérification des informations…</div>
+  <div id="info-box" class="info-box" style="display:none"></div>
+  <div id="spinner" class="spinner"></div>
+  <div id="status" class="status"></div>
+  <div id="status-sub" class="status-sub"></div>
+  <div id="actions"></div>
+</div>
+
+<script>
+const p = new URLSearchParams(window.location.search);
+
+const data = {
+  type: p.get('type') || 'residential_lease_check_in',
+  scheduled_at: p.get('scheduled_at'),
+  display_name: p.get('display_name'),
+  address: p.get('address'),
+  floor_number: p.get('floor') ? parseInt(p.get('floor')) : null,
+  surface_area: p.get('surface') ? parseFloat(p.get('surface')) : null,
+  furnished: p.get('furnished') === 'true',
+  property_type: p.get('property_type') || 'flat',
+  rooms_count: p.get('rooms') ? parseInt(p.get('rooms')) : null,
+  locataire_prenom: p.get('locataire_prenom'),
+  locataire_nom: p.get('locataire_nom'),
+  locataire_email: p.get('locataire_email'),
+  locataire_tel: p.get('locataire_tel'),
+  bailleur_nom: p.get('bailleur_nom'),
+  bailleur_email: p.get('bailleur_email'),
+  from_report_id: p.get('from_report_id'),
+};
+
+// Afficher les infos
+const typeLabel = data.type === 'residential_lease_check_out' ? 'EDL Sortie' : 'EDL Entrée';
+document.getElementById('subtitle').textContent = 'Création en cours…';
+
+const infoBox = document.getElementById('info-box');
+infoBox.style.display = 'block';
+infoBox.innerHTML = `
+  <div class="info-row"><span class="info-label">Type</span><strong>${typeLabel}</strong></div>
+  <div class="info-row"><span class="info-label">Adresse</span>${data.address || '—'}</div>
+  ${data.surface_area ? `<div class="info-row"><span class="info-label">Surface</span>${data.surface_area} m²</div>` : ''}
+  <div class="info-row"><span class="info-label">Locataire</span>${[data.locataire_prenom, data.locataire_nom].filter(Boolean).join(' ') || '—'}</div>
+  ${data.locataire_email ? `<div class="info-row"><span class="info-label">Email</span>${data.locataire_email}</div>` : ''}
+  ${data.bailleur_nom ? `<div class="info-row"><span class="info-label">Bailleur</span>${data.bailleur_nom}</div>` : ''}
+`;
+
+// Lancer la création
+async function createReport() {
+  try {
+    document.getElementById('status').textContent = 'Création du rapport…';
+    document.getElementById('status-sub').textContent = 'Connexion à Nockee en cours…';
+
+    const res = await fetch('/api/nockee-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'create_report', ...data })
+    });
+
+    const result = await res.json();
+
+    if (!res.ok || !result.success) {
+      throw new Error(result.error || result.detail || 'Erreur création');
+    }
+
+    // Succès
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('status').innerHTML = '<div class="success-icon">✅</div>Rapport créé sur Nockee !';
+    document.getElementById('status-sub').textContent = 'Les signataires ont été ajoutés automatiquement.';
+    document.getElementById('subtitle').textContent = 'Rapport prêt — cliquez pour l\'ouvrir';
+
+    const reportId = result.report?.id;
+    const actions = document.getElementById('actions');
+    if (reportId) {
+      actions.innerHTML = `
+        <a href="https://app.nockee.fr" target="_blank" class="btn">🔗 Ouvrir Nockee</a>
+      `;
+    }
+
+  } catch(e) {
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('status').innerHTML = '<div class="error-icon">❌</div>Erreur';
+    document.getElementById('status-sub').textContent = e.message;
+    document.getElementById('actions').innerHTML = `
+      <button class="btn" onclick="createReport()">Réessayer</button>
+    `;
+  }
+}
+
+// Lancer automatiquement
+createReport();
+</script>
+</body>
+</html>
