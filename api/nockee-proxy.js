@@ -5,10 +5,8 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const NOCKEE_API_KEY = process.env.NOCKEE_API_KEY;
-  if (!NOCKEE_API_KEY) {
-    return res.status(500).json({ error: 'Clé API Nockee manquante' });
-  }
+  const NOCKEE_API_KEY = process.env['CLÉ_API_NOCKEE'] || process.env.NOCKEE_API_KEY || process.env.CLE_API_NOCKEE;
+  if (!NOCKEE_API_KEY) return res.status(500).json({ error: 'Clé API Nockee manquante' });
 
   const reqBody = req.method === 'POST' ? req.body : {};
   const query = req.query || {};
@@ -17,9 +15,6 @@ export default async function handler(req, res) {
   // ── VÉRIFICATION CLIENT AUTORISÉ ──
   if (action === 'check_client') {
     const mdp = (reqBody.mdp || query.mdp || '').trim();
-
-    // Nouvelle logique : mot de passe → organisation via CLIENTS_MAP
-    // Format : "MDP1:ORG1,MDP2:ORG2"
     const clientsMap = process.env.CLIENTS_MAP || '';
     if (mdp && clientsMap) {
       const pairs = clientsMap.split(',').map(p => p.trim());
@@ -33,8 +28,7 @@ export default async function handler(req, res) {
       }
       return res.status(200).json({ autorise: false, nom: null });
     }
-
-    // Fallback : ancienne logique par nom (CLIENTS_AUTORISES)
+    // Fallback ancienne logique
     const clientsRaw = process.env.CLIENTS_AUTORISES || '';
     const clients = clientsRaw.split(',').map(c => c.trim().toUpperCase());
     const nom = (reqBody.nom || query.nom || '').trim().toUpperCase();
@@ -43,6 +37,16 @@ export default async function handler(req, res) {
   }
 
   const BASE_URL = 'https://api.nockee.eu/v2';
+  const WORKSPACE = 'wspc_031fW5itBb1PiShGmzqGSp';
+
+  // EPI comme mandataire (signataire fixe)
+  const EPI_SIGNATORY = {
+    type: 'property_manager',
+    first_name: 'Robin',
+    last_name: 'ALBET',
+    legal_name: 'EPI Expertises Immobilières',
+    email: 'robin.albet@epi-gs.com',
+  };
 
   try {
     const search_term = reqBody.search_term || query.search_term;
@@ -57,57 +61,149 @@ export default async function handler(req, res) {
     } else if (action === 'get_report') {
       url = `${BASE_URL}/inspection_reports/${inspection_report_id}?expand=rooms&expand=rooms__elements&expand=signatories&expand=keys&expand=meters`;
 
+    } else if (action === 'get_signatories') {
+      url = `${BASE_URL}/inspection_report_signatories?inspection_report=${inspection_report_id}`;
+
     } else if (action === 'compare') {
       url = `${BASE_URL}/inspection_reports/${inspection_report_id}/compare`;
       method = 'POST';
       fetchBody = JSON.stringify({ source: { inspection_report: source_id }, output_format: 'json' });
 
-    } else if (action === 'get_signatories') {
-      url = `${BASE_URL}/inspection_report_signatories?inspection_report=${inspection_report_id}`;
-
     } else if (action === 'create_report') {
-      const { type, scheduled_at, display_name, address, observations } = reqBody;
-      const addrParts = (address || '').split(',');
-      const line1 = (addrParts[0] || '').trim();
-      const cityPart = (addrParts[1] || '').trim();
-      const postalMatch = cityPart.match(/(\d{5})\s*(.*)/);
-      const postalCode = postalMatch ? postalMatch[1] : '';
-      const city = postalMatch ? postalMatch[2].trim() : cityPart;
+      // ── CRÉATION D'UN NOUVEAU RAPPORT ──
+      const {
+        type,             // 'residential_lease_check_in' ou 'residential_lease_check_out'
+        scheduled_at,     // ISO datetime
+        display_name,
+        address,          // "10 Rue Desnouettes, 75015 Paris"
+        floor_number,     // entier
+        surface_area,     // nombre
+        furnished,        // bool
+        rooms_count,
+        property_type,    // 'flat', 'house', etc.
+        // Locataire
+        locataire_prenom,
+        locataire_nom,
+        locataire_email,
+        locataire_tel,
+        // Bailleur (cabinet de gestion)
+        bailleur_nom,     // ex: "ADUXIM"
+        bailleur_email,   // ex: "gerance@aduxim.fr"
+        // Clone depuis rapport existant
+        from_report_id,   // si on clone un rapport précédent
+      } = reqBody;
+
+      // Parser l'adresse
+      const addrParts = (address || '').match(/^(.+?),?\s*(\d{5})\s*(.+)?$/);
+      const line1 = addrParts ? addrParts[1].trim() : address;
+      const postalCode = addrParts ? addrParts[2] : '';
+      const city = addrParts ? (addrParts[3] || '').trim() : '';
 
       url = `${BASE_URL}/inspection_reports`;
       method = 'POST';
-      fetchBody = JSON.stringify({
-        type,
-        scheduled_at,
-        display_name,
+
+      const reportBody = {
+        type: type || 'residential_lease_check_in',
+        scheduled_at: scheduled_at || null,
+        display_name: display_name || null,
         property: {
-          address: { line_1: line1, postal_code: postalCode, city },
-          type: 'flat',
+          address: { line_1: line1, postal_code: postalCode, city: city },
+          type: property_type || 'flat',
+          surface_area: surface_area ? parseFloat(surface_area) : null,
+          furnished: furnished || false,
+          rooms_count: rooms_count ? parseInt(rooms_count) : null,
         },
-        observations: { owner: observations || null, tenant: null },
+      };
+
+      // Si on clone depuis un rapport précédent
+      if (from_report_id) {
+        reportBody.from_inspection_report = {
+          inspection_report: from_report_id,
+          options: {
+            ignore_tenant_signatories: true,  // Ne pas copier l'ancien locataire
+            ignore_element_states: true,       // Repartir à zéro sur les états
+            ignore_element_defects: true,
+            ignore_element_comments: true,
+            ignore_element_pictures: true,
+            ignore_global_pictures: true,
+          }
+        };
+      }
+
+      fetchBody = JSON.stringify(reportBody);
+
+      // Créer le rapport d'abord
+      const reportRes = await fetch(url, {
+        method: 'POST',
+        headers: { 'X-Api-Key': NOCKEE_API_KEY, 'Content-Type': 'application/json' },
+        body: fetchBody,
+      });
+      const reportData = await reportRes.json();
+      if (!reportRes.ok) return res.status(reportRes.status).json(reportData);
+
+      const reportId = reportData.id;
+
+      // Ajouter les signataires en parallèle
+      const signataires = [];
+
+      // 1. Locataire
+      if (locataire_nom || locataire_email) {
+        signataires.push({
+          type: 'tenant',
+          first_name: locataire_prenom || '',
+          last_name: locataire_nom || '',
+          email: locataire_email || null,
+          phone: locataire_tel || null,
+        });
+      }
+
+      // 2. Bailleur (cabinet de gestion)
+      if (bailleur_nom || bailleur_email) {
+        signataires.push({
+          type: 'owner',
+          legal_name: bailleur_nom || '',
+          email: bailleur_email || null,
+        });
+      }
+
+      // 3. Mandataire EPI (toujours)
+      signataires.push(EPI_SIGNATORY);
+
+      // Créer tous les signataires
+      const sigResults = await Promise.allSettled(
+        signataires.map(sig =>
+          fetch(`${BASE_URL}/inspection_report_signatories`, {
+            method: 'POST',
+            headers: { 'X-Api-Key': NOCKEE_API_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...sig, inspection_report: reportId }),
+          }).then(r => r.json())
+        )
+      );
+
+      return res.status(200).json({
+        success: true,
+        report: reportData,
+        signatories: sigResults.map(r => r.status === 'fulfilled' ? r.value : { error: r.reason }),
+        nockee_url: `https://app.nockee.fr/inspection-reports/${reportId}`,
       });
 
     } else {
       return res.status(400).json({ error: 'Action inconnue' });
     }
 
-    const fetchOptions = {
-      method,
-      headers: {
-        'X-Api-Key': NOCKEE_API_KEY,
-        'Content-Type': 'application/json',
-      },
-    };
-    if (fetchBody) fetchOptions.body = fetchBody;
+    // Pour les actions simples GET/POST
+    if (action !== 'create_report') {
+      const fetchOptions = {
+        method,
+        headers: { 'X-Api-Key': NOCKEE_API_KEY, 'Content-Type': 'application/json' },
+      };
+      if (fetchBody) fetchOptions.body = fetchBody;
 
-    const response = await fetch(url, fetchOptions);
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json(data);
+      const response = await fetch(url, fetchOptions);
+      const data = await response.json();
+      if (!response.ok) return res.status(response.status).json(data);
+      return res.status(200).json(data);
     }
-
-    return res.status(200).json(data);
 
   } catch (error) {
     console.error('Nockee proxy error:', error);
