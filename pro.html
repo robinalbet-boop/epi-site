@@ -564,7 +564,6 @@
               <th>Date RDV</th>
               <th>Statut</th>
               <th>Ordre de mission</th>
-              <th>Rapport EDL</th>
             </tr>
           </thead>
           <tbody id="histBody"></tbody>
@@ -1348,21 +1347,7 @@ async function loadHistorique() {
         '<td>' + dateRdvFr + '</td>' +
         '<td><span class="statut-badge ' + statutClass + '">' + statut + '</span></td>' +
         '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>' +
-        '<td id="rapport-' + idx + '"></td>';
-      // Stocker les données pour ce rapport
-      window._rapportData = window._rapportData || {};
-      window._rapportData[idx] = { address: r.address||'', locataire: r.locataire||'', type: r.type||'' };
-      const rapportCell = tr.querySelector('td:last-child');
-      const rapportBtn = document.createElement('button');
-      rapportBtn.className = 'btn-om';
-      rapportBtn.style.background = '#c9a84c';
-      rapportBtn.textContent = '🔍 Chercher';
-      rapportBtn.dataset.idx = idx;
-      rapportBtn.addEventListener('click', function() {
-        const d = window._rapportData[this.dataset.idx];
-        loadRapportNockee(d.address, d.locataire, d.type, this);
-      });
-      rapportCell.appendChild(rapportBtn);
+
       tbody.appendChild(tr);
     });
 
@@ -1426,7 +1411,7 @@ Réponds UNIQUEMENT avec ce JSON :
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }]
       })
