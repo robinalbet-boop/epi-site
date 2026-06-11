@@ -387,25 +387,6 @@
     <!-- ONGLET EDL -->
     <div class="tab-panel active" id="panel-edl">
       <div class="section-label">Demande d'état des lieux</div>
-
-      <!-- REMPLISSAGE AUTOMATIQUE -->
-      <div style="background:var(--bleu-pale);border:1.5px solid rgba(26,60,110,0.2);border-radius:10px;padding:16px 20px;margin-bottom:20px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--bleu)">✨ Remplissage automatique</div>
-            <div style="font-size:11px;color:var(--texte-leger);margin-top:2px">Collez les infos du locataire depuis votre logiciel — les champs se rempliront automatiquement</div>
-          </div>
-          <button onclick="toggleAutoFill()" id="btnAutoFill" style="background:var(--bleu);color:white;border:none;border-radius:8px;padding:8px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Coller les infos</button>
-        </div>
-        <div id="autoFillZone" style="display:none">
-          <textarea id="autoFillText" style="width:100%;min-height:100px;border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--texte);resize:vertical;outline:none" placeholder="Collez ici n'importe quel texte contenant les infos du locataire&#10;&#10;Exemple :&#10;Locataire : MARTIN Jean — jean.martin@gmail.com — 06 12 34 56 78&#10;Bien : T3 Vide 65m², 12 rue de la Paix 75002 Paris, 2ème étage&#10;Bailleur : SCI DUPONT&#10;Date EDL : 15/07/2026"></textarea>
-          <div style="display:flex;gap:10px;margin-top:10px">
-            <button onclick="runAutoFill()" id="btnRunAutoFill" style="background:var(--or);color:white;border:none;border-radius:8px;padding:9px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer">Remplir les champs</button>
-            <button onclick="toggleAutoFill()" style="background:white;border:1.5px solid var(--border);color:var(--texte-leger);border-radius:8px;padding:9px 16px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer">Annuler</button>
-          </div>
-          <div id="autoFillStatus" style="font-size:12px;margin-top:8px;color:var(--bleu);display:none"></div>
-        </div>
-      </div>
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">Type de mission</label>
@@ -469,21 +450,15 @@
           <input type="text" class="form-input" id="edlProprietaire" placeholder="Nom complet">
         </div>
         <div class="form-group">
-          <label class="form-label">Nom du locataire</label>
+          <label class="form-label">Nom du locataire entrant</label>
           <input type="text" class="form-input" id="edlLocataire" placeholder="Nom complet">
         </div>
       </div>
       <div class="form-grid">
         <div class="form-group">
-          <label class="form-label">Nom du gestionnaire</label>
-          <input type="text" class="form-input" id="edlGestionnaire" placeholder="Nom complet">
+          <label class="form-label">Nom de l'ancien locataire</label>
+          <input type="text" class="form-input" id="edlAncienLocataire" placeholder="Nom complet">
         </div>
-        <div class="form-group">
-          <label class="form-label">Email du gestionnaire</label>
-          <input type="email" class="form-input" id="edlEmailGestionnaire" placeholder="gestionnaire@cabinet.fr">
-        </div>
-      </div>
-      <div class="form-grid full">
         <div class="form-group">
           <label class="form-label">Téléphone du locataire</label>
           <input type="tel" class="form-input" id="edlTelLocataire" placeholder="06 00 00 00 00">
@@ -737,7 +712,7 @@ function selectDiag(el, type) {
 }
 
 // ── SOUMETTRE EDL ──
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzSDsbr0bWCgtkeirnDN25YdIE4H3Vs6OOU6t7D6ylAV-vS1EzO3CwRX3QyZBgRjahF/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPD-blGjzfcGzY_dZdSOZaaEGciDSNKIyJItWXRDcDo0CfRtUVTs3NzIuE04E7Y8a-/exec';
 
 async function submitEdl() {
   const type = document.getElementById('edlType').value;
@@ -749,6 +724,7 @@ async function submitEdl() {
   const code = document.getElementById('edlCode').value.trim();
   const proprietaire = document.getElementById('edlProprietaire').value.trim();
   const locataire = document.getElementById('edlLocataire').value.trim();
+  const ancienLocataire = document.getElementById('edlAncienLocataire').value.trim();
   const emailLocataire = document.getElementById('edlEmailLocataire').value.trim();
   const telLocataire = document.getElementById('edlTelLocataire').value.trim();
   const observations = document.getElementById('edlObservations').value.trim();
@@ -779,10 +755,9 @@ async function submitEdl() {
         code_immeuble: code,
         proprietaire,
         locataire,
+        ancien_locataire: ancienLocataire,
         email_locataire: emailLocataire,
         tel_locataire: telLocataire,
-        gestionnaire: document.getElementById('edlGestionnaire').value.trim(),
-        email_gestionnaire: document.getElementById('edlEmailGestionnaire').value.trim(),
         date,
         observations,
       })
@@ -797,8 +772,7 @@ async function submitEdl() {
     document.getElementById('edlConfirm').classList.add('visible');
 
     ['edlAdresse','edlEtage','edlCode','edlProprietaire','edlLocataire',
-'edlEmailLocataire','edlTelLocataire','edlObservations','edlSurface',
-     'edlGestionnaire','edlEmailGestionnaire']
+     'edlAncienLocataire','edlEmailLocataire','edlTelLocataire','edlObservations','edlSurface']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
 
   } catch (e) {
@@ -1034,9 +1008,6 @@ ${edleRooms}
 
 EDL SORTIE :
 ${edlsRooms}
-
-RÈGLE ABSOLUE N°0 — ÉLÉMENTS DISPARUS :
-Avant de qualifier un élément comme "disparu", vérifier SCRUPULEUSEMENT dans l'ENSEMBLE du rapport de sortie (toutes les pièces, observations générales, observations linéaires, notes finales) que l'élément ne réapparaît pas ailleurs. Un détecteur de fumée non mentionné dans une pièce peut apparaître en observation générale ou en note finale. Un équipement absent d'une pièce peut être mentionné dans une autre. Ne qualifier "disparu" QUE si l'élément est totalement absent de tout le rapport de sortie.
 
 RÈGLE ABSOLUE N°1 — PAS D'AGGRAVATION = NON IMPUTABLE :
 Un élément est "imputable" UNIQUEMENT si la situation s'est AGGRAVÉE par rapport à l'entrée. Si les observations sont identiques ou quasi-identiques entre entrée et sortie (même si la note a changé), qualifier en "usure_normale". Si problème mentionné à l'entrée et non renseigné à la sortie → "usure_normale".
@@ -1305,7 +1276,7 @@ async function loadHistorique() {
     }
 
     tbody.innerHTML = '';
-    rows.forEach((r, idx) => {
+    rows.forEach(r => {
       const statut = r.statut || 'En attente';
       const statutClass = {
         'En attente': 'statut-attente',
@@ -1314,26 +1285,9 @@ async function loadHistorique() {
         'Facturé': 'statut-facture',
       }[statut] || 'statut-attente';
 
-      function parseDateFr(d) {
-        if (!d || d === '—' || d === '') return '—';
-        d = String(d).trim();
-        if (/^\d{2}\/\d{2}\/\d{4}$/.test(d)) return d; // déjà DD/MM/YYYY
-        if (d.includes('T')) d = d.split('T')[0]; // ISO complet
-        if (/^\d{4}-\d{2}-\d{2}$/.test(d)) { // YYYY-MM-DD
-          const [y,m,day] = d.split('-');
-          return day + '/' + m + '/' + y;
-        }
-        // Format JS Date toString : "Mon May 18 2026 00:00:00 GMT..."
-        const jsDate = new Date(d);
-        if (!isNaN(jsDate.getTime())) {
-          return String(jsDate.getDate()).padStart(2,'0') + '/' +
-                 String(jsDate.getMonth()+1).padStart(2,'0') + '/' +
-                 jsDate.getFullYear();
-        }
-        return d;
-      }
       const dateRdv = r.date_rdv_confirme || r.date_rdv || '—';
-      const dateRdvFr = parseDateFr(dateRdv);
+      const dateRdvFr = dateRdv && dateRdv.includes('-') ?
+        dateRdv.split('-').reverse().join('/') : dateRdv;
 
       // Lien ordre de mission
       const omParams = new URLSearchParams({
@@ -1347,6 +1301,7 @@ async function loadHistorique() {
         code_immeuble: r.code_immeuble || '',
         proprietaire: r.proprietaire || '',
         locataire: r.locataire || '',
+        ancien_locataire: r.ancien_locataire || '',
         date_rdv: r.date_rdv || '',
         observations: r.observations || '',
       });
@@ -1355,15 +1310,14 @@ async function loadHistorique() {
       const tr = document.createElement('tr');
       tr.innerHTML =
         '<td style="font-size:11px;color:#8a909e">' + (r.id || '—') + '</td>' +
-        '<td>' + parseDateFr(r.date) + '</td>' +
+        '<td>' + (r.date || '—') + '</td>' +
         '<td><strong>' + (r.type || '—') + '</strong></td>' +
         '<td style="color:var(--texte-leger)">' + (r.type_bien || '—') + '</td>' +
         '<td>' + (r.address || '—') + '</td>' +
         '<td>' + (r.locataire || '—') + '</td>' +
         '<td>' + dateRdvFr + '</td>' +
         '<td><span class="statut-badge ' + statutClass + '">' + statut + '</span></td>' +
-        '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>' +
-
+        '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>';
       tbody.appendChild(tr);
     });
 
@@ -1376,191 +1330,7 @@ async function loadHistorique() {
   }
 }
 
-// ── REMPLISSAGE AUTOMATIQUE ──
-function toggleAutoFill() {
-  const zone = document.getElementById('autoFillZone');
-  zone.style.display = zone.style.display === 'none' ? 'block' : 'none';
-  if (zone.style.display === 'block') {
-    document.getElementById('autoFillText').focus();
-  }
-}
-
-async function runAutoFill() {
-  const text = document.getElementById('autoFillText').value.trim();
-  if (!text) { alert('Veuillez coller du texte à analyser.'); return; }
-
-  const btn = document.getElementById('btnRunAutoFill');
-  const status = document.getElementById('autoFillStatus');
-  btn.disabled = true;
-  btn.textContent = '⏳ Analyse en cours…';
-  status.style.display = 'block';
-  status.textContent = 'Claude analyse les informations…';
-
-  try {
-    const prompt = `Tu es un assistant spécialisé dans l'extraction d'informations immobilières.
-Analyse ce texte et extrais les informations suivantes en JSON.
-Si une information est absente, mets une chaîne vide "".
-Les dates doivent être au format YYYY-MM-DD.
-Le type doit être "EDLE" (entrée) ou "EDLS" (sortie).
-Le type_bien doit correspondre à : Studio Vide, Studio Meublé, T1 Vide, T1 Meublé, T2 Vide, T2 Meublé, T3 Vide, T3 Meublé, T4 Vide, T4 Meublé, T5 Vide, T5 Meublé, Maison Vide, Maison Meublée, Local commercial, Bureau, Autre.
-
-Texte à analyser :
-${text}
-
-Réponds UNIQUEMENT avec ce JSON :
-{
-  "type": "",
-  "date": "",
-  "type_bien": "",
-  "surface": "",
-  "adresse": "",
-  "etage": "",
-  "code_immeuble": "",
-  "proprietaire": "",
-  "locataire": "",
-  "email_locataire": "",
-  "tel_locataire": "",
-  "observations": ""
-}`;
-
-    const res = await fetch('/api/claude-proxy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    const data = await res.json();
-    const text_response = data.content?.[0]?.text || '{}';
-    const parsed = JSON.parse(text_response);
-
-    // Remplir les champs
-    if (parsed.type) document.getElementById('edlType').value = parsed.type;
-    if (parsed.date) document.getElementById('edlDate').value = parsed.date;
-    if (parsed.type_bien) document.getElementById('edlBienType').value = parsed.type_bien;
-    if (parsed.surface) document.getElementById('edlSurface').value = parsed.surface;
-    if (parsed.adresse) document.getElementById('edlAdresse').value = parsed.adresse;
-    if (parsed.etage) document.getElementById('edlEtage').value = parsed.etage;
-    if (parsed.code_immeuble) document.getElementById('edlCode').value = parsed.code_immeuble;
-    if (parsed.proprietaire) document.getElementById('edlProprietaire').value = parsed.proprietaire;
-    if (parsed.locataire) document.getElementById('edlLocataire').value = parsed.locataire;
-    if (parsed.email_locataire) document.getElementById('edlEmailLocataire').value = parsed.email_locataire;
-    if (parsed.tel_locataire) document.getElementById('edlTelLocataire').value = parsed.tel_locataire;
-    if (parsed.observations) document.getElementById('edlObservations').value = parsed.observations;
-
-    status.style.color = '#16a34a';
-    status.textContent = '✓ Champs remplis automatiquement — vérifiez et complétez si nécessaire';
-    document.getElementById('autoFillText').value = '';
-
-  } catch(e) {
-    status.style.color = '#e05c5c';
-    status.textContent = '✗ Erreur : ' + e.message;
-  }
-
-  btn.disabled = false;
-  btn.textContent = 'Remplir les champs';
-}
-
 // Charger l'historique est géré directement dans showTab ci-dessous
-
-// ── RÉCUPÉRATION RAPPORT NOCKEE ──
-async function loadRapportNockee(address, locataire, type, btn) {
-  btn.disabled = true;
-  btn.textContent = '⏳ Recherche…';
-
-  try {
-    const typeNockee = type === 'EDLE' ? 'residential_lease_check_in' : 'residential_lease_check_out';
-
-    // Fonction de normalisation d'adresse pour comparaison souple
-    function normAddr(s) {
-      return (s||'').toUpperCase()
-        .replace(/[ÀÁÂÃ]/g,'A').replace(/[ÉÈÊË]/g,'E').replace(/[ÎÏÌÍ]/g,'I')
-        .replace(/[ÔÒÕÖ]/g,'O').replace(/[ÙÛÜÚ]/g,'U').replace(/Ç/g,'C')
-        .replace(/[^A-Z0-9]/g,'');
-    }
-
-    // Extraire le numéro et début de rue depuis l'adresse
-    function addrScore(sheetAddr, nockeeAddr) {
-      const a = normAddr(sheetAddr);
-      const b = normAddr(nockeeAddr);
-      // Chercher les 10 premiers caractères significatifs
-      const aKey = a.substring(0, 12);
-      const bKey = b.substring(0, 12);
-      if (a === b) return 3;
-      if (b.includes(aKey) || a.includes(bKey)) return 2;
-      // Comparer les chiffres (numéro de rue)
-      const aNum = (sheetAddr.match(/\d+/) || [''])[0];
-      const bNum = (nockeeAddr.match(/\d+/) || [''])[0];
-      if (aNum && aNum === bNum && normAddr(sheetAddr).substring(2,8) === normAddr(nockeeAddr).substring(2,8)) return 1;
-      return 0;
-    }
-
-    let match = null;
-
-    // 1. Chercher par nom de locataire
-    if (locataire && locataire.trim()) {
-      const lastName = locataire.trim().split(/\s+/).pop(); // Prendre le dernier mot (nom de famille)
-      const res1 = await fetch(`${PROXY_BASE}/nockee-proxy?action=search&search_term=${encodeURIComponent(lastName)}`);
-      const data1 = await res1.json();
-      const reports1 = (data1.data || []).filter(r => r.type === typeNockee);
-      // Scorer par adresse
-      const scored1 = reports1.map(r => ({
-        r, score: addrScore(address, (r.property?.address?.line_1||'') + ' ' + (r.property?.address?.postal_code||''))
-      })).filter(x => x.score > 0).sort((a,b) => b.score - a.score);
-      if (scored1.length > 0) match = scored1[0].r;
-    }
-
-    // 2. Si pas trouvé, chercher par numéro + début de rue
-    if (!match) {
-      const streetNum = (address.match(/^\d+/) || [''])[0];
-      const streetWords = address.replace(/^\d+\s*/,'').split(/\s+/).slice(0,2).join(' ');
-      const searchTerm2 = (streetNum + ' ' + streetWords).trim();
-      if (searchTerm2.length > 2) {
-        const res2 = await fetch(`${PROXY_BASE}/nockee-proxy?action=search&search_term=${encodeURIComponent(searchTerm2)}`);
-        const data2 = await res2.json();
-        const reports2 = (data2.data || []).filter(r => r.type === typeNockee);
-        const scored2 = reports2.map(r => ({
-          r, score: addrScore(address, (r.property?.address?.line_1||'') + ' ' + (r.property?.address?.postal_code||''))
-        })).filter(x => x.score > 0).sort((a,b) => b.score - a.score);
-        if (scored2.length > 0) match = scored2[0].r;
-      }
-    }
-
-    if (!match) {
-      btn.textContent = '❌ Non trouvé';
-      btn.style.background = '#e05c5c';
-      btn.disabled = false;
-      return;
-    }
-
-    // Récupérer le rapport complet pour avoir le PDF url
-    const res2 = await fetch(`${PROXY_BASE}/nockee-proxy?action=get_report&inspection_report_id=${match.id}`);
-    const report = await res2.json();
-
-    // Champs PDF retournés par l'API Nockee
-    const reportData = report.data || report;
-    const pdfUrl = reportData.inspection_report_pdf;
-    const reportUrl = reportData.report_url;
-
-    if (pdfUrl) {
-      btn.parentElement.innerHTML =
-        '<a href="' + pdfUrl + '" target="_blank" class="btn-om" style="background:#16a34a">📥 Télécharger PDF</a>';
-    } else if (reportUrl) {
-      btn.parentElement.innerHTML =
-        '<a href="' + reportUrl + '" target="_blank" class="btn-om" style="background:#2a5298">🔗 Voir le rapport</a>';
-    } else {
-      btn.parentElement.innerHTML =
-        '<span style="font-size:11px;color:#5a6070">Non disponible</span>';
-    }
-
-  } catch(e) {
-    btn.textContent = '❌ Erreur';
-    btn.style.background = '#e05c5c';
-    console.error(e);
-  }
-}
 </script>
 </body>
 </html>
