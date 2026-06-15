@@ -387,6 +387,18 @@
     <!-- ONGLET EDL -->
     <div class="tab-panel active" id="panel-edl">
       <div class="section-label">Demande d'état des lieux</div>
+      <!-- REMPLISSAGE AUTOMATIQUE IA -->
+      <div style="background:var(--bleu-pale);border:1.5px solid rgba(26,60,110,0.15);border-radius:12px;padding:18px 20px;margin-bottom:24px">
+        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--bleu);font-weight:700;margin-bottom:10px">✨ Remplissage automatique</div>
+        <div style="font-size:12px;color:var(--texte-leger);margin-bottom:10px">Collez le texte de l'ordre de mission reçu par mail — l'IA remplit le formulaire automatiquement.</div>
+        <textarea id="autoFillText" class="form-textarea" style="min-height:80px;font-size:12px;background:white" placeholder="Collez ici le texte de l'ordre de mission (adresse, locataire, date, type de bien…)"></textarea>
+        <button onclick="autoFillForm()" id="btnAutoFill" style="margin-top:10px;background:var(--bleu);color:white;border:none;border-radius:8px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px">
+          <span id="autoFillSpinner" style="display:none;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite"></span>
+          ✨ Remplir automatiquement
+        </button>
+        <div id="autoFillMsg" style="font-size:12px;margin-top:8px;color:var(--success);display:none"></div>
+      </div>
+
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">Type de mission</label>
@@ -450,15 +462,11 @@
           <input type="text" class="form-input" id="edlProprietaire" placeholder="Nom complet">
         </div>
         <div class="form-group">
-          <label class="form-label">Nom du locataire entrant</label>
+          <label class="form-label">Nom du locataire</label>
           <input type="text" class="form-input" id="edlLocataire" placeholder="Nom complet">
         </div>
       </div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Nom de l'ancien locataire</label>
-          <input type="text" class="form-input" id="edlAncienLocataire" placeholder="Nom complet">
-        </div>
+      <div class="form-grid full">
         <div class="form-group">
           <label class="form-label">Téléphone du locataire</label>
           <input type="tel" class="form-input" id="edlTelLocataire" placeholder="06 00 00 00 00">
@@ -712,7 +720,7 @@ function selectDiag(el, type) {
 }
 
 // ── SOUMETTRE EDL ──
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxPD-blGjzfcGzY_dZdSOZaaEGciDSNKIyJItWXRDcDo0CfRtUVTs3NzIuE04E7Y8a-/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzqKY7eDpgAMEAdGXZDPuLIslYEtqb5HH_UEElGFRVBAZmm7tTNagbGPPFvrXfyqAVx/exec';
 
 async function submitEdl() {
   const type = document.getElementById('edlType').value;
@@ -724,8 +732,6 @@ async function submitEdl() {
   const code = document.getElementById('edlCode').value.trim();
   const proprietaire = document.getElementById('edlProprietaire').value.trim();
   const locataire = document.getElementById('edlLocataire').value.trim();
-  const ancienLocataire = document.getElementById('edlAncienLocataire').value.trim();
-  const emailLocataire = document.getElementById('edlEmailLocataire').value.trim();
   const telLocataire = document.getElementById('edlTelLocataire').value.trim();
   const observations = document.getElementById('edlObservations').value.trim();
 
@@ -755,7 +761,6 @@ async function submitEdl() {
         code_immeuble: code,
         proprietaire,
         locataire,
-        ancien_locataire: ancienLocataire,
         email_locataire: emailLocataire,
         tel_locataire: telLocataire,
         date,
@@ -772,7 +777,7 @@ async function submitEdl() {
     document.getElementById('edlConfirm').classList.add('visible');
 
     ['edlAdresse','edlEtage','edlCode','edlProprietaire','edlLocataire',
-     'edlAncienLocataire','edlEmailLocataire','edlTelLocataire','edlObservations','edlSurface']
+     'edlEmailLocataire','edlTelLocataire','edlObservations','edlSurface','autoFillText']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
 
   } catch (e) {
@@ -1328,6 +1333,82 @@ async function loadHistorique() {
     emptyMsg.textContent = 'Erreur de chargement : ' + e.message;
     emptyMsg.style.display = 'block';
   }
+}
+
+// ══════════════════════════════════════
+// ── REMPLISSAGE AUTOMATIQUE IA ──
+// ══════════════════════════════════════
+
+async function autoFillForm() {
+  const texte = document.getElementById('autoFillText').value.trim();
+  if (!texte) { alert('Collez d\'abord le texte de l\'ordre de mission.'); return; }
+
+  const btn = document.getElementById('btnAutoFill');
+  const spinner = document.getElementById('autoFillSpinner');
+  const msg = document.getElementById('autoFillMsg');
+  btn.disabled = true;
+  spinner.style.display = 'inline-block';
+  msg.style.display = 'none';
+
+  try {
+    const prompt = `Tu es un expert en extraction d'informations immobilières françaises.
+Analyse ce texte d'ordre de mission et extrais les informations en JSON.
+Si une info est absente mets "".
+Pour type : EDLE (entrée) ou EDLS (sortie).
+Pour type_bien : utilise exactement l'une de ces valeurs : "Studio Vide", "Studio Meublé", "T1 Vide", "T1 Meublé", "T2 Vide", "T2 Meublé", "T3 Vide", "T3 Meublé", "T4 Vide", "T4 Meublé", "T5 Vide", "T5 Meublé", "Maison Vide", "Maison Meublée", "Local commercial", "Bureau", "Autre".
+Pour date : format YYYY-MM-DD.
+Pour surface : chiffre uniquement sans m².
+
+TEXTE :
+${texte}
+
+JSON UNIQUEMENT sans markdown :
+{"type":"","type_bien":"","surface":"","address":"","etage":"","code_immeuble":"","proprietaire":"","locataire":"","email_locataire":"","tel_locataire":"","date":"","observations":""}`;
+
+    const res = await fetch(`${PROXY_BASE}/claude-proxy`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 800,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const text = (data.content?.[0]?.text || '{}').replace(/```json|```/g, '').trim();
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Réponse inattendue de l\'IA');
+    const infos = JSON.parse(jsonMatch[0]);
+
+    // Remplir les champs du formulaire
+    if (infos.type) document.getElementById('edlType').value = infos.type;
+    if (infos.type_bien) document.getElementById('edlBienType').value = infos.type_bien;
+    if (infos.surface) document.getElementById('edlSurface').value = infos.surface;
+    if (infos.address) document.getElementById('edlAdresse').value = infos.address;
+    if (infos.etage) document.getElementById('edlEtage').value = infos.etage;
+    if (infos.code_immeuble) document.getElementById('edlCode').value = infos.code_immeuble;
+    if (infos.proprietaire) document.getElementById('edlProprietaire').value = infos.proprietaire;
+    if (infos.locataire) document.getElementById('edlLocataire').value = infos.locataire;
+    if (infos.email_locataire) document.getElementById('edlEmailLocataire').value = infos.email_locataire;
+    if (infos.tel_locataire) document.getElementById('edlTelLocataire').value = infos.tel_locataire;
+    if (infos.date) document.getElementById('edlDate').value = infos.date;
+    if (infos.observations) document.getElementById('edlObservations').value = infos.observations;
+
+    // Compter les champs remplis
+    const nbRemplis = Object.values(infos).filter(v => v && v.trim() !== '').length;
+    msg.textContent = '✓ ' + nbRemplis + ' champ(s) remplis automatiquement. Vérifiez et complétez si besoin.';
+    msg.style.color = 'var(--success)';
+    msg.style.display = 'block';
+
+  } catch(e) {
+    msg.textContent = 'Erreur : ' + e.message;
+    msg.style.color = 'var(--error)';
+    msg.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  spinner.style.display = 'none';
 }
 
 // Charger l'historique est géré directement dans showTab ci-dessous
