@@ -326,6 +326,7 @@
   .spinner-inline { width: 14px; height: 14px; border: 2px solid var(--bleu-pale); border-top-color: var(--bleu); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
 </style>
 </head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <body>
 
 <!-- NAV -->
@@ -538,13 +539,42 @@
     <!-- ONGLET HISTORIQUE -->
     <div class="tab-panel" id="panel-historique">
       <div class="section-label">Mes demandes</div>
+
       <div id="histLoadingMsg" style="text-align:center;padding:24px;color:var(--texte-leger)">
         <div class="spinner" style="border-top-color:var(--bleu);border-color:var(--bleu-pale);margin:0 auto 12px"></div>
         Chargement de vos demandes…
       </div>
+
       <div id="histEmpty" style="display:none;text-align:center;padding:40px;color:var(--texte-leger);font-size:13px">
         Aucune demande enregistrée pour le moment.
       </div>
+
+      <div id="histToolbar" style="display:none">
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+          <div class="search-wrap" style="flex:1;min-width:220px;margin-bottom:0">
+            <input type="text" id="histSearchInput" placeholder="Rechercher : adresse, locataire, référence…" autocomplete="off">
+            <span class="search-icon">⌕</span>
+          </div>
+          <select class="form-select" id="histFilterType" style="width:auto;min-width:130px">
+            <option value="">Tous types</option>
+            <option value="EDLE">EDLE</option>
+            <option value="EDLS">EDLS</option>
+          </select>
+          <select class="form-select" id="histFilterStatut" style="width:auto;min-width:150px">
+            <option value="">Tous statuts</option>
+            <option value="En attente">En attente</option>
+            <option value="RDV confirmé">RDV confirmé</option>
+            <option value="Réalisé">Réalisé</option>
+            <option value="Facturé">Facturé</option>
+          </select>
+          <select class="form-select" id="histFilterMois" style="width:auto;min-width:140px">
+            <option value="">Tous les mois</option>
+          </select>
+          <button class="btn-submit" id="btnExportExcel" style="margin-top:0;background:var(--or);white-space:nowrap" onclick="exportHistoriqueExcel()">⬇ Exporter Excel</button>
+        </div>
+        <div style="font-size:11px;color:var(--texte-leger);margin-bottom:10px" id="histResultCount"></div>
+      </div>
+
       <div id="histTable" style="display:none">
         <table class="hist-table">
           <thead>
@@ -562,6 +592,9 @@
           </thead>
           <tbody id="histBody"></tbody>
         </table>
+        <div id="histNoResults" style="display:none;text-align:center;padding:32px;color:var(--texte-leger);font-size:13px">
+          Aucune demande ne correspond à votre recherche.
+        </div>
       </div>
     </div>
 
@@ -1260,15 +1293,52 @@ compBtnCopy.addEventListener('click', () => {
 // ── HISTORIQUE DES DEMANDES ──
 // ══════════════════════════════════════
 
+// ── Stockage en mémoire des demandes pour filtrage instantané ──
+let histAllRows = [];
+
+const STATUT_CLASS = {
+  'En attente': 'statut-attente',
+  'RDV confirmé': 'statut-confirme',
+  'Réalisé': 'statut-realise',
+  'Facturé': 'statut-facture',
+};
+
+const MOIS_ORDRE = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+function histFmtDate(val) {
+  if (!val || val === '—' || val.toString().trim() === '') return '—';
+  const s = val.toString().trim();
+  if (s.includes('T')) {
+    const d = new Date(s);
+    return isNaN(d) ? s : d.toLocaleDateString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric'});
+  }
+  if (s.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    const [y,m,d] = s.split('-'); return d+'/'+m+'/'+y;
+  }
+  return s;
+}
+
+function histMoisDepuisDate(val) {
+  if (!val) return '';
+  const s = val.toString().trim();
+  let d;
+  if (s.includes('T')) d = new Date(s);
+  else if (s.match(/^\d{4}-\d{2}-\d{2}$/)) { const [y,m,day] = s.split('-'); d = new Date(parseInt(y), parseInt(m)-1, parseInt(day)); }
+  else if (s.includes('/')) { const p = s.split('/'); if (p.length===3) d = new Date(parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0])); }
+  if (!d || isNaN(d)) return '';
+  return MOIS_ORDRE[d.getMonth()];
+}
+
 async function loadHistorique() {
   const loadMsg = document.getElementById('histLoadingMsg');
   const emptyMsg = document.getElementById('histEmpty');
   const table = document.getElementById('histTable');
-  const tbody = document.getElementById('histBody');
+  const toolbar = document.getElementById('histToolbar');
 
   loadMsg.style.display = 'block';
   emptyMsg.style.display = 'none';
   table.style.display = 'none';
+  toolbar.style.display = 'none';
 
   try {
     const url = APPS_SCRIPT_URL + '?client=' + encodeURIComponent(currentClient);
@@ -1282,72 +1352,210 @@ async function loadHistorique() {
       return;
     }
 
-    tbody.innerHTML = '';
+    histAllRows = rows;
+
+    // Peupler le filtre Mois avec les mois réellement présents, dans l'ordre calendaire
+    const moisPresents = new Set();
     rows.forEach(r => {
-      const statut = r.statut || 'En attente';
-      const statutClass = {
-        'En attente': 'statut-attente',
-        'RDV confirmé': 'statut-confirme',
-        'Réalisé': 'statut-realise',
-        'Facturé': 'statut-facture',
-      }[statut] || 'statut-attente';
-
-      // Formater les dates proprement (ISO, YYYY-MM-DD, DD/MM/YYYY)
-      function fmtDate(val) {
-        if (!val || val === '—' || val.toString().trim() === '') return '—';
-        const s = val.toString().trim();
-        // ISO timestamp : 2026-06-14T22:00:00.000Z
-        if (s.includes('T')) {
-          const d = new Date(s);
-          return isNaN(d) ? s : d.toLocaleDateString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric'});
-        }
-        // YYYY-MM-DD
-        if (s.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          const [y,m,d] = s.split('-'); return d+'/'+m+'/'+y;
-        }
-        return s; // Déjà DD/MM/YYYY ou autre
-      }
-
-      const dateRdv = r.date_rdv_confirme || r.date_rdv || '—';
-
-      // Lien ordre de mission
-      const omParams = new URLSearchParams({
-        id: r.id || '',
-        client: r.client || '',
-        type: r.type || '',
-        type_bien: r.type_bien || '',
-        surface: r.surface || '',
-        address: r.address || '',
-        etage: r.etage || '',
-        code_immeuble: r.code_immeuble || '',
-        proprietaire: r.proprietaire || '',
-        locataire: r.locataire || '',
-        date_rdv: r.date_rdv || '',
-        observations: r.observations || '',
-      });
-      const omUrl = '/ordre-mission-template.html?' + omParams.toString();
-
-      const tr = document.createElement('tr');
-      tr.innerHTML =
-        '<td style="font-size:11px;color:#8a909e">' + (r.id || '—') + '</td>' +
-        '<td>' + fmtDate(r.date) + '</td>' +
-        '<td><strong>' + (r.type || '—') + '</strong></td>' +
-        '<td style="color:var(--texte-leger)">' + (r.type_bien || '—') + '</td>' +
-        '<td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (r.address || '—') + '</td>' +
-        '<td>' + (r.locataire || '—') + '</td>' +
-        '<td>' + fmtDate(dateRdv) + '</td>' +
-        '<td><span class="statut-badge ' + statutClass + '">' + statut + '</span></td>' +
-        '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>';
-      tbody.appendChild(tr);
+      const m = (r.mois && r.mois.trim()) ? r.mois.trim() : histMoisDepuisDate(r.date_rdv);
+      if (m) moisPresents.add(m);
+    });
+    const filterMois = document.getElementById('histFilterMois');
+    filterMois.innerHTML = '<option value="">Tous les mois</option>';
+    MOIS_ORDRE.filter(m => moisPresents.has(m)).forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m; opt.textContent = m;
+      filterMois.appendChild(opt);
     });
 
+    toolbar.style.display = 'block';
     table.style.display = 'block';
+    histRenderFiltered();
 
   } catch(e) {
     loadMsg.style.display = 'none';
     emptyMsg.textContent = 'Erreur de chargement : ' + e.message;
     emptyMsg.style.display = 'block';
   }
+}
+
+function histGetFiltered() {
+  const search = (document.getElementById('histSearchInput').value || '').trim().toLowerCase();
+  const fType = document.getElementById('histFilterType').value;
+  const fStatut = document.getElementById('histFilterStatut').value;
+  const fMois = document.getElementById('histFilterMois').value;
+
+  return histAllRows.filter(r => {
+    if (fType && r.type !== fType) return false;
+    const statutReel = r.statut || 'En attente';
+    if (fStatut && statutReel !== fStatut) return false;
+    if (fMois) {
+      const m = (r.mois && r.mois.trim()) ? r.mois.trim() : histMoisDepuisDate(r.date_rdv);
+      if (m !== fMois) return false;
+    }
+    if (search) {
+      const blob = [r.id, r.address, r.locataire, r.proprietaire, r.type_bien, r.client]
+        .map(v => (v||'').toString().toLowerCase()).join(' ');
+      if (!blob.includes(search)) return false;
+    }
+    return true;
+  });
+}
+
+function histRenderFiltered() {
+  const tbody = document.getElementById('histBody');
+  const noResults = document.getElementById('histNoResults');
+  const countEl = document.getElementById('histResultCount');
+  const filtered = histGetFiltered();
+
+  countEl.textContent = filtered.length + ' demande(s) sur ' + histAllRows.length;
+  tbody.innerHTML = '';
+
+  if (filtered.length === 0) {
+    noResults.style.display = 'block';
+    return;
+  }
+  noResults.style.display = 'none';
+
+  filtered.forEach(r => {
+    const statut = r.statut || 'En attente';
+    const statutClass = STATUT_CLASS[statut] || 'statut-attente';
+    const dateRdv = r.date_rdv || '—';
+
+    const omParams = new URLSearchParams({
+      id: r.id || '', client: r.client || '', type: r.type || '',
+      type_bien: r.type_bien || '', surface: r.surface || '', address: r.address || '',
+      etage: r.etage || '', code_immeuble: r.code_immeuble || '',
+      proprietaire: r.proprietaire || '', locataire: r.locataire || '',
+      date_rdv: r.date_rdv || '', observations: r.observations || '',
+    });
+    const omUrl = '/ordre-mission-template.html?' + omParams.toString();
+
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td style="font-size:11px;color:#8a909e">' + (r.id || '—') + '</td>' +
+      '<td>' + histFmtDate(r.date) + '</td>' +
+      '<td><strong>' + (r.type || '—') + '</strong></td>' +
+      '<td style="color:var(--texte-leger)">' + (r.type_bien || '—') + '</td>' +
+      '<td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (r.address || '—') + '</td>' +
+      '<td>' + (r.locataire || '—') + '</td>' +
+      '<td>' + histFmtDate(dateRdv) + '</td>' +
+      '<td><span class="statut-badge ' + statutClass + '">' + statut + '</span></td>' +
+      '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+// Brancher les filtres pour un rendu instantané
+['histSearchInput'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', histRenderFiltered);
+});
+['histFilterType','histFilterStatut','histFilterMois'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('change', histRenderFiltered);
+});
+
+// ══════════════════════════════════════
+// ── EXPORT EXCEL — charte EPI ──
+// ══════════════════════════════════════
+
+async function exportHistoriqueExcel() {
+  const btn = document.getElementById('btnExportExcel');
+  const filtered = histGetFiltered();
+  if (filtered.length === 0) { alert('Aucune donnée à exporter avec ces filtres.'); return; }
+
+  btn.disabled = true;
+  const oldLabel = btn.textContent;
+  btn.textContent = 'Génération…';
+
+  try {
+    const wb = XLSX.utils.book_new();
+
+    // En-tête colonnes
+    const headers = ['Référence','Date demande','Type','Bien','Surface (m²)','Adresse','Étage','Locataire','Email locataire','Téléphone','Propriétaire','Mois','Date RDV','Statut','Observations'];
+
+    const dataRows = filtered.map(r => [
+      r.id || '', histFmtDate(r.date), r.type || '', r.type_bien || '', r.surface || '',
+      r.address || '', r.etage || '', r.locataire || '', r.email_locataire || '', r.tel_locataire || '',
+      r.proprietaire || '', (r.mois && r.mois.trim()) ? r.mois.trim() : histMoisDepuisDate(r.date_rdv),
+      histFmtDate(r.date_rdv), r.statut || 'En attente', r.observations || ''
+    ]);
+
+    // Lignes de titre / logo en haut du fichier
+    const titleRows = [
+      ['EPI EXPERTISES IMMOBILIÈRES'],
+      ['15 Rue George Sand — 75016 Paris'],
+      ['Export des demandes — ' + (currentClient || '') ],
+      ['Généré le ' + new Date().toLocaleDateString('fr-FR') + ' à ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'})],
+      [],
+      headers
+    ];
+
+    const aoa = [...titleRows, ...dataRows];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+    const headerRowIdx = titleRows.length - 1; // 0-indexed, ligne des en-têtes de colonnes
+    const nbCols = headers.length;
+
+    // Largeurs de colonnes
+    ws['!cols'] = [
+      {wch:16},{wch:12},{wch:8},{wch:18},{wch:10},{wch:32},{wch:10},
+      {wch:20},{wch:24},{wch:14},{wch:20},{wch:11},{wch:12},{wch:14},{wch:30}
+    ];
+
+    // Fusionner les cellules de titre sur toute la largeur
+    ws['!merges'] = [
+      { s:{r:0,c:0}, e:{r:0,c:nbCols-1} },
+      { s:{r:1,c:0}, e:{r:1,c:nbCols-1} },
+      { s:{r:2,c:0}, e:{r:2,c:nbCols-1} },
+      { s:{r:3,c:0}, e:{r:3,c:nbCols-1} },
+    ];
+
+    // Style bandeau bleu EPI + texte or pour le titre principal
+    const styleTitre = { font:{bold:true,sz:16,color:{rgb:'FFFFFF'}}, fill:{fgColor:{rgb:'1A3C6E'}}, alignment:{horizontal:'center',vertical:'center'} };
+    const styleSousTitre = { font:{bold:false,sz:11,color:{rgb:'FFFFFF'}}, fill:{fgColor:{rgb:'1A3C6E'}}, alignment:{horizontal:'center'} };
+    const styleInfo = { font:{italic:true,sz:9,color:{rgb:'5A6070'}}, alignment:{horizontal:'center'} };
+    const styleEnTeteCol = { font:{bold:true,sz:10,color:{rgb:'FFFFFF'}}, fill:{fgColor:{rgb:'1A3C6E'}}, alignment:{horizontal:'center',vertical:'center'}, border:{bottom:{style:'thin',color:{rgb:'C9A84C'}}} };
+
+    if (!ws['A1']) ws['A1'] = {t:'s', v:'EPI EXPERTISES IMMOBILIÈRES'};
+    ws['A1'].s = styleTitre;
+    if (ws['A2']) ws['A2'].s = styleSousTitre;
+    if (ws['A3']) ws['A3'].s = styleSousTitre;
+    if (ws['A4']) ws['A4'].s = styleInfo;
+
+    for (let c = 0; c < nbCols; c++) {
+      const addr = XLSX.utils.encode_cell({r:headerRowIdx, c});
+      if (ws[addr]) ws[addr].s = styleEnTeteCol;
+    }
+
+    // Couleurs alternées + couleur par statut sur la colonne Statut (index 13)
+    const statutColors = {
+      'En attente': 'FFF3C7', 'RDV confirmé': 'DBEAFE', 'Réalisé': 'DCFCE7', 'Facturé': 'F3E8FF'
+    };
+    for (let i = 0; i < dataRows.length; i++) {
+      const r = headerRowIdx + 1 + i;
+      const bgRow = (i % 2 === 0) ? 'FFFFFF' : 'F0F4FB';
+      for (let c = 0; c < nbCols; c++) {
+        const addr = XLSX.utils.encode_cell({r, c});
+        if (!ws[addr]) continue;
+        const statutVal = dataRows[i][13];
+        const bg = (c === 13 && statutColors[statutVal]) ? statutColors[statutVal] : bgRow;
+        ws[addr].s = { fill:{fgColor:{rgb:bg}}, font:{sz:10,color:{rgb:'1A1A2E'}}, alignment:{vertical:'center'} };
+      }
+    }
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Mes demandes EPI');
+
+    const dateStr = new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb, 'EPI_Demandes_' + (currentClient||'export').replace(/[^a-z0-9]/gi,'_') + '_' + dateStr + '.xlsx');
+
+  } catch(e) {
+    alert('Erreur export Excel : ' + e.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = oldLabel;
 }
 
 // ══════════════════════════════════════
