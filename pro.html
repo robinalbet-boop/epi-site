@@ -324,6 +324,25 @@
   .btn-om:hover { background: var(--bleu-clair); }
 
   .spinner-inline { width: 14px; height: 14px; border: 2px solid var(--bleu-pale); border-top-color: var(--bleu); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
+  /* ── MODALE ENVOI CHIFFRAGE ── */
+  .send-modal-overlay { display:none; position:fixed; inset:0; background:rgba(13,37,72,0.55); backdrop-filter:blur(3px); z-index:2000; align-items:center; justify-content:center; padding:20px; }
+  .send-modal-overlay.visible { display:flex; }
+  .send-modal-box { background:white; border-radius:16px; max-width:520px; width:100%; max-height:85vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.25); }
+  .send-modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .send-modal-title { font-family:'Playfair Display',serif; font-size:17px; color:var(--bleu); }
+  .send-modal-close { background:none; border:none; font-size:20px; color:var(--texte-leger); cursor:pointer; line-height:1; padding:4px; }
+  .send-modal-close:hover { color:var(--error); }
+  .send-modal-body { padding:20px 24px; }
+  .send-modal-sub { font-size:12px; color:var(--texte-leger); margin-bottom:16px; }
+  .send-modal-preview { background:var(--gris); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-size:11.5px; color:var(--texte-leger); max-height:140px; overflow-y:auto; white-space:pre-wrap; font-family:'DM Mono',monospace; margin-bottom:18px; }
+  .send-modal-options { display:flex; flex-direction:column; gap:8px; }
+  .send-modal-opt { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1.5px solid var(--border); border-radius:10px; background:white; cursor:pointer; transition:all 0.15s; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--texte); text-align:left; width:100%; }
+  .send-modal-opt:hover { border-color:var(--bleu); background:var(--bleu-pale); }
+  .send-modal-opt-icon { font-size:18px; width:24px; text-align:center; flex-shrink:0; }
+  .send-modal-opt-label { font-weight:600; }
+  .send-modal-opt-sub { font-size:11px; color:var(--texte-leger); margin-top:1px; }
+  .send-modal-feedback { font-size:12px; color:var(--success); margin-top:10px; text-align:center; display:none; }
+  .send-modal-feedback.visible { display:block; }
 </style>
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -647,6 +666,43 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- MODALE ENVOI CHIFFRAGE -->
+<div class="send-modal-overlay" id="sendModalOverlay">
+  <div class="send-modal-box">
+    <div class="send-modal-header">
+      <div class="send-modal-title" id="sendModalTitle">Envoyer pour chiffrage</div>
+      <button class="send-modal-close" onclick="fermerModaleEnvoi()">✕</button>
+    </div>
+    <div class="send-modal-body">
+      <div class="send-modal-sub" id="sendModalSub">Choisissez comment transmettre ce message.</div>
+      <div class="send-modal-preview" id="sendModalPreview"></div>
+      <div class="send-modal-options">
+        <button class="send-modal-opt" id="sendOptCopy">
+          <span class="send-modal-opt-icon">📋</span>
+          <span><span class="send-modal-opt-label">Copier le texte</span><br><span class="send-modal-opt-sub">Coller où vous voulez (mail, Slack, Teams…)</span></span>
+        </button>
+        <button class="send-modal-opt" id="sendOptGmail">
+          <span class="send-modal-opt-icon">✉️</span>
+          <span><span class="send-modal-opt-label">Ouvrir dans Gmail</span><br><span class="send-modal-opt-sub">Nouveau message pré-rempli dans Gmail web</span></span>
+        </button>
+        <button class="send-modal-opt" id="sendOptOutlook">
+          <span class="send-modal-opt-icon">📧</span>
+          <span><span class="send-modal-opt-label">Ouvrir dans Outlook Web</span><br><span class="send-modal-opt-sub">Nouveau message pré-rempli dans Outlook.com</span></span>
+        </button>
+        <button class="send-modal-opt" id="sendOptMailto">
+          <span class="send-modal-opt-icon">💻</span>
+          <span><span class="send-modal-opt-label">Application mail par défaut</span><br><span class="send-modal-opt-sub">Ouvre votre logiciel de messagerie habituel</span></span>
+        </button>
+        <button class="send-modal-opt" id="sendOptDownload">
+          <span class="send-modal-opt-icon">⬇️</span>
+          <span><span class="send-modal-opt-label">Télécharger en .txt</span><br><span class="send-modal-opt-sub">Pour archiver ou joindre à un logiciel métier</span></span>
+        </button>
+      </div>
+      <div class="send-modal-feedback" id="sendModalFeedback"></div>
+    </div>
   </div>
 </div>
 
@@ -1079,6 +1135,78 @@ Règles de filtrage STRICTES pour usure_normale :
 
 }
 
+// ══════════════════════════════════════
+// ── MODALE ENVOI CHIFFRAGE (multi-options) ──
+// ══════════════════════════════════════
+
+let sendModalData = { to: '', subject: '', body: '' };
+
+function ouvrirModaleEnvoi(titre, to, subject, body) {
+  sendModalData = { to, subject, body };
+  document.getElementById('sendModalTitle').textContent = titre;
+  document.getElementById('sendModalPreview').textContent = body;
+  document.getElementById('sendModalFeedback').classList.remove('visible');
+  document.getElementById('sendModalOverlay').classList.add('visible');
+}
+
+function fermerModaleEnvoi() {
+  document.getElementById('sendModalOverlay').classList.remove('visible');
+}
+
+document.getElementById('sendModalOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'sendModalOverlay') fermerModaleEnvoi();
+});
+
+function sendModalFeedback(msg) {
+  const fb = document.getElementById('sendModalFeedback');
+  fb.textContent = msg;
+  fb.classList.add('visible');
+}
+
+document.getElementById('sendOptCopy').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(sendModalData.body);
+    sendModalFeedback('✓ Texte copié dans le presse-papier.');
+  } catch(e) {
+    sendModalFeedback('Erreur lors de la copie : ' + e.message);
+  }
+});
+
+document.getElementById('sendOptGmail').addEventListener('click', () => {
+  const url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(sendModalData.to) +
+    '&su=' + encodeURIComponent(sendModalData.subject) + '&body=' + encodeURIComponent(sendModalData.body);
+  window.open(url, '_blank');
+  sendModalFeedback('✓ Gmail ouvert dans un nouvel onglet.');
+});
+
+document.getElementById('sendOptOutlook').addEventListener('click', () => {
+  const url = 'https://outlook.office.com/mail/deeplink/compose?to=' + encodeURIComponent(sendModalData.to) +
+    '&subject=' + encodeURIComponent(sendModalData.subject) + '&body=' + encodeURIComponent(sendModalData.body);
+  window.open(url, '_blank');
+  sendModalFeedback('✓ Outlook Web ouvert dans un nouvel onglet.');
+});
+
+document.getElementById('sendOptMailto').addEventListener('click', () => {
+  const mailto = 'mailto:' + encodeURIComponent(sendModalData.to) +
+    '?subject=' + encodeURIComponent(sendModalData.subject) + '&body=' + encodeURIComponent(sendModalData.body);
+  window.location.href = mailto;
+  sendModalFeedback('✓ Application mail par défaut lancée.');
+});
+
+document.getElementById('sendOptDownload').addEventListener('click', () => {
+  const contenu = 'À : ' + sendModalData.to + '\nObjet : ' + sendModalData.subject + '\n\n' + sendModalData.body;
+  const blob = new Blob([contenu], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'EPI_' + sendModalData.subject.replace(/[^a-z0-9]/gi, '_').substring(0, 60) + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  sendModalFeedback('✓ Fichier .txt téléchargé.');
+});
+
 function compRenderAnalysis(json, edle, edls) {
   if (json.erreur_parsing) {
     compResultContent.innerHTML = `<div style="white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:12px">${json.erreur_parsing}</div>`;
@@ -1236,8 +1364,8 @@ function compRenderAnalysis(json, edle, edls) {
       `• ${c.dataset.piece} — ${c.dataset.element}\n  Entrée : ${c.dataset.entree}\n  Sortie : ${c.dataset.sortie}\n  Note : ${c.dataset.commentaire}`
     ).join('\n\n');
     const body = `Bonjour,\n\nVeuillez trouver ci-dessous le détail des dégradations imputables au locataire pour le bien situé au ${addrStr} (locataire : ${tenantStr}), pour chiffrage.\n\n━━ PARTIE LOCATAIRE ━━\n\n${lignes}\n\nCordialement,\nEPI Expertises Immobilières`;
-    const mailto = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage dégradations locataire — ' + addrStr + ' — ' + tenantStr)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
+    const subject = 'Chiffrage dégradations locataire — ' + addrStr + ' — ' + tenantStr;
+    ouvrirModaleEnvoi('Envoyer pour chiffrage — Locataire', 'jmrservices75@gmail.com', subject, body);
   });
 
   document.getElementById('compBtnValBail')?.addEventListener('click', () => {
@@ -1247,8 +1375,8 @@ function compRenderAnalysis(json, edle, edls) {
       `• ${c.dataset.piece} — ${c.dataset.element}\n  Entrée : ${c.dataset.entree}\n  Sortie : ${c.dataset.sortie}\n  Note : ${c.dataset.commentaire}`
     ).join('\n\n');
     const body = `Bonjour,\n\nVeuillez trouver ci-dessous le détail des remises en état à la charge du bailleur pour le bien situé au ${addrStr} (locataire : ${tenantStr}), pour chiffrage.\n\n━━ PARTIE BAILLEUR ━━\n\n${lignes}\n\nCordialement,\nEPI Expertises Immobilières`;
-    const mailto = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage remise en état bailleur — ' + addrStr + ' — ' + tenantStr)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
+    const subject = 'Chiffrage remise en état bailleur — ' + addrStr + ' — ' + tenantStr;
+    ouvrirModaleEnvoi('Envoyer pour chiffrage — Bailleur', 'jmrservices75@gmail.com', subject, body);
   });
 }
 
