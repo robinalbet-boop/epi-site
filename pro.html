@@ -496,7 +496,14 @@
       <div class="form-grid full">
         <div class="form-group">
           <label class="form-label">Email du locataire</label>
-          <input type="email" class="form-input" id="edlEmailLocataire" placeholder="locataire@email.com">
+          <input type="text" class="form-input" id="edlEmailLocataire" placeholder="locataire@email.com — plusieurs adresses séparées par une virgule">
+        </div>
+      </div>
+      <div class="form-grid full">
+        <div class="form-group">
+          <label class="form-label">Email du gestionnaire</label>
+          <input type="email" class="form-input" id="edlEmailGestionnaire" placeholder="gestionnaire@cabinet.com">
+          <div style="font-size:10px;color:var(--texte-leger);margin-top:4px">Un email de confirmation de prise en charge lui sera envoyé automatiquement</div>
         </div>
       </div>
       <div class="form-grid full">
@@ -824,6 +831,7 @@ async function submitEdl() {
   const locataire = document.getElementById('edlLocataire').value.trim();
   const emailLocataire = document.getElementById('edlEmailLocataire').value.trim();
   const telLocataire = document.getElementById('edlTelLocataire').value.trim();
+  const emailGestionnaire = document.getElementById('edlEmailGestionnaire')?.value.trim() || '';
   const observations = document.getElementById('edlObservations').value.trim();
 
   if (!adresse || !locataire) {
@@ -854,6 +862,7 @@ async function submitEdl() {
         locataire,
         email_locataire: emailLocataire,
         tel_locataire: telLocataire,
+        email_gestionnaire: emailGestionnaire,
         date,
         observations,
       })
@@ -864,11 +873,12 @@ async function submitEdl() {
       (date ? ' pour le <strong>' + formatDate(date) + '</strong>' : '') + '.<br>' +
       'Adresse : ' + adresse + (etage ? ' — ' + etage : '') + '<br>' +
       'Type : ' + typeBien + (surface ? ' — ' + surface + ' m²' : '') + '<br>' +
-      'Un mail de confirmation a été envoyé à EPI.';
+      'Un mail de confirmation a été envoyé à EPI.' +
+      (emailGestionnaire ? '<br>✉️ Confirmation envoyée au gestionnaire.' : '');
     document.getElementById('edlConfirm').classList.add('visible');
 
     ['edlAdresse','edlEtage','edlCode','edlProprietaire','edlLocataire',
-     'edlEmailLocataire','edlTelLocataire','edlObservations','edlSurface','autoFillText']
+     'edlEmailLocataire','edlTelLocataire','edlEmailGestionnaire','edlObservations','edlSurface','autoFillText']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
 
   } catch (e) {
