@@ -371,6 +371,60 @@
   .btn-cancel-edit { background: white; color: var(--texte-leger); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
   .edit-success { display: none; background: #dcfce7; color: #16a34a; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 13px; font-weight: 500; }
   .edit-success.visible { display: block; }
+
+  /* ── BOUTON INSTRUCTION ── */
+  .btn-instruction {
+    background: #f0fdf4; border: 1px solid #16a34a; color: #16a34a;
+    border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-weight: 500; white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .btn-instruction:hover { background: #16a34a; color: white; }
+
+  /* ── MODALE INSTRUCTION ── */
+  .instr-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(13,37,72,0.6); backdrop-filter: blur(4px);
+    z-index: 3000; align-items: center; justify-content: center; padding: 20px;
+  }
+  .instr-modal-overlay.open { display: flex; }
+  .instr-modal {
+    background: white; border-radius: 16px; width: 100%; max-width: 520px;
+    box-shadow: 0 20px 60px rgba(13,37,72,0.25);
+    animation: modalIn 0.2s ease;
+  }
+  .instr-modal-header {
+    background: #16a34a; color: white; padding: 18px 24px;
+    border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: space-between;
+  }
+  .instr-modal-header h3 { font-size: 15px; font-weight: 600; }
+  .instr-modal-body { padding: 20px 24px; }
+  .instr-modal-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+  .instr-ref { font-size: 11px; color: var(--texte-leger); margin-bottom: 14px; padding: 8px 12px; background: var(--bleu-mid); border-radius: 6px; }
+
+  /* Suggestions rapides */
+  .instr-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .instr-chip {
+    background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d;
+    border-radius: 20px; padding: 5px 12px; font-size: 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap;
+  }
+  .instr-chip:hover { background: #dcfce7; border-color: #16a34a; }
+  .instr-chip.selected { background: #16a34a; color: white; border-color: #16a34a; }
+
+  .instr-textarea {
+    width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 10px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif;
+    color: var(--texte); resize: vertical; min-height: 100px;
+    transition: border-color 0.15s;
+  }
+  .instr-textarea:focus { outline: none; border-color: #16a34a; }
+  .instr-label { font-size: 11px; font-weight: 600; color: var(--bleu); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
+  .btn-send-instr { background: #16a34a; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .btn-send-instr:hover { background: #15803d; }
+  .btn-cancel-instr { background: white; color: var(--texte-leger); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .instr-success { display: none; background: #dcfce7; color: #16a34a; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 13px; font-weight: 500; }
+  .instr-success.visible { display: block; }
   .send-modal-overlay.visible { display:flex; }
   .send-modal-box { background:white; border-radius:16px; max-width:520px; width:100%; max-height:85vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.25); }
   .send-modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
@@ -660,6 +714,7 @@
               <th>Statut</th>
               <th>Ordre de mission</th>
               <th>Modifier</th>
+              <th>Instructions</th>
             </tr>
           </thead>
           <tbody id="histBody"></tbody>
@@ -1479,6 +1534,7 @@ compBtnCopy.addEventListener('click', () => {
 
 // ── Stockage en mémoire des demandes pour filtrage instantané ──
 let histAllRows = [];
+let histFilteredRows = [];
 
 const STATUT_CLASS = {
   'En attente': 'statut-attente',
@@ -1594,6 +1650,7 @@ function histRenderFiltered() {
 
   countEl.textContent = filtered.length + ' demande(s) sur ' + histAllRows.length;
   tbody.innerHTML = '';
+  histFilteredRows = [];
 
   if (filtered.length === 0) {
     noResults.style.display = 'block';
@@ -1601,7 +1658,9 @@ function histRenderFiltered() {
   }
   noResults.style.display = 'none';
 
-  filtered.forEach(r => {
+  filtered.forEach((r, idx) => {
+    // Stocker la ligne dans un tableau global indexé pour éviter les problèmes d'apostrophes
+    histFilteredRows[idx] = r;
     const statut = r.statut || 'En attente';
     const statutClass = STATUT_CLASS[statut] || 'statut-attente';
     const dateRdv = r.date_rdv || '—';
@@ -1626,9 +1685,83 @@ function histRenderFiltered() {
       '<td>' + histFmtDate(dateRdv) + '</td>' +
       '<td><span class="statut-badge ' + statutClass + '">' + statut + '</span></td>' +
       '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>' +
-      '<td><button class="btn-edit-mission" onclick="openEditModal(' + JSON.stringify(r) + ')">✏️ Modifier</button></td>';
+      '<td><button class="btn-edit-mission" onclick="openEditModal(' + idx + ')">✏️ Modifier</button></td>' +
+      '<td><button class="btn-instruction" onclick="openInstructionModal(' + idx + ')">💬 Instruction</button></td>';
     tbody.appendChild(tr);
   });
+}
+
+// ══════════════════════════════════════
+// ── INSTRUCTION SPÉCIALE ──
+// ══════════════════════════════════════
+
+let currentInstrMission = null;
+
+function openInstructionModal(idx) {
+  const r = histFilteredRows[idx];
+  if (!r) return;
+  currentInstrMission = r;
+  document.getElementById('instrModalRef').textContent =
+    'Réf. ' + (r.id || '—') + ' — ' + (r.address || '') +
+    (r.date_rdv ? ' — RDV ' + histFmtDate(r.date_rdv) : '');
+  document.getElementById('instrMessage').value = '';
+  document.getElementById('instrSuccess').classList.remove('visible');
+  document.getElementById('btnSendInstr').disabled = false;
+  document.getElementById('btnSendInstr').textContent = '📨 Envoyer l\'instruction';
+  // Réinitialiser les chips
+  document.querySelectorAll('.instr-chip').forEach(c => c.classList.remove('selected'));
+  document.getElementById('instrModalOverlay').classList.add('open');
+}
+
+function closeInstructionModal() {
+  document.getElementById('instrModalOverlay').classList.remove('open');
+  currentInstrMission = null;
+}
+
+function toggleChip(el, text) {
+  el.classList.toggle('selected');
+  const textarea = document.getElementById('instrMessage');
+  const current = textarea.value;
+  if (el.classList.contains('selected')) {
+    textarea.value = current ? current + '\n' + text : text;
+  } else {
+    textarea.value = current.replace('\n' + text, '').replace(text + '\n', '').replace(text, '').trim();
+  }
+}
+
+async function sendInstruction() {
+  const message = document.getElementById('instrMessage').value.trim();
+  if (!message) { alert('Veuillez saisir une instruction.'); return; }
+
+  const btn = document.getElementById('btnSendInstr');
+  btn.disabled = true;
+  btn.textContent = '⏳ Envoi…';
+
+  const payload = {
+    action: 'addInstruction',
+    id: currentInstrMission?.id || '',
+    client: currentInstrMission?.client || '',
+    address: currentInstrMission?.address || '',
+    locataire: currentInstrMission?.locataire || '',
+    date_rdv: currentInstrMission?.date_rdv || '',
+    message,
+  };
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    document.getElementById('instrSuccess').classList.add('visible');
+    btn.textContent = '✅ Envoyé';
+    setTimeout(() => closeInstructionModal(), 2000);
+  } catch(err) {
+    btn.disabled = false;
+    btn.textContent = '📨 Envoyer l\'instruction';
+    alert('Erreur lors de l\'envoi. Veuillez réessayer.');
+  }
 }
 
 // Brancher les filtres pour un rendu instantané
@@ -1639,7 +1772,9 @@ function histRenderFiltered() {
 
 let currentEditRow = null;
 
-function openEditModal(r) {
+function openEditModal(idx) {
+  const r = histFilteredRows[idx];
+  if (!r) return;
   currentEditRow = r;
   document.getElementById('editModalRef').textContent = 'Réf. ' + (r.id || '—') + ' — ' + (r.client || '') + ' — ' + (r.address || '');
   document.getElementById('editId').value = r.id || '';
@@ -1986,6 +2121,38 @@ JSON UNIQUEMENT sans markdown :
     <div class="edit-modal-footer">
       <button class="btn-cancel-edit" onclick="closeEditModal()">Annuler</button>
       <button class="btn-save-edit" id="btnSaveEdit" onclick="saveEditMission()">💾 Enregistrer les modifications</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- MODALE INSTRUCTION SPÉCIALE                       -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="instr-modal-overlay" id="instrModalOverlay">
+  <div class="instr-modal">
+    <div class="instr-modal-header">
+      <h3>💬 Instruction spéciale</h3>
+      <button onclick="closeInstructionModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div class="instr-modal-body">
+      <div class="instr-ref" id="instrModalRef">Mission —</div>
+
+      <label class="instr-label">Suggestions rapides</label>
+      <div class="instr-suggestions">
+        <span class="instr-chip" onclick="toggleChip(this, '🔑 Laisser les clés à un tiers')">🔑 Laisser les clés à un tiers</span>
+        <span class="instr-chip" onclick="toggleChip(this, '⚡ Rapporter les clés rapidement')">⚡ Rapporter les clés rapidement</span>
+        <span class="instr-chip" onclick="toggleChip(this, '🔍 Faire attention à un dégât particulier')">🔍 Dégât particulier</span>
+        <span class="instr-chip" onclick="toggleChip(this, '⏰ RDV à confirmer urgemment')">⏰ Confirmer urgemment</span>
+      </div>
+
+      <label class="instr-label" style="margin-top:4px">Votre message</label>
+      <textarea class="instr-textarea" id="instrMessage" placeholder="Décrivez votre instruction spéciale…"></textarea>
+
+      <div class="instr-success" id="instrSuccess">✅ Instruction transmise à EPI — nous en tiendrons compte pour cette mission.</div>
+    </div>
+    <div class="instr-modal-footer">
+      <button class="btn-cancel-instr" onclick="closeInstructionModal()">Annuler</button>
+      <button class="btn-send-instr" id="btnSendInstr" onclick="sendInstruction()">📨 Envoyer l'instruction</button>
     </div>
   </div>
 </div>
