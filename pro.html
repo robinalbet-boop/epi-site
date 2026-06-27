@@ -326,6 +326,51 @@
   .spinner-inline { width: 14px; height: 14px; border: 2px solid var(--bleu-pale); border-top-color: var(--bleu); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
   /* ── MODALE ENVOI CHIFFRAGE ── */
   .send-modal-overlay { display:none; position:fixed; inset:0; background:rgba(13,37,72,0.55); backdrop-filter:blur(3px); z-index:2000; align-items:center; justify-content:center; padding:20px; }
+
+  /* ── BOUTON MODIFIER ── */
+  .btn-edit-mission {
+    background: var(--or-pale); border: 1px solid var(--or); color: var(--bleu);
+    border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-weight: 500; white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .btn-edit-mission:hover { background: var(--or); color: white; }
+
+  /* ── MODALE MODIFICATION MISSION ── */
+  .edit-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(13,37,72,0.6); backdrop-filter: blur(4px);
+    z-index: 3000; align-items: center; justify-content: center; padding: 20px;
+  }
+  .edit-modal-overlay.open { display: flex; }
+  .edit-modal {
+    background: white; border-radius: 16px; width: 100%; max-width: 580px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(13,37,72,0.25);
+    animation: modalIn 0.2s ease;
+  }
+  .edit-modal-header {
+    background: var(--bleu); color: white; padding: 20px 24px;
+    border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: space-between;
+  }
+  .edit-modal-header h3 { font-size: 16px; font-weight: 600; }
+  .edit-modal-body { padding: 24px; }
+  .edit-modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+  .edit-field-group { margin-bottom: 14px; }
+  .edit-field-group label { display: block; font-size: 11px; font-weight: 600; color: var(--bleu); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .edit-field-group input, .edit-field-group textarea, .edit-field-group select {
+    width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 9px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif;
+    color: var(--texte); background: white; transition: border-color 0.15s;
+  }
+  .edit-field-group input:focus, .edit-field-group textarea:focus { outline: none; border-color: var(--bleu); }
+  .edit-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .edit-ref { font-size: 11px; color: var(--texte-leger); margin-bottom: 16px; padding: 8px 12px; background: var(--bleu-mid); border-radius: 6px; }
+  .btn-save-edit { background: var(--bleu); color: white; border: none; padding: 10px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .btn-save-edit:hover { background: var(--bleu-clair); }
+  .btn-cancel-edit { background: white; color: var(--texte-leger); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .edit-success { display: none; background: #dcfce7; color: #16a34a; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 13px; font-weight: 500; }
+  .edit-success.visible { display: block; }
   .send-modal-overlay.visible { display:flex; }
   .send-modal-box { background:white; border-radius:16px; max-width:520px; width:100%; max-height:85vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.25); }
   .send-modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
@@ -614,6 +659,7 @@
               <th>Date RDV</th>
               <th>Statut</th>
               <th>Ordre de mission</th>
+              <th>Modifier</th>
             </tr>
           </thead>
           <tbody id="histBody"></tbody>
@@ -1579,12 +1625,97 @@ function histRenderFiltered() {
       '<td>' + (r.locataire || '—') + '</td>' +
       '<td>' + histFmtDate(dateRdv) + '</td>' +
       '<td><span class="statut-badge ' + statutClass + '">' + statut + '</span></td>' +
-      '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>';
+      '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>' +
+      '<td><button class="btn-edit-mission" onclick="openEditModal(' + JSON.stringify(r) + ')">✏️ Modifier</button></td>';
     tbody.appendChild(tr);
   });
 }
 
 // Brancher les filtres pour un rendu instantané
+
+// ══════════════════════════════════════
+// ── MODIFICATION MISSION ──
+// ══════════════════════════════════════
+
+let currentEditRow = null;
+
+function openEditModal(r) {
+  currentEditRow = r;
+  document.getElementById('editModalRef').textContent = 'Réf. ' + (r.id || '—') + ' — ' + (r.client || '') + ' — ' + (r.address || '');
+  document.getElementById('editId').value = r.id || '';
+  document.getElementById('editType').value = r.type || 'EDLE';
+  document.getElementById('editTypeBien').value = r.type_bien || '';
+  document.getElementById('editAdresse').value = r.address || '';
+  document.getElementById('editEtage').value = r.etage || '';
+  document.getElementById('editCode').value = r.code_immeuble || '';
+  document.getElementById('editProprietaire').value = r.proprietaire || '';
+  document.getElementById('editLocataire').value = r.locataire || '';
+  document.getElementById('editEmailLocataire').value = r.email_locataire || '';
+  document.getElementById('editTelLocataire').value = r.tel_locataire || '';
+  document.getElementById('editObservations').value = r.observations || '';
+  // Convertir date_rdv en format input[date]
+  const drv = r.date_rdv || '';
+  if (drv) {
+    try {
+      let d;
+      if (drv.match(/^\d{4}-\d{2}-\d{2}$/)) d = drv;
+      else if (drv.includes('/')) { const p = drv.split('/'); d = p[2] + '-' + p[1].padStart(2,'0') + '-' + p[0].padStart(2,'0'); }
+      if (d) document.getElementById('editDateRdv').value = d;
+    } catch(e) {}
+  }
+  document.getElementById('editSuccess').classList.remove('visible');
+  document.getElementById('btnSaveEdit').disabled = false;
+  document.getElementById('btnSaveEdit').textContent = '💾 Enregistrer les modifications';
+  document.getElementById('editModalOverlay').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('editModalOverlay').classList.remove('open');
+  currentEditRow = null;
+}
+
+async function saveEditMission() {
+  const btn = document.getElementById('btnSaveEdit');
+  btn.disabled = true;
+  btn.textContent = '⏳ Enregistrement…';
+
+  const payload = {
+    action: 'updateMission',
+    id:             document.getElementById('editId').value,
+    type:           document.getElementById('editType').value,
+    type_bien:      document.getElementById('editTypeBien').value,
+    address:        document.getElementById('editAdresse').value,
+    etage:          document.getElementById('editEtage').value,
+    code_immeuble:  document.getElementById('editCode').value,
+    proprietaire:   document.getElementById('editProprietaire').value,
+    locataire:      document.getElementById('editLocataire').value,
+    email_locataire:document.getElementById('editEmailLocataire').value,
+    tel_locataire:  document.getElementById('editTelLocataire').value,
+    date_rdv:       document.getElementById('editDateRdv').value,
+    observations:   document.getElementById('editObservations').value,
+    client:         currentEditRow ? (currentEditRow.client || '') : '',
+  };
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    document.getElementById('editSuccess').classList.add('visible');
+    btn.textContent = '✅ Enregistré';
+    // Rafraîchir les données après 1.5s
+    setTimeout(async () => {
+      await fetchMissions();
+      closeEditModal();
+    }, 1500);
+  } catch(err) {
+    btn.disabled = false;
+    btn.textContent = '💾 Enregistrer les modifications';
+    alert('Erreur lors de la mise à jour. Veuillez réessayer.');
+  }
+}
 ['histSearchInput'].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.addEventListener('input', histRenderFiltered);
@@ -1774,5 +1905,90 @@ JSON UNIQUEMENT sans markdown :
 
 // Charger l'historique est géré directement dans showTab ci-dessous
 </script>
+<!-- ══════════════════════════════════════════════════ -->
+<!-- MODALE MODIFICATION MISSION                       -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="edit-modal-overlay" id="editModalOverlay">
+  <div class="edit-modal">
+    <div class="edit-modal-header">
+      <h3>✏️ Modifier la mission</h3>
+      <button onclick="closeEditModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div class="edit-modal-body">
+      <div class="edit-ref" id="editModalRef">Réf. —</div>
+      <input type="hidden" id="editId">
+      <input type="hidden" id="editCalEventId">
+
+      <div class="edit-grid-2">
+        <div class="edit-field-group">
+          <label>Type de mission</label>
+          <select id="editType">
+            <option value="EDLE">EDLE — Entrée</option>
+            <option value="EDLS">EDLS — Sortie</option>
+          </select>
+        </div>
+        <div class="edit-field-group">
+          <label>Type de bien</label>
+          <input type="text" id="editTypeBien" placeholder="T2 Vide, Studio Meublé…">
+        </div>
+      </div>
+
+      <div class="edit-field-group">
+        <label>Adresse</label>
+        <input type="text" id="editAdresse" placeholder="Adresse complète">
+      </div>
+
+      <div class="edit-grid-2">
+        <div class="edit-field-group">
+          <label>Étage</label>
+          <input type="text" id="editEtage" placeholder="2ème droite">
+        </div>
+        <div class="edit-field-group">
+          <label>Code immeuble</label>
+          <input type="text" id="editCode" placeholder="1234A">
+        </div>
+      </div>
+
+      <div class="edit-grid-2">
+        <div class="edit-field-group">
+          <label>Propriétaire</label>
+          <input type="text" id="editProprietaire" placeholder="Nom du propriétaire">
+        </div>
+        <div class="edit-field-group">
+          <label>Locataire</label>
+          <input type="text" id="editLocataire" placeholder="Nom du locataire">
+        </div>
+      </div>
+
+      <div class="edit-grid-2">
+        <div class="edit-field-group">
+          <label>Email locataire</label>
+          <input type="text" id="editEmailLocataire" placeholder="email@exemple.com">
+        </div>
+        <div class="edit-field-group">
+          <label>Téléphone locataire</label>
+          <input type="text" id="editTelLocataire" placeholder="06 XX XX XX XX">
+        </div>
+      </div>
+
+      <div class="edit-field-group">
+        <label>Date RDV</label>
+        <input type="date" id="editDateRdv">
+      </div>
+
+      <div class="edit-field-group">
+        <label>Observations</label>
+        <textarea id="editObservations" rows="3" placeholder="Informations complémentaires…"></textarea>
+      </div>
+
+      <div class="edit-success" id="editSuccess">✅ Mission mise à jour avec succès — Sheet et agenda synchronisés.</div>
+    </div>
+    <div class="edit-modal-footer">
+      <button class="btn-cancel-edit" onclick="closeEditModal()">Annuler</button>
+      <button class="btn-save-edit" id="btnSaveEdit" onclick="saveEditMission()">💾 Enregistrer les modifications</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
