@@ -919,6 +919,8 @@ function selectDiag(el, type) {
 
 // ── SOUMETTRE EDL ──
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwh-8UhW3rCTbrJV0n8FJUZrYdyQKiUlCTt-nNv0YJBfk-7qJcyJNsDl1po-h51-G3r/exec';
+// Proxy Vercel — évite les problèmes no-cors et double requête preflight
+const APPS_SCRIPT_PROXY = '/api/apps-script';
 
 async function submitEdl() {
   const type = document.getElementById('edlType').value;
@@ -947,11 +949,11 @@ async function submitEdl() {
   try {
     const displayName = type + ' - ' + currentClient + ' - ' + locataire;
 
-    await fetch(APPS_SCRIPT_URL, {
+    await fetch(APPS_SCRIPT_PROXY, {
       method: 'POST',
-      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        action: 'newMission',
         client: currentClient,
         type,
         type_bien: typeBien,
@@ -1581,7 +1583,7 @@ async function loadHistorique() {
   toolbar.style.display = 'none';
 
   try {
-    const url = APPS_SCRIPT_URL + '?client=' + encodeURIComponent(currentClient);
+    const url = APPS_SCRIPT_PROXY + '?client=' + encodeURIComponent(currentClient);
     const res = await fetch(url);
     const rows = await res.json();
 
@@ -1748,9 +1750,8 @@ async function sendInstruction() {
   };
 
   try {
-    await fetch(APPS_SCRIPT_URL, {
+    await fetch(APPS_SCRIPT_PROXY, {
       method: 'POST',
-      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
@@ -1832,9 +1833,8 @@ async function saveEditMission() {
   };
 
   try {
-    await fetch(APPS_SCRIPT_URL, {
+    await fetch(APPS_SCRIPT_PROXY, {
       method: 'POST',
-      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
