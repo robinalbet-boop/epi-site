@@ -1775,31 +1775,36 @@ async function voirRapportNockee(btn, idx) {
     const data = await res.json();
     const reports = data.data || [];
 
-    // Matching souple sur adresse (numéro + début de rue)
-    const addrNorm = (r.address || '').toLowerCase().replace(/[,\.]/g, ' ').replace(/\s+/g, ' ').trim();
-    const addrMots = addrNorm.split(' ').filter(m => m.length > 2).slice(0, 4);
+    // Matching souple — adresse + locataire
+    const addrNorm = (r.address || '').toLowerCase().replace(/[,\.\-]/g, ' ').replace(/\s+/g, ' ').trim();
+    const addrMots = addrNorm.split(' ').filter(m => m.length > 2 && !/^(paris|rue|avenue|bd|boulevard|alle|impasse|place)$/.test(m));
+    const locNorm  = (r.locataire || '').toLowerCase().replace(/[,\.\-\/]/g, ' ').trim();
+    const locMots  = locNorm.split(' ').filter(m => m.length > 2);
 
     let found = null;
     let bestScore = 0;
 
     for (const rep of reports) {
-      const repAddr = [
-        rep.property?.address?.line_1 || '',
-        rep.property?.address?.line_2 || '',
-        rep.property?.address?.postal_code || '',
-        rep.property?.address?.city || '',
-      ].join(' ').toLowerCase().replace(/[,\.]/g, ' ').replace(/\s+/g, ' ').trim();
+      const a = rep.property?.address || {};
+      const repAddrFull = [a.line_1||'', a.line_2||'', a.postal_code||'', a.city||'']
+        .join(' ').toLowerCase().replace(/[,\.\-]/g, ' ').replace(/\s+/g, ' ').trim();
 
-      // Score : nb de mots de l'adresse EPI présents dans l'adresse Nockee
-      const score = addrMots.filter(m => repAddr.includes(m)).length;
+      // Score adresse : chaque mot de l'adresse Sheet trouvé dans Nockee
+      const addrScore = addrMots.filter(m => repAddrFull.includes(m)).length;
+
+      // Score locataire : chaque mot du locataire Sheet trouvé dans le titre ou signataires Nockee
+      const repTitle = (rep.display_name || rep.name || '').toLowerCase();
+      const locScore = locMots.filter(m => repAddrFull.includes(m) || repTitle.includes(m)).length;
+
+      const score = addrScore + locScore;
       if (score > bestScore) {
         bestScore = score;
         found = rep;
       }
     }
 
-    // Seuil minimum : au moins 2 mots en commun
-    if (bestScore < 2) found = null;
+    // Seuil : au moins 1 mot significatif en commun (numéro ou nom de rue)
+    if (bestScore < 1) found = null;
 
     // Afficher la modale
     const addrLabel = r.address || '—';
