@@ -1811,12 +1811,33 @@ async function voirRapportNockee(btn, idx) {
     document.getElementById('rapportModalType').textContent = typeLabel;
 
     const linkBox = document.getElementById('rapportLinkBox');
+
+    // Récupérer le lien public du rapport via get_report
+    let nockeeUrl = null;
     if (found && found.id) {
-      const nockeeUrl = 'https://app.nockee.eu/inspection_reports/' + found.id;
+      try {
+        const detailRes = await fetch(`${PROXY_BASE}/nockee-proxy?action=get_report&inspection_report_id=${found.id}`);
+        const detailData = await detailRes.json();
+        nockeeUrl = detailData.public_url
+          || detailData.share_url
+          || detailData.url
+          || detailData.public_link
+          || detailData.sharing_url
+          || detailData.report_url
+          || (detailData.public_token ? 'https://app.nockee.fr/public/inspection-report/' + detailData.public_token : null)
+          || (detailData.token ? 'https://app.nockee.fr/public/inspection-report/' + detailData.token : null);
+        console.log('Champs rapport Nockee :', Object.keys(detailData));
+      } catch(e) {
+        console.log('Erreur get_report :', e.message);
+      }
+      if (!nockeeUrl) nockeeUrl = 'https://app.nockee.fr/inspection_reports/' + found.id;
+    }
+
+    if (found && found.id) {
       linkBox.innerHTML =
         '<div style="font-size:12px;color:#15803d;margin-bottom:10px">Rapport trouvé ✅</div>' +
         '<a href="' + nockeeUrl + '" target="_blank" style="display:block;background:#16a34a;color:white;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;text-align:center">🔗 Ouvrir le rapport Nockee</a>' +
-        '<div style="margin-top:10px;font-size:11px;color:#888">Statut : ' + (found.status || '—') + ' · Date : ' + (found.date || found.check_in_date || '—') + '</div>';
+        '<div style="margin-top:10px;font-size:11px;color:#888">Statut : ' + ({'delivered':'Remis','draft':'Brouillon','finalized':'Finalisé'}[found.status] || found.status || '—') + ' · Date : ' + (found.date || found.check_in_date || '—') + '</div>';
     } else {
       linkBox.innerHTML =
         '<div class="rapport-not-found">' +
