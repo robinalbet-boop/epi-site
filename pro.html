@@ -320,7 +320,105 @@
   .statut-realise { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
   .statut-facture { background: #f3e8ff; color: #7c3aed; border: 1px solid #c4b5fd; }
 
-  /* ── BOUTON RAPPORT NOCKEE ── */
+  /* ── BOUTON MODIFIER ── */
+  .btn-edit-mission {
+    background: var(--or-pale); border: 1px solid var(--or); color: var(--bleu);
+    border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-weight: 500; white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .btn-edit-mission:hover { background: var(--or); color: white; }
+
+  /* ── MODALE MODIFICATION MISSION ── */
+  .edit-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(13,37,72,0.6); backdrop-filter: blur(4px);
+    z-index: 3000; align-items: center; justify-content: center; padding: 20px;
+  }
+  .edit-modal-overlay.open { display: flex; }
+  .edit-modal {
+    background: white; border-radius: 16px; width: 100%; max-width: 580px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(13,37,72,0.25);
+    animation: modalIn 0.2s ease;
+  }
+  .edit-modal-header {
+    background: var(--bleu); color: white; padding: 20px 24px;
+    border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: space-between;
+  }
+  .edit-modal-header h3 { font-size: 16px; font-weight: 600; }
+  .edit-modal-body { padding: 24px; }
+  .edit-modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+  .edit-field-group { margin-bottom: 14px; }
+  .edit-field-group label { display: block; font-size: 11px; font-weight: 600; color: var(--bleu); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+  .edit-field-group input, .edit-field-group textarea, .edit-field-group select {
+    width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 9px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif;
+    color: var(--texte); background: white; transition: border-color 0.15s;
+  }
+  .edit-field-group input:focus, .edit-field-group textarea:focus, .edit-field-group select:focus { outline: none; border-color: var(--bleu); }
+  .edit-field-group textarea { resize: vertical; min-height: 70px; }
+  .edit-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .edit-ref { font-size: 11px; color: var(--texte-leger); margin-bottom: 16px; padding: 8px 12px; background: var(--bleu-mid); border-radius: 6px; }
+  .btn-save-edit { background: var(--bleu); color: white; border: none; padding: 10px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .btn-save-edit:hover { background: var(--bleu-clair); }
+  .btn-cancel-edit { background: white; color: var(--texte-leger); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .edit-success { display: none; background: #dcfce7; color: #16a34a; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 13px; font-weight: 500; }
+  .edit-success.visible { display: block; }
+
+  /* ── BOUTON INSTRUCTION ── */
+  .btn-instruction {
+    background: #f0fdf4; border: 1px solid #16a34a; color: #16a34a;
+    border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-weight: 500; white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .btn-instruction:hover { background: #16a34a; color: white; }
+
+  /* ── MODALE INSTRUCTION ── */
+  .instr-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(13,37,72,0.6); backdrop-filter: blur(4px);
+    z-index: 3000; align-items: center; justify-content: center; padding: 20px;
+  }
+  .instr-modal-overlay.open { display: flex; }
+  .instr-modal {
+    background: white; border-radius: 16px; width: 100%; max-width: 520px;
+    box-shadow: 0 20px 60px rgba(13,37,72,0.25);
+    animation: modalIn 0.2s ease;
+  }
+  .instr-modal-header {
+    background: #16a34a; color: white; padding: 18px 24px;
+    border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: space-between;
+  }
+  .instr-modal-header h3 { font-size: 15px; font-weight: 600; }
+  .instr-modal-body { padding: 20px 24px; }
+  .instr-modal-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+  .instr-ref { font-size: 11px; color: var(--texte-leger); margin-bottom: 14px; padding: 8px 12px; background: var(--bleu-mid); border-radius: 6px; }
+  .instr-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .instr-chip {
+    background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d;
+    border-radius: 20px; padding: 5px 12px; font-size: 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap;
+  }
+  .instr-chip:hover { background: #dcfce7; border-color: #16a34a; }
+  .instr-chip.selected { background: #16a34a; color: white; border-color: #16a34a; }
+  .instr-textarea {
+    width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 10px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif;
+    color: var(--texte); resize: vertical; min-height: 100px;
+    transition: border-color 0.15s;
+  }
+  .instr-textarea:focus { outline: none; border-color: #16a34a; }
+  .instr-label { font-size: 11px; font-weight: 600; color: var(--bleu); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
+  .btn-send-instr { background: #16a34a; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .btn-send-instr:hover { background: #15803d; }
+  .btn-cancel-instr { background: white; color: var(--texte-leger); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .instr-success { display: none; background: #dcfce7; color: #16a34a; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 13px; font-weight: 500; }
+  .instr-success.visible { display: block; }
+  @keyframes modalIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+
+  /* ── MODALE RAPPORT NOCKEE ── */
   .btn-rapport {
     background: #f0fdf4; border: 1px solid #16a34a; color: #16a34a;
     border-radius: 6px; padding: 5px 10px; font-size: 11px; cursor: pointer;
