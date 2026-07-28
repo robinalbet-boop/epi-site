@@ -1818,14 +1818,10 @@ async function voirRapportNockee(btn, idx) {
       try {
         const detailRes = await fetch(`${PROXY_BASE}/nockee-proxy?action=get_report&inspection_report_id=${found.id}`);
         const detailData = await detailRes.json();
-        nockeeUrl = detailData.public_url
+        nockeeUrl = detailData.hosted_inspection_report_url
+          || detailData.public_url
           || detailData.share_url
-          || detailData.url
-          || detailData.public_link
-          || detailData.sharing_url
-          || detailData.report_url
-          || (detailData.public_token ? 'https://app.nockee.fr/public/inspection-report/' + detailData.public_token : null)
-          || (detailData.token ? 'https://app.nockee.fr/public/inspection-report/' + detailData.token : null);
+          || detailData.url;
         console.log('Champs rapport Nockee :', Object.keys(detailData));
       } catch(e) {
         console.log('Erreur get_report :', e.message);
