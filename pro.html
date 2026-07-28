@@ -634,107 +634,6 @@
       </div>
     </div>
 
-    <!-- MODALE MODIFICATION MISSION -->
-    <div class="edit-modal-overlay" id="editModalOverlay">
-      <div class="edit-modal">
-        <div class="edit-modal-header">
-          <h3>✏️ Modifier la mission</h3>
-          <button onclick="closeEditModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
-        </div>
-        <div class="edit-modal-body">
-          <div class="edit-ref" id="editModalRef">Réf. —</div>
-          <input type="hidden" id="editId">
-          <div class="edit-grid-2">
-            <div class="edit-field-group">
-              <label>Type de mission</label>
-              <select id="editType">
-                <option value="EDLE">EDLE — Entrée</option>
-                <option value="EDLS">EDLS — Sortie</option>
-              </select>
-            </div>
-            <div class="edit-field-group">
-              <label>Type de bien</label>
-              <input type="text" id="editTypeBien" placeholder="T2 Vide, Studio Meublé…">
-            </div>
-          </div>
-          <div class="edit-field-group">
-            <label>Adresse</label>
-            <input type="text" id="editAdresse" placeholder="Adresse complète">
-          </div>
-          <div class="edit-grid-2">
-            <div class="edit-field-group">
-              <label>Étage</label>
-              <input type="text" id="editEtage" placeholder="2ème droite">
-            </div>
-            <div class="edit-field-group">
-              <label>Code immeuble</label>
-              <input type="text" id="editCode" placeholder="1234A">
-            </div>
-          </div>
-          <div class="edit-grid-2">
-            <div class="edit-field-group">
-              <label>Propriétaire</label>
-              <input type="text" id="editProprietaire" placeholder="Nom du propriétaire">
-            </div>
-            <div class="edit-field-group">
-              <label>Locataire</label>
-              <input type="text" id="editLocataire" placeholder="Nom du locataire">
-            </div>
-          </div>
-          <div class="edit-grid-2">
-            <div class="edit-field-group">
-              <label>Email locataire</label>
-              <input type="text" id="editEmailLocataire" placeholder="email@exemple.com">
-            </div>
-            <div class="edit-field-group">
-              <label>Téléphone locataire</label>
-              <input type="text" id="editTelLocataire" placeholder="06 XX XX XX XX">
-            </div>
-          </div>
-          <div class="edit-field-group">
-            <label>Date RDV</label>
-            <input type="date" id="editDateRdv">
-          </div>
-          <div class="edit-field-group">
-            <label>Observations</label>
-            <textarea id="editObservations" rows="3" placeholder="Informations complémentaires…"></textarea>
-          </div>
-          <div class="edit-success" id="editSuccess">✅ Mission mise à jour avec succès.</div>
-        </div>
-        <div class="edit-modal-footer">
-          <button class="btn-cancel-edit" onclick="closeEditModal()">Annuler</button>
-          <button class="btn-save-edit" id="btnSaveEdit" onclick="saveEditMission()">💾 Enregistrer</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODALE INSTRUCTION SPÉCIALE -->
-    <div class="instr-modal-overlay" id="instrModalOverlay">
-      <div class="instr-modal">
-        <div class="instr-modal-header">
-          <h3>💬 Instruction spéciale</h3>
-          <button onclick="closeInstructionModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
-        </div>
-        <div class="instr-modal-body">
-          <div class="instr-ref" id="instrModalRef">Mission —</div>
-          <label class="instr-label">Suggestions rapides</label>
-          <div class="instr-suggestions">
-            <span class="instr-chip" onclick="toggleChip(this, '🔑 Laisser les clés à un tiers')">🔑 Laisser les clés à un tiers</span>
-            <span class="instr-chip" onclick="toggleChip(this, '⚡ Rapporter les clés rapidement')">⚡ Rapporter les clés rapidement</span>
-            <span class="instr-chip" onclick="toggleChip(this, '🔍 Faire attention à un dégât particulier')">🔍 Dégât particulier</span>
-            <span class="instr-chip" onclick="toggleChip(this, '⏰ RDV à confirmer urgemment')">⏰ Confirmer urgemment</span>
-          </div>
-          <label class="instr-label" style="margin-top:8px">Votre message</label>
-          <textarea class="instr-textarea" id="instrMessage" placeholder="Décrivez votre instruction…"></textarea>
-          <div class="instr-success" id="instrSuccess">✅ Instruction transmise à EPI.</div>
-        </div>
-        <div class="instr-modal-footer">
-          <button class="btn-cancel-instr" onclick="closeInstructionModal()">Annuler</button>
-          <button class="btn-send-instr" id="btnSendInstr" onclick="sendInstruction()">📨 Envoyer</button>
-        </div>
-      </div>
-    </div>
-
     <!-- ONGLET COMPARATIF -->
     <div class="tab-panel" id="panel-comparatif">
       <div class="section-label">Comparatif EDL</div>
@@ -784,6 +683,111 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- MODALE MODIFICATION MISSION                       -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="edit-modal-overlay" id="editModalOverlay">
+  <div class="edit-modal">
+    <div class="edit-modal-header">
+      <h3>✏️ Modifier la mission</h3>
+      <button onclick="closeEditModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div class="edit-modal-body">
+      <div class="edit-ref" id="editModalRef">Réf. —</div>
+      <input type="hidden" id="editId">
+      <div class="edit-grid-2">
+        <div class="edit-field-group">
+          <label>Type de mission</label>
+          <select id="editType">
+            <option value="EDLE">EDLE — Entrée</option>
+            <option value="EDLS">EDLS — Sortie</option>
+          </select>
+        </div>
+        <div class="edit-field-group">
+          <label>Type de bien</label>
+          <input type="text" id="editTypeBien" placeholder="T2 Vide, Studio Meublé…">
+        </div>
+      </div>
+      <div class="edit-field-group">
+        <label>Adresse</label>
+        <input type="text" id="editAdresse" placeholder="Adresse complète">
+      </div>
+      <div class="edit-grid-2">
+        <div class="edit-field-group">
+          <label>Étage</label>
+          <input type="text" id="editEtage" placeholder="2ème droite">
+        </div>
+        <div class="edit-field-group">
+          <label>Code immeuble</label>
+          <input type="text" id="editCode" placeholder="1234A">
+        </div>
+      </div>
+      <div class="edit-grid-2">
+        <div class="edit-field-group">
+          <label>Propriétaire</label>
+          <input type="text" id="editProprietaire" placeholder="Nom du propriétaire">
+        </div>
+        <div class="edit-field-group">
+          <label>Locataire</label>
+          <input type="text" id="editLocataire" placeholder="Nom du locataire">
+        </div>
+      </div>
+      <div class="edit-grid-2">
+        <div class="edit-field-group">
+          <label>Email locataire</label>
+          <input type="text" id="editEmailLocataire" placeholder="email@exemple.com">
+        </div>
+        <div class="edit-field-group">
+          <label>Téléphone locataire</label>
+          <input type="text" id="editTelLocataire" placeholder="06 XX XX XX XX">
+        </div>
+      </div>
+      <div class="edit-field-group">
+        <label>Date RDV</label>
+        <input type="date" id="editDateRdv">
+      </div>
+      <div class="edit-field-group">
+        <label>Observations</label>
+        <textarea id="editObservations" rows="3" placeholder="Informations complémentaires…"></textarea>
+      </div>
+      <div class="edit-success" id="editSuccess">✅ Mission mise à jour avec succès.</div>
+    </div>
+    <div class="edit-modal-footer">
+      <button class="btn-cancel-edit" onclick="closeEditModal()">Annuler</button>
+      <button class="btn-save-edit" id="btnSaveEdit" onclick="saveEditMission()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- MODALE INSTRUCTION SPÉCIALE                       -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="instr-modal-overlay" id="instrModalOverlay">
+  <div class="instr-modal">
+    <div class="instr-modal-header">
+      <h3>💬 Instruction spéciale</h3>
+      <button onclick="closeInstructionModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div class="instr-modal-body">
+      <div class="instr-ref" id="instrModalRef">Mission —</div>
+      <label class="instr-label">Suggestions rapides</label>
+      <div class="instr-suggestions">
+        <span class="instr-chip" onclick="toggleChip(this, '🔑 Laisser les clés à un tiers')">🔑 Laisser les clés à un tiers</span>
+        <span class="instr-chip" onclick="toggleChip(this, '⚡ Rapporter les clés rapidement')">⚡ Rapporter les clés rapidement</span>
+        <span class="instr-chip" onclick="toggleChip(this, '🔍 Faire attention à un dégât particulier')">🔍 Dégât particulier</span>
+        <span class="instr-chip" onclick="toggleChip(this, '⏰ RDV à confirmer urgemment')">⏰ Confirmer urgemment</span>
+      </div>
+      <label class="instr-label" style="margin-top:8px">Votre message</label>
+      <textarea class="instr-textarea" id="instrMessage" placeholder="Décrivez votre instruction…"></textarea>
+      <div class="instr-success" id="instrSuccess">✅ Instruction transmise à EPI.</div>
+    </div>
+    <div class="instr-modal-footer">
+      <button class="btn-cancel-instr" onclick="closeInstructionModal()">Annuler</button>
+      <button class="btn-send-instr" id="btnSendInstr" onclick="sendInstruction()">📨 Envoyer</button>
+    </div>
   </div>
 </div>
 
