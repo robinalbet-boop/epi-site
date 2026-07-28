@@ -759,6 +759,7 @@ function selectDiag(el, type) {
 
 // ── SOUMETTRE EDL ──
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzqKY7eDpgAMEAdGXZDPuLIslYEtqb5HH_UEElGFRVBAZmm7tTNagbGPPFvrXfyqAVx/exec';
+const APPS_SCRIPT_PROXY = '/api/apps-script';
 
 async function submitEdl() {
   const type = document.getElementById('edlType').value;
@@ -787,7 +788,7 @@ async function submitEdl() {
   try {
     const displayName = type + ' - ' + currentClient + ' - ' + locataire;
 
-    await fetch(APPS_SCRIPT_URL, {
+    await fetch(APPS_SCRIPT_PROXY, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
