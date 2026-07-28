@@ -320,131 +320,55 @@
   .statut-realise { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
   .statut-facture { background: #f3e8ff; color: #7c3aed; border: 1px solid #c4b5fd; }
 
+  /* ── BOUTON RAPPORT NOCKEE ── */
+  .btn-rapport {
+    background: #f0fdf4; border: 1px solid #16a34a; color: #16a34a;
+    border-radius: 6px; padding: 5px 10px; font-size: 11px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-weight: 600; white-space: nowrap;
+    transition: all 0.15s; text-decoration: none; display: inline-block;
+  }
+  .btn-rapport:hover { background: #16a34a; color: white; }
+  .btn-rapport.loading { opacity: 0.6; cursor: wait; }
+
+  /* ── MODALE RAPPORT ── */
+  .rapport-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(13,37,72,0.6); backdrop-filter: blur(4px);
+    z-index: 3000; align-items: center; justify-content: center; padding: 20px;
+  }
+  .rapport-modal-overlay.open { display: flex; }
+  .rapport-modal {
+    background: white; border-radius: 16px; width: 100%; max-width: 480px;
+    box-shadow: 0 20px 60px rgba(13,37,72,0.25); animation: modalIn 0.2s ease;
+  }
+  .rapport-modal-header {
+    background: #16a34a; color: white; padding: 18px 24px;
+    border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: space-between;
+  }
+  .rapport-modal-header h3 { font-size: 15px; font-weight: 600; }
+  .rapport-modal-body { padding: 24px; }
+  .rapport-modal-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
+  .rapport-link-box {
+    background: #f0fdf4; border: 1.5px solid #16a34a; border-radius: 10px;
+    padding: 16px 20px; margin-bottom: 16px; text-align: center;
+  }
+  .rapport-link-box a {
+    color: #16a34a; font-weight: 600; font-size: 14px;
+    text-decoration: none; word-break: break-all;
+  }
+  .rapport-link-box a:hover { text-decoration: underline; }
+  .rapport-not-found {
+    background: #fff5f5; border: 1.5px solid #fca5a5; border-radius: 10px;
+    padding: 16px 20px; color: #dc2626; font-size: 13px; text-align: center;
+  }
+  @keyframes modalIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+
   .btn-om { background: var(--bleu); color: white; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; white-space: nowrap; text-decoration: none; display: inline-block; }
   .btn-om:hover { background: var(--bleu-clair); }
 
   .spinner-inline { width: 14px; height: 14px; border: 2px solid var(--bleu-pale); border-top-color: var(--bleu); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
-  /* ── MODALE ENVOI CHIFFRAGE ── */
-  .send-modal-overlay { display:none; position:fixed; inset:0; background:rgba(13,37,72,0.55); backdrop-filter:blur(3px); z-index:2000; align-items:center; justify-content:center; padding:20px; }
-
-  /* ── BOUTON MODIFIER ── */
-  .btn-edit-mission {
-    background: var(--or-pale); border: 1px solid var(--or); color: var(--bleu);
-    border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-weight: 500; white-space: nowrap;
-    transition: all 0.15s;
-  }
-  .btn-edit-mission:hover { background: var(--or); color: white; }
-
-  /* ── MODALE MODIFICATION MISSION ── */
-  .edit-modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(13,37,72,0.6); backdrop-filter: blur(4px);
-    z-index: 3000; align-items: center; justify-content: center; padding: 20px;
-  }
-  .edit-modal-overlay.open { display: flex; }
-  .edit-modal {
-    background: white; border-radius: 16px; width: 100%; max-width: 580px;
-    max-height: 90vh; overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(13,37,72,0.25);
-    animation: modalIn 0.2s ease;
-  }
-  .edit-modal-header {
-    background: var(--bleu); color: white; padding: 20px 24px;
-    border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: space-between;
-  }
-  .edit-modal-header h3 { font-size: 16px; font-weight: 600; }
-  .edit-modal-body { padding: 24px; }
-  .edit-modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
-  .edit-field-group { margin-bottom: 14px; }
-  .edit-field-group label { display: block; font-size: 11px; font-weight: 600; color: var(--bleu); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-  .edit-field-group input, .edit-field-group textarea, .edit-field-group select {
-    width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
-    padding: 9px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif;
-    color: var(--texte); background: white; transition: border-color 0.15s;
-  }
-  .edit-field-group input:focus, .edit-field-group textarea:focus { outline: none; border-color: var(--bleu); }
-  .edit-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .edit-ref { font-size: 11px; color: var(--texte-leger); margin-bottom: 16px; padding: 8px 12px; background: var(--bleu-mid); border-radius: 6px; }
-  .btn-save-edit { background: var(--bleu); color: white; border: none; padding: 10px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-  .btn-save-edit:hover { background: var(--bleu-clair); }
-  .btn-cancel-edit { background: white; color: var(--texte-leger); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-  .edit-success { display: none; background: #dcfce7; color: #16a34a; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 13px; font-weight: 500; }
-  .edit-success.visible { display: block; }
-
-  /* ── BOUTON INSTRUCTION ── */
-  .btn-instruction {
-    background: #f0fdf4; border: 1px solid #16a34a; color: #16a34a;
-    border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-weight: 500; white-space: nowrap;
-    transition: all 0.15s;
-  }
-  .btn-instruction:hover { background: #16a34a; color: white; }
-
-  /* ── MODALE INSTRUCTION ── */
-  .instr-modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(13,37,72,0.6); backdrop-filter: blur(4px);
-    z-index: 3000; align-items: center; justify-content: center; padding: 20px;
-  }
-  .instr-modal-overlay.open { display: flex; }
-  .instr-modal {
-    background: white; border-radius: 16px; width: 100%; max-width: 520px;
-    box-shadow: 0 20px 60px rgba(13,37,72,0.25);
-    animation: modalIn 0.2s ease;
-  }
-  .instr-modal-header {
-    background: #16a34a; color: white; padding: 18px 24px;
-    border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: space-between;
-  }
-  .instr-modal-header h3 { font-size: 15px; font-weight: 600; }
-  .instr-modal-body { padding: 20px 24px; }
-  .instr-modal-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
-  .instr-ref { font-size: 11px; color: var(--texte-leger); margin-bottom: 14px; padding: 8px 12px; background: var(--bleu-mid); border-radius: 6px; }
-
-  /* Suggestions rapides */
-  .instr-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-  .instr-chip {
-    background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d;
-    border-radius: 20px; padding: 5px 12px; font-size: 12px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap;
-  }
-  .instr-chip:hover { background: #dcfce7; border-color: #16a34a; }
-  .instr-chip.selected { background: #16a34a; color: white; border-color: #16a34a; }
-
-  .instr-textarea {
-    width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
-    padding: 10px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif;
-    color: var(--texte); resize: vertical; min-height: 100px;
-    transition: border-color 0.15s;
-  }
-  .instr-textarea:focus { outline: none; border-color: #16a34a; }
-  .instr-label { font-size: 11px; font-weight: 600; color: var(--bleu); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
-  .btn-send-instr { background: #16a34a; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-  .btn-send-instr:hover { background: #15803d; }
-  .btn-cancel-instr { background: white; color: var(--texte-leger); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
-  .instr-success { display: none; background: #dcfce7; color: #16a34a; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 13px; font-weight: 500; }
-  .instr-success.visible { display: block; }
-  .send-modal-overlay.visible { display:flex; }
-  .send-modal-box { background:white; border-radius:16px; max-width:520px; width:100%; max-height:85vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.25); }
-  .send-modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-  .send-modal-title { font-family:'Playfair Display',serif; font-size:17px; color:var(--bleu); }
-  .send-modal-close { background:none; border:none; font-size:20px; color:var(--texte-leger); cursor:pointer; line-height:1; padding:4px; }
-  .send-modal-close:hover { color:var(--error); }
-  .send-modal-body { padding:20px 24px; }
-  .send-modal-sub { font-size:12px; color:var(--texte-leger); margin-bottom:16px; }
-  .send-modal-preview { background:var(--gris); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-size:11.5px; color:var(--texte-leger); max-height:140px; overflow-y:auto; white-space:pre-wrap; font-family:'DM Mono',monospace; margin-bottom:18px; }
-  .send-modal-options { display:flex; flex-direction:column; gap:8px; }
-  .send-modal-opt { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1.5px solid var(--border); border-radius:10px; background:white; cursor:pointer; transition:all 0.15s; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--texte); text-align:left; width:100%; }
-  .send-modal-opt:hover { border-color:var(--bleu); background:var(--bleu-pale); }
-  .send-modal-opt-icon { font-size:18px; width:24px; text-align:center; flex-shrink:0; }
-  .send-modal-opt-label { font-weight:600; }
-  .send-modal-opt-sub { font-size:11px; color:var(--texte-leger); margin-top:1px; }
-  .send-modal-feedback { font-size:12px; color:var(--success); margin-top:10px; text-align:center; display:none; }
-  .send-modal-feedback.visible { display:block; }
 </style>
 </head>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <body>
 
 <!-- NAV -->
@@ -506,19 +430,6 @@
     <!-- ONGLET EDL -->
     <div class="tab-panel active" id="panel-edl">
       <div class="section-label">Demande d'état des lieux</div>
-
-      <!-- REMPLISSAGE AUTOMATIQUE IA -->
-      <div style="background:var(--bleu-pale);border:1.5px solid rgba(26,60,110,0.15);border-radius:12px;padding:18px 20px;margin-bottom:24px">
-        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--bleu);font-weight:700;margin-bottom:10px">✨ Remplissage automatique</div>
-        <div style="font-size:12px;color:var(--texte-leger);margin-bottom:10px">Collez le texte de l'ordre de mission reçu par mail — l'IA remplit le formulaire automatiquement.</div>
-        <textarea id="autoFillText" class="form-textarea" style="min-height:80px;font-size:12px;background:white" placeholder="Collez ici le texte de l'ordre de mission (adresse, locataire, date, type de bien…)"></textarea>
-        <button onclick="autoFillForm()" id="btnAutoFill" style="margin-top:10px;background:var(--bleu);color:white;border:none;border-radius:8px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px">
-          <span id="autoFillSpinner" style="display:none;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite"></span>
-          ✨ Remplir automatiquement
-        </button>
-        <div id="autoFillMsg" style="font-size:12px;margin-top:8px;color:var(--success);display:none"></div>
-      </div>
-
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">Type de mission</label>
@@ -582,11 +493,15 @@
           <input type="text" class="form-input" id="edlProprietaire" placeholder="Nom complet">
         </div>
         <div class="form-group">
-          <label class="form-label">Nom du locataire</label>
+          <label class="form-label">Nom du locataire entrant</label>
           <input type="text" class="form-input" id="edlLocataire" placeholder="Nom complet">
         </div>
       </div>
-      <div class="form-grid full">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nom de l'ancien locataire</label>
+          <input type="text" class="form-input" id="edlAncienLocataire" placeholder="Nom complet">
+        </div>
         <div class="form-group">
           <label class="form-label">Téléphone du locataire</label>
           <input type="tel" class="form-input" id="edlTelLocataire" placeholder="06 00 00 00 00">
@@ -595,14 +510,7 @@
       <div class="form-grid full">
         <div class="form-group">
           <label class="form-label">Email du locataire</label>
-          <input type="text" class="form-input" id="edlEmailLocataire" placeholder="locataire@email.com — plusieurs adresses séparées par une virgule">
-        </div>
-      </div>
-      <div class="form-grid full">
-        <div class="form-group">
-          <label class="form-label">Email du gestionnaire</label>
-          <input type="email" class="form-input" id="edlEmailGestionnaire" placeholder="gestionnaire@cabinet.com">
-          <div style="font-size:10px;color:var(--texte-leger);margin-top:4px">Un email de confirmation de prise en charge lui sera envoyé automatiquement</div>
+          <input type="email" class="form-input" id="edlEmailLocataire" placeholder="locataire@email.com">
         </div>
       </div>
       <div class="form-grid full">
@@ -664,48 +572,19 @@
     <!-- ONGLET HISTORIQUE -->
     <div class="tab-panel" id="panel-historique">
       <div class="section-label">Mes demandes</div>
-
       <div id="histLoadingMsg" style="text-align:center;padding:24px;color:var(--texte-leger)">
         <div class="spinner" style="border-top-color:var(--bleu);border-color:var(--bleu-pale);margin:0 auto 12px"></div>
         Chargement de vos demandes…
       </div>
-
       <div id="histEmpty" style="display:none;text-align:center;padding:40px;color:var(--texte-leger);font-size:13px">
         Aucune demande enregistrée pour le moment.
       </div>
-
-      <div id="histToolbar" style="display:none">
-        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
-          <div class="search-wrap" style="flex:1;min-width:220px;margin-bottom:0">
-            <input type="text" id="histSearchInput" placeholder="Rechercher : adresse, locataire, référence…" autocomplete="off">
-            <span class="search-icon">⌕</span>
-          </div>
-          <select class="form-select" id="histFilterType" style="width:auto;min-width:130px">
-            <option value="">Tous types</option>
-            <option value="EDLE">EDLE</option>
-            <option value="EDLS">EDLS</option>
-          </select>
-          <select class="form-select" id="histFilterStatut" style="width:auto;min-width:150px">
-            <option value="">Tous statuts</option>
-            <option value="En attente">En attente</option>
-            <option value="RDV confirmé">RDV confirmé</option>
-            <option value="Réalisé">Réalisé</option>
-            <option value="Facturé">Facturé</option>
-          </select>
-          <select class="form-select" id="histFilterMois" style="width:auto;min-width:140px">
-            <option value="">Tous les mois</option>
-          </select>
-          <button class="btn-submit" id="btnExportExcel" style="margin-top:0;background:var(--or);white-space:nowrap" onclick="exportHistoriqueExcel()">⬇ Exporter Excel</button>
-        </div>
-        <div style="font-size:11px;color:var(--texte-leger);margin-bottom:10px" id="histResultCount"></div>
-      </div>
-
       <div id="histTable" style="display:none">
         <table class="hist-table">
           <thead>
             <tr>
               <th>Réf.</th>
-              <th>Demande</th>
+              <th>Date</th>
               <th>Type</th>
               <th>Bien</th>
               <th>Adresse</th>
@@ -715,13 +594,11 @@
               <th>Ordre de mission</th>
               <th>Modifier</th>
               <th>Instructions</th>
+              <th>Rapport EDL</th>
             </tr>
           </thead>
           <tbody id="histBody"></tbody>
         </table>
-        <div id="histNoResults" style="display:none;text-align:center;padding:32px;color:var(--texte-leger);font-size:13px">
-          Aucune demande ne correspond à votre recherche.
-        </div>
       </div>
     </div>
 
@@ -774,43 +651,6 @@
       </div>
     </div>
 
-  </div>
-</div>
-
-<!-- MODALE ENVOI CHIFFRAGE -->
-<div class="send-modal-overlay" id="sendModalOverlay">
-  <div class="send-modal-box">
-    <div class="send-modal-header">
-      <div class="send-modal-title" id="sendModalTitle">Envoyer pour chiffrage</div>
-      <button class="send-modal-close" onclick="fermerModaleEnvoi()">✕</button>
-    </div>
-    <div class="send-modal-body">
-      <div class="send-modal-sub" id="sendModalSub">Choisissez comment transmettre ce message.</div>
-      <div class="send-modal-preview" id="sendModalPreview"></div>
-      <div class="send-modal-options">
-        <button class="send-modal-opt" id="sendOptCopy">
-          <span class="send-modal-opt-icon">📋</span>
-          <span><span class="send-modal-opt-label">Copier le texte</span><br><span class="send-modal-opt-sub">Coller où vous voulez (mail, Slack, Teams…)</span></span>
-        </button>
-        <button class="send-modal-opt" id="sendOptGmail">
-          <span class="send-modal-opt-icon">✉️</span>
-          <span><span class="send-modal-opt-label">Ouvrir dans Gmail</span><br><span class="send-modal-opt-sub">Nouveau message pré-rempli dans Gmail web</span></span>
-        </button>
-        <button class="send-modal-opt" id="sendOptOutlook">
-          <span class="send-modal-opt-icon">📧</span>
-          <span><span class="send-modal-opt-label">Ouvrir dans Outlook Web</span><br><span class="send-modal-opt-sub">Nouveau message pré-rempli dans Outlook.com</span></span>
-        </button>
-        <button class="send-modal-opt" id="sendOptMailto">
-          <span class="send-modal-opt-icon">💻</span>
-          <span><span class="send-modal-opt-label">Application mail par défaut</span><br><span class="send-modal-opt-sub">Ouvre votre logiciel de messagerie habituel</span></span>
-        </button>
-        <button class="send-modal-opt" id="sendOptDownload">
-          <span class="send-modal-opt-icon">⬇️</span>
-          <span><span class="send-modal-opt-label">Télécharger en .txt</span><br><span class="send-modal-opt-sub">Pour archiver ou joindre à un logiciel métier</span></span>
-        </button>
-      </div>
-      <div class="send-modal-feedback" id="sendModalFeedback"></div>
-    </div>
   </div>
 </div>
 
@@ -918,9 +758,7 @@ function selectDiag(el, type) {
 }
 
 // ── SOUMETTRE EDL ──
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwh-8UhW3rCTbrJV0n8FJUZrYdyQKiUlCTt-nNv0YJBfk-7qJcyJNsDl1po-h51-G3r/exec';
-// Proxy Vercel — évite les problèmes no-cors et double requête preflight
-const APPS_SCRIPT_PROXY = '/api/apps-script';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzqKY7eDpgAMEAdGXZDPuLIslYEtqb5HH_UEElGFRVBAZmm7tTNagbGPPFvrXfyqAVx/exec';
 
 async function submitEdl() {
   const type = document.getElementById('edlType').value;
@@ -932,9 +770,9 @@ async function submitEdl() {
   const code = document.getElementById('edlCode').value.trim();
   const proprietaire = document.getElementById('edlProprietaire').value.trim();
   const locataire = document.getElementById('edlLocataire').value.trim();
+  const ancienLocataire = document.getElementById('edlAncienLocataire').value.trim();
   const emailLocataire = document.getElementById('edlEmailLocataire').value.trim();
   const telLocataire = document.getElementById('edlTelLocataire').value.trim();
-  const emailGestionnaire = document.getElementById('edlEmailGestionnaire')?.value.trim() || '';
   const observations = document.getElementById('edlObservations').value.trim();
 
   if (!adresse || !locataire) {
@@ -949,11 +787,11 @@ async function submitEdl() {
   try {
     const displayName = type + ' - ' + currentClient + ' - ' + locataire;
 
-    await fetch(APPS_SCRIPT_PROXY, {
+    await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
+      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        action: 'newMission',
         client: currentClient,
         type,
         type_bien: typeBien,
@@ -963,9 +801,9 @@ async function submitEdl() {
         code_immeuble: code,
         proprietaire,
         locataire,
+        ancien_locataire: ancienLocataire,
         email_locataire: emailLocataire,
         tel_locataire: telLocataire,
-        email_gestionnaire: emailGestionnaire,
         date,
         observations,
       })
@@ -976,12 +814,11 @@ async function submitEdl() {
       (date ? ' pour le <strong>' + formatDate(date) + '</strong>' : '') + '.<br>' +
       'Adresse : ' + adresse + (etage ? ' — ' + etage : '') + '<br>' +
       'Type : ' + typeBien + (surface ? ' — ' + surface + ' m²' : '') + '<br>' +
-      'Un mail de confirmation a été envoyé à EPI.' +
-      (emailGestionnaire ? '<br>✉️ Confirmation envoyée au gestionnaire.' : '');
+      'Un mail de confirmation a été envoyé à EPI.';
     document.getElementById('edlConfirm').classList.add('visible');
 
     ['edlAdresse','edlEtage','edlCode','edlProprietaire','edlLocataire',
-     'edlEmailLocataire','edlTelLocataire','edlEmailGestionnaire','edlObservations','edlSurface','autoFillText']
+     'edlAncienLocataire','edlEmailLocataire','edlTelLocataire','edlObservations','edlSurface']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
 
   } catch (e) {
@@ -1248,78 +1085,6 @@ Règles de filtrage STRICTES pour usure_normale :
 
 }
 
-// ══════════════════════════════════════
-// ── MODALE ENVOI CHIFFRAGE (multi-options) ──
-// ══════════════════════════════════════
-
-let sendModalData = { to: '', subject: '', body: '' };
-
-function ouvrirModaleEnvoi(titre, to, subject, body) {
-  sendModalData = { to, subject, body };
-  document.getElementById('sendModalTitle').textContent = titre;
-  document.getElementById('sendModalPreview').textContent = body;
-  document.getElementById('sendModalFeedback').classList.remove('visible');
-  document.getElementById('sendModalOverlay').classList.add('visible');
-}
-
-function fermerModaleEnvoi() {
-  document.getElementById('sendModalOverlay').classList.remove('visible');
-}
-
-document.getElementById('sendModalOverlay').addEventListener('click', (e) => {
-  if (e.target.id === 'sendModalOverlay') fermerModaleEnvoi();
-});
-
-function sendModalFeedback(msg) {
-  const fb = document.getElementById('sendModalFeedback');
-  fb.textContent = msg;
-  fb.classList.add('visible');
-}
-
-document.getElementById('sendOptCopy').addEventListener('click', async () => {
-  try {
-    await navigator.clipboard.writeText(sendModalData.body);
-    sendModalFeedback('✓ Texte copié dans le presse-papier.');
-  } catch(e) {
-    sendModalFeedback('Erreur lors de la copie : ' + e.message);
-  }
-});
-
-document.getElementById('sendOptGmail').addEventListener('click', () => {
-  const url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(sendModalData.to) +
-    '&su=' + encodeURIComponent(sendModalData.subject) + '&body=' + encodeURIComponent(sendModalData.body);
-  window.open(url, '_blank');
-  sendModalFeedback('✓ Gmail ouvert dans un nouvel onglet.');
-});
-
-document.getElementById('sendOptOutlook').addEventListener('click', () => {
-  const url = 'https://outlook.office.com/mail/deeplink/compose?to=' + encodeURIComponent(sendModalData.to) +
-    '&subject=' + encodeURIComponent(sendModalData.subject) + '&body=' + encodeURIComponent(sendModalData.body);
-  window.open(url, '_blank');
-  sendModalFeedback('✓ Outlook Web ouvert dans un nouvel onglet.');
-});
-
-document.getElementById('sendOptMailto').addEventListener('click', () => {
-  const mailto = 'mailto:' + encodeURIComponent(sendModalData.to) +
-    '?subject=' + encodeURIComponent(sendModalData.subject) + '&body=' + encodeURIComponent(sendModalData.body);
-  window.location.href = mailto;
-  sendModalFeedback('✓ Application mail par défaut lancée.');
-});
-
-document.getElementById('sendOptDownload').addEventListener('click', () => {
-  const contenu = 'À : ' + sendModalData.to + '\nObjet : ' + sendModalData.subject + '\n\n' + sendModalData.body;
-  const blob = new Blob([contenu], { type: 'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'EPI_' + sendModalData.subject.replace(/[^a-z0-9]/gi, '_').substring(0, 60) + '.txt';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  sendModalFeedback('✓ Fichier .txt téléchargé.');
-});
-
 function compRenderAnalysis(json, edle, edls) {
   if (json.erreur_parsing) {
     compResultContent.innerHTML = `<div style="white-space:pre-wrap;font-family:'DM Mono',monospace;font-size:12px">${json.erreur_parsing}</div>`;
@@ -1477,8 +1242,8 @@ function compRenderAnalysis(json, edle, edls) {
       `• ${c.dataset.piece} — ${c.dataset.element}\n  Entrée : ${c.dataset.entree}\n  Sortie : ${c.dataset.sortie}\n  Note : ${c.dataset.commentaire}`
     ).join('\n\n');
     const body = `Bonjour,\n\nVeuillez trouver ci-dessous le détail des dégradations imputables au locataire pour le bien situé au ${addrStr} (locataire : ${tenantStr}), pour chiffrage.\n\n━━ PARTIE LOCATAIRE ━━\n\n${lignes}\n\nCordialement,\nEPI Expertises Immobilières`;
-    const subject = 'Chiffrage dégradations locataire — ' + addrStr + ' — ' + tenantStr;
-    ouvrirModaleEnvoi('Envoyer pour chiffrage — Locataire', 'jmrservices75@gmail.com', subject, body);
+    const mailto = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage dégradations locataire — ' + addrStr + ' — ' + tenantStr)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
   });
 
   document.getElementById('compBtnValBail')?.addEventListener('click', () => {
@@ -1488,8 +1253,8 @@ function compRenderAnalysis(json, edle, edls) {
       `• ${c.dataset.piece} — ${c.dataset.element}\n  Entrée : ${c.dataset.entree}\n  Sortie : ${c.dataset.sortie}\n  Note : ${c.dataset.commentaire}`
     ).join('\n\n');
     const body = `Bonjour,\n\nVeuillez trouver ci-dessous le détail des remises en état à la charge du bailleur pour le bien situé au ${addrStr} (locataire : ${tenantStr}), pour chiffrage.\n\n━━ PARTIE BAILLEUR ━━\n\n${lignes}\n\nCordialement,\nEPI Expertises Immobilières`;
-    const subject = 'Chiffrage remise en état bailleur — ' + addrStr + ' — ' + tenantStr;
-    ouvrirModaleEnvoi('Envoyer pour chiffrage — Bailleur', 'jmrservices75@gmail.com', subject, body);
+    const mailto = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage remise en état bailleur — ' + addrStr + ' — ' + tenantStr)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
   });
 }
 
@@ -1534,56 +1299,18 @@ compBtnCopy.addEventListener('click', () => {
 // ── HISTORIQUE DES DEMANDES ──
 // ══════════════════════════════════════
 
-// ── Stockage en mémoire des demandes pour filtrage instantané ──
-let histAllRows = [];
-let histFilteredRows = [];
-
-const STATUT_CLASS = {
-  'En attente': 'statut-attente',
-  'RDV confirmé': 'statut-confirme',
-  'Réalisé': 'statut-realise',
-  'Facturé': 'statut-facture',
-};
-
-const MOIS_ORDRE = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-
-function histFmtDate(val) {
-  if (!val || val === '—' || val.toString().trim() === '') return '—';
-  const s = val.toString().trim();
-  if (s.includes('T')) {
-    const d = new Date(s);
-    return isNaN(d) ? s : d.toLocaleDateString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric'});
-  }
-  if (s.match(/^\d{4}-\d{2}-\d{2}$/)) {
-    const [y,m,d] = s.split('-'); return d+'/'+m+'/'+y;
-  }
-  return s;
-}
-
-function histMoisDepuisDate(val) {
-  if (!val) return '';
-  const s = val.toString().trim();
-  let d;
-  if (s.includes('T')) d = new Date(s);
-  else if (s.match(/^\d{4}-\d{2}-\d{2}$/)) { const [y,m,day] = s.split('-'); d = new Date(parseInt(y), parseInt(m)-1, parseInt(day)); }
-  else if (s.includes('/')) { const p = s.split('/'); if (p.length===3) d = new Date(parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0])); }
-  if (!d || isNaN(d)) return '';
-  return MOIS_ORDRE[d.getMonth()];
-}
-
 async function loadHistorique() {
   const loadMsg = document.getElementById('histLoadingMsg');
   const emptyMsg = document.getElementById('histEmpty');
   const table = document.getElementById('histTable');
-  const toolbar = document.getElementById('histToolbar');
+  const tbody = document.getElementById('histBody');
 
   loadMsg.style.display = 'block';
   emptyMsg.style.display = 'none';
   table.style.display = 'none';
-  toolbar.style.display = 'none';
 
   try {
-    const url = APPS_SCRIPT_PROXY + '?client=' + encodeURIComponent(currentClient);
+    const url = APPS_SCRIPT_URL + '?client=' + encodeURIComponent(currentClient);
     const res = await fetch(url);
     const rows = await res.json();
 
@@ -1594,25 +1321,60 @@ async function loadHistorique() {
       return;
     }
 
-    histAllRows = rows;
-
-    // Peupler le filtre Mois avec les mois réellement présents, dans l'ordre calendaire
-    const moisPresents = new Set();
+    tbody.innerHTML = '';
     rows.forEach(r => {
-      const m = (r.mois && r.mois.trim()) ? r.mois.trim() : histMoisDepuisDate(r.date_rdv);
-      if (m) moisPresents.add(m);
-    });
-    const filterMois = document.getElementById('histFilterMois');
-    filterMois.innerHTML = '<option value="">Tous les mois</option>';
-    MOIS_ORDRE.filter(m => moisPresents.has(m)).forEach(m => {
-      const opt = document.createElement('option');
-      opt.value = m; opt.textContent = m;
-      filterMois.appendChild(opt);
+      const statut = r.statut || 'En attente';
+      const statutClass = {
+        'En attente': 'statut-attente',
+        'RDV confirmé': 'statut-confirme',
+        'Réalisé': 'statut-realise',
+        'Facturé': 'statut-facture',
+      }[statut] || 'statut-attente';
+
+      const dateRdv = r.date_rdv_confirme || r.date_rdv || '—';
+      const dateRdvFr = dateRdv && dateRdv.includes('-') ?
+        dateRdv.split('-').reverse().join('/') : dateRdv;
+
+      // Lien ordre de mission
+      const omParams = new URLSearchParams({
+        id: r.id || '',
+        client: r.client || '',
+        type: r.type || '',
+        type_bien: r.type_bien || '',
+        surface: r.surface || '',
+        address: r.address || '',
+        etage: r.etage || '',
+        code_immeuble: r.code_immeuble || '',
+        proprietaire: r.proprietaire || '',
+        locataire: r.locataire || '',
+        ancien_locataire: r.ancien_locataire || '',
+        date_rdv: r.date_rdv || '',
+        observations: r.observations || '',
+      });
+      const omUrl = '/ordre-mission-template.html?' + omParams.toString();
+
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td style="font-size:11px;color:#8a909e">' + (r.id || '—') + '</td>' +
+        '<td>' + (r.date || '—') + '</td>' +
+        '<td><strong>' + (r.type || '—') + '</strong></td>' +
+        '<td style="color:var(--texte-leger)">' + (r.type_bien || '—') + '</td>' +
+        '<td>' + (r.address || '—') + '</td>' +
+        '<td>' + (r.locataire || '—') + '</td>' +
+        '<td>' + dateRdvFr + '</td>' +
+        '<td><span class="statut-badge ' + statutClass + '">' + statut + '</span></td>' +
+        '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>' +
+        '<td><button class="btn-edit-mission" onclick="openEditModal(' + idx + ')">✏️ Modifier</button></td>' +
+        '<td><button class="btn-instruction" onclick="openInstructionModal(' + idx + ')">💬 Instruction</button></td>' +
+        '<td>' + (
+          (statut === 'Réalisé' || statut === 'Facturé')
+            ? '<button class="btn-rapport" onclick="voirRapportNockee(this, ' + idx + ')">🔗 Voir rapport</button>'
+            : '<span style="color:#ccc;font-size:11px">—</span>'
+        ) + '</td>';
+      tbody.appendChild(tr);
     });
 
-    toolbar.style.display = 'block';
     table.style.display = 'block';
-    histRenderFiltered();
 
   } catch(e) {
     loadMsg.style.display = 'none';
@@ -1621,538 +1383,103 @@ async function loadHistorique() {
   }
 }
 
-function histGetFiltered() {
-  const search = (document.getElementById('histSearchInput').value || '').trim().toLowerCase();
-  const fType = document.getElementById('histFilterType').value;
-  const fStatut = document.getElementById('histFilterStatut').value;
-  const fMois = document.getElementById('histFilterMois').value;
+// ══════════════════════════════════════════════
+// ── RAPPORT NOCKEE ──
+// ══════════════════════════════════════════════
 
-  return histAllRows.filter(r => {
-    if (fType && r.type !== fType) return false;
-    const statutReel = r.statut || 'En attente';
-    if (fStatut && statutReel !== fStatut) return false;
-    if (fMois) {
-      const m = (r.mois && r.mois.trim()) ? r.mois.trim() : histMoisDepuisDate(r.date_rdv);
-      if (m !== fMois) return false;
-    }
-    if (search) {
-      const blob = [r.id, r.address, r.locataire, r.proprietaire, r.type_bien, r.client]
-        .map(v => (v||'').toString().toLowerCase()).join(' ');
-      if (!blob.includes(search)) return false;
-    }
-    return true;
-  });
-}
-
-function histRenderFiltered() {
-  const tbody = document.getElementById('histBody');
-  const noResults = document.getElementById('histNoResults');
-  const countEl = document.getElementById('histResultCount');
-  const filtered = histGetFiltered();
-
-  countEl.textContent = filtered.length + ' demande(s) sur ' + histAllRows.length;
-  tbody.innerHTML = '';
-  histFilteredRows = [];
-
-  if (filtered.length === 0) {
-    noResults.style.display = 'block';
-    return;
-  }
-  noResults.style.display = 'none';
-
-  filtered.forEach((r, idx) => {
-    // Stocker la ligne dans un tableau global indexé pour éviter les problèmes d'apostrophes
-    histFilteredRows[idx] = r;
-    const statut = r.statut || 'En attente';
-    const statutClass = STATUT_CLASS[statut] || 'statut-attente';
-    const dateRdv = r.date_rdv || '—';
-
-    const omParams = new URLSearchParams({
-      id: r.id || '', client: r.client || '', type: r.type || '',
-      type_bien: r.type_bien || '', surface: r.surface || '', address: r.address || '',
-      etage: r.etage || '', code_immeuble: r.code_immeuble || '',
-      proprietaire: r.proprietaire || '', locataire: r.locataire || '',
-      date_rdv: r.date_rdv || '', observations: r.observations || '',
-    });
-    const omUrl = '/ordre-mission-template.html?' + omParams.toString();
-
-    const tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td style="font-size:11px;color:#8a909e">' + (r.id || '—') + '</td>' +
-      '<td>' + histFmtDate(r.date) + '</td>' +
-      '<td><strong>' + (r.type || '—') + '</strong></td>' +
-      '<td style="color:var(--texte-leger)">' + (r.type_bien || '—') + '</td>' +
-      '<td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (r.address || '—') + '</td>' +
-      '<td>' + (r.locataire || '—') + '</td>' +
-      '<td>' + histFmtDate(dateRdv) + '</td>' +
-      '<td><span class="statut-badge ' + statutClass + '">' + statut + '</span></td>' +
-      '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>' +
-      '<td><button class="btn-edit-mission" onclick="openEditModal(' + idx + ')">✏️ Modifier</button></td>' +
-      '<td><button class="btn-instruction" onclick="openInstructionModal(' + idx + ')">💬 Instruction</button></td>';
-    tbody.appendChild(tr);
-  });
-}
-
-// ══════════════════════════════════════
-// ── INSTRUCTION SPÉCIALE ──
-// ══════════════════════════════════════
-
-let currentInstrMission = null;
-
-function openInstructionModal(idx) {
+async function voirRapportNockee(btn, idx) {
   const r = histFilteredRows[idx];
   if (!r) return;
-  currentInstrMission = r;
-  document.getElementById('instrModalRef').textContent =
-    'Réf. ' + (r.id || '—') + ' — ' + (r.address || '') +
-    (r.date_rdv ? ' — RDV ' + histFmtDate(r.date_rdv) : '');
-  document.getElementById('instrMessage').value = '';
-  document.getElementById('instrSuccess').classList.remove('visible');
-  document.getElementById('btnSendInstr').disabled = false;
-  document.getElementById('btnSendInstr').textContent = '📨 Envoyer l\'instruction';
-  // Réinitialiser les chips
-  document.querySelectorAll('.instr-chip').forEach(c => c.classList.remove('selected'));
-  document.getElementById('instrModalOverlay').classList.add('open');
-}
 
-function closeInstructionModal() {
-  document.getElementById('instrModalOverlay').classList.remove('open');
-  currentInstrMission = null;
-}
-
-function toggleChip(el, text) {
-  el.classList.toggle('selected');
-  const textarea = document.getElementById('instrMessage');
-  const current = textarea.value;
-  if (el.classList.contains('selected')) {
-    textarea.value = current ? current + '\n' + text : text;
-  } else {
-    textarea.value = current.replace('\n' + text, '').replace(text + '\n', '').replace(text, '').trim();
-  }
-}
-
-async function sendInstruction() {
-  const message = document.getElementById('instrMessage').value.trim();
-  if (!message) { alert('Veuillez saisir une instruction.'); return; }
-
-  const btn = document.getElementById('btnSendInstr');
-  btn.disabled = true;
-  btn.textContent = '⏳ Envoi…';
-
-  const payload = {
-    action: 'addInstruction',
-    id: currentInstrMission?.id || '',
-    client: currentInstrMission?.client || '',
-    address: currentInstrMission?.address || '',
-    locataire: currentInstrMission?.locataire || '',
-    date_rdv: currentInstrMission?.date_rdv || '',
-    message,
-  };
+  btn.classList.add('loading');
+  btn.textContent = '⏳ Recherche…';
 
   try {
-    await fetch(APPS_SCRIPT_PROXY, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    document.getElementById('instrSuccess').classList.add('visible');
-    btn.textContent = '✅ Envoyé';
-    setTimeout(() => closeInstructionModal(), 2000);
-  } catch(err) {
-    btn.disabled = false;
-    btn.textContent = '📨 Envoyer l\'instruction';
-    alert('Erreur lors de l\'envoi. Veuillez réessayer.');
-  }
-}
-
-// Brancher les filtres pour un rendu instantané
-
-// ══════════════════════════════════════
-// ── MODIFICATION MISSION ──
-// ══════════════════════════════════════
-
-let currentEditRow = null;
-
-function openEditModal(idx) {
-  const r = histFilteredRows[idx];
-  if (!r) return;
-  currentEditRow = r;
-  document.getElementById('editModalRef').textContent = 'Réf. ' + (r.id || '—') + ' — ' + (r.client || '') + ' — ' + (r.address || '');
-  document.getElementById('editId').value = r.id || '';
-  document.getElementById('editType').value = r.type || 'EDLE';
-  document.getElementById('editTypeBien').value = r.type_bien || '';
-  document.getElementById('editAdresse').value = r.address || '';
-  document.getElementById('editEtage').value = r.etage || '';
-  document.getElementById('editCode').value = r.code_immeuble || '';
-  document.getElementById('editProprietaire').value = r.proprietaire || '';
-  document.getElementById('editLocataire').value = r.locataire || '';
-  document.getElementById('editEmailLocataire').value = r.email_locataire || '';
-  document.getElementById('editTelLocataire').value = r.tel_locataire || '';
-  document.getElementById('editObservations').value = r.observations || '';
-  // Convertir date_rdv en format input[date]
-  const drv = r.date_rdv || '';
-  if (drv) {
-    try {
-      let d;
-      if (drv.match(/^\d{4}-\d{2}-\d{2}$/)) d = drv;
-      else if (drv.includes('/')) { const p = drv.split('/'); d = p[2] + '-' + p[1].padStart(2,'0') + '-' + p[0].padStart(2,'0'); }
-      if (d) document.getElementById('editDateRdv').value = d;
-    } catch(e) {}
-  }
-  document.getElementById('editSuccess').classList.remove('visible');
-  document.getElementById('btnSaveEdit').disabled = false;
-  document.getElementById('btnSaveEdit').textContent = '💾 Enregistrer les modifications';
-  document.getElementById('editModalOverlay').classList.add('open');
-}
-
-function closeEditModal() {
-  document.getElementById('editModalOverlay').classList.remove('open');
-  currentEditRow = null;
-}
-
-async function saveEditMission() {
-  const btn = document.getElementById('btnSaveEdit');
-  btn.disabled = true;
-  btn.textContent = '⏳ Enregistrement…';
-
-  const payload = {
-    action: 'updateMission',
-    id:             document.getElementById('editId').value,
-    type:           document.getElementById('editType').value,
-    type_bien:      document.getElementById('editTypeBien').value,
-    address:        document.getElementById('editAdresse').value,
-    etage:          document.getElementById('editEtage').value,
-    code_immeuble:  document.getElementById('editCode').value,
-    proprietaire:   document.getElementById('editProprietaire').value,
-    locataire:      document.getElementById('editLocataire').value,
-    email_locataire:document.getElementById('editEmailLocataire').value,
-    tel_locataire:  document.getElementById('editTelLocataire').value,
-    date_rdv:       document.getElementById('editDateRdv').value,
-    observations:   document.getElementById('editObservations').value,
-    client:         currentEditRow ? (currentEditRow.client || '') : '',
-  };
-
-  try {
-    await fetch(APPS_SCRIPT_PROXY, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    document.getElementById('editSuccess').classList.add('visible');
-    btn.textContent = '✅ Enregistré';
-    // Rafraîchir les données après 1.5s
-    setTimeout(async () => {
-      await fetchMissions();
-      closeEditModal();
-    }, 1500);
-  } catch(err) {
-    btn.disabled = false;
-    btn.textContent = '💾 Enregistrer les modifications';
-    alert('Erreur lors de la mise à jour. Veuillez réessayer.');
-  }
-}
-['histSearchInput'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('input', histRenderFiltered);
-});
-['histFilterType','histFilterStatut','histFilterMois'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('change', histRenderFiltered);
-});
-
-// ══════════════════════════════════════
-// ── EXPORT EXCEL — charte EPI ──
-// ══════════════════════════════════════
-
-async function exportHistoriqueExcel() {
-  const btn = document.getElementById('btnExportExcel');
-  const filtered = histGetFiltered();
-  if (filtered.length === 0) { alert('Aucune donnée à exporter avec ces filtres.'); return; }
-
-  btn.disabled = true;
-  const oldLabel = btn.textContent;
-  btn.textContent = 'Génération…';
-
-  try {
-    const wb = XLSX.utils.book_new();
-
-    // En-tête colonnes
-    const headers = ['Référence','Date demande','Type','Bien','Surface (m²)','Adresse','Étage','Locataire','Email locataire','Téléphone','Propriétaire','Mois','Date RDV','Statut','Observations'];
-
-    const dataRows = filtered.map(r => [
-      r.id || '', histFmtDate(r.date), r.type || '', r.type_bien || '', r.surface || '',
-      r.address || '', r.etage || '', r.locataire || '', r.email_locataire || '', r.tel_locataire || '',
-      r.proprietaire || '', (r.mois && r.mois.trim()) ? r.mois.trim() : histMoisDepuisDate(r.date_rdv),
-      histFmtDate(r.date_rdv), r.statut || 'En attente', r.observations || ''
-    ]);
-
-    // Lignes de titre / logo en haut du fichier
-    const titleRows = [
-      ['EPI EXPERTISES IMMOBILIÈRES'],
-      ['15 Rue George Sand — 75016 Paris'],
-      ['Export des demandes — ' + (currentClient || '') ],
-      ['Généré le ' + new Date().toLocaleDateString('fr-FR') + ' à ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'})],
-      [],
-      headers
-    ];
-
-    const aoa = [...titleRows, ...dataRows];
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
-
-    const headerRowIdx = titleRows.length - 1; // 0-indexed, ligne des en-têtes de colonnes
-    const nbCols = headers.length;
-
-    // Largeurs de colonnes
-    ws['!cols'] = [
-      {wch:16},{wch:12},{wch:8},{wch:18},{wch:10},{wch:32},{wch:10},
-      {wch:20},{wch:24},{wch:14},{wch:20},{wch:11},{wch:12},{wch:14},{wch:30}
-    ];
-
-    // Fusionner les cellules de titre sur toute la largeur
-    ws['!merges'] = [
-      { s:{r:0,c:0}, e:{r:0,c:nbCols-1} },
-      { s:{r:1,c:0}, e:{r:1,c:nbCols-1} },
-      { s:{r:2,c:0}, e:{r:2,c:nbCols-1} },
-      { s:{r:3,c:0}, e:{r:3,c:nbCols-1} },
-    ];
-
-    // Style bandeau bleu EPI + texte or pour le titre principal
-    const styleTitre = { font:{bold:true,sz:16,color:{rgb:'FFFFFF'}}, fill:{fgColor:{rgb:'1A3C6E'}}, alignment:{horizontal:'center',vertical:'center'} };
-    const styleSousTitre = { font:{bold:false,sz:11,color:{rgb:'FFFFFF'}}, fill:{fgColor:{rgb:'1A3C6E'}}, alignment:{horizontal:'center'} };
-    const styleInfo = { font:{italic:true,sz:9,color:{rgb:'5A6070'}}, alignment:{horizontal:'center'} };
-    const styleEnTeteCol = { font:{bold:true,sz:10,color:{rgb:'FFFFFF'}}, fill:{fgColor:{rgb:'1A3C6E'}}, alignment:{horizontal:'center',vertical:'center'}, border:{bottom:{style:'thin',color:{rgb:'C9A84C'}}} };
-
-    if (!ws['A1']) ws['A1'] = {t:'s', v:'EPI EXPERTISES IMMOBILIÈRES'};
-    ws['A1'].s = styleTitre;
-    if (ws['A2']) ws['A2'].s = styleSousTitre;
-    if (ws['A3']) ws['A3'].s = styleSousTitre;
-    if (ws['A4']) ws['A4'].s = styleInfo;
-
-    for (let c = 0; c < nbCols; c++) {
-      const addr = XLSX.utils.encode_cell({r:headerRowIdx, c});
-      if (ws[addr]) ws[addr].s = styleEnTeteCol;
-    }
-
-    // Couleurs alternées + couleur par statut sur la colonne Statut (index 13)
-    const statutColors = {
-      'En attente': 'FFF3C7', 'RDV confirmé': 'DBEAFE', 'Réalisé': 'DCFCE7', 'Facturé': 'F3E8FF'
-    };
-    for (let i = 0; i < dataRows.length; i++) {
-      const r = headerRowIdx + 1 + i;
-      const bgRow = (i % 2 === 0) ? 'FFFFFF' : 'F0F4FB';
-      for (let c = 0; c < nbCols; c++) {
-        const addr = XLSX.utils.encode_cell({r, c});
-        if (!ws[addr]) continue;
-        const statutVal = dataRows[i][13];
-        const bg = (c === 13 && statutColors[statutVal]) ? statutColors[statutVal] : bgRow;
-        ws[addr].s = { fill:{fgColor:{rgb:bg}}, font:{sz:10,color:{rgb:'1A1A2E'}}, alignment:{vertical:'center'} };
-      }
-    }
-
-    XLSX.utils.book_append_sheet(wb, ws, 'Mes demandes EPI');
-
-    const dateStr = new Date().toISOString().slice(0,10);
-    XLSX.writeFile(wb, 'EPI_Demandes_' + (currentClient||'export').replace(/[^a-z0-9]/gi,'_') + '_' + dateStr + '.xlsx');
-
-  } catch(e) {
-    alert('Erreur export Excel : ' + e.message);
-  }
-
-  btn.disabled = false;
-  btn.textContent = oldLabel;
-}
-
-// ══════════════════════════════════════
-// ── REMPLISSAGE AUTOMATIQUE IA ──
-// ══════════════════════════════════════
-
-async function autoFillForm() {
-  const texte = document.getElementById('autoFillText').value.trim();
-  if (!texte) { alert('Collez d\'abord le texte de l\'ordre de mission.'); return; }
-
-  const btn = document.getElementById('btnAutoFill');
-  const spinner = document.getElementById('autoFillSpinner');
-  const msg = document.getElementById('autoFillMsg');
-  btn.disabled = true;
-  spinner.style.display = 'inline-block';
-  msg.style.display = 'none';
-
-  try {
-    const prompt = `Tu es un expert en extraction d'informations immobilières françaises.
-Analyse ce texte d'ordre de mission et extrais les informations en JSON.
-Si une info est absente mets "".
-Pour type : EDLE (entrée) ou EDLS (sortie).
-Pour type_bien : utilise exactement l'une de ces valeurs : "Studio Vide", "Studio Meublé", "T1 Vide", "T1 Meublé", "T2 Vide", "T2 Meublé", "T3 Vide", "T3 Meublé", "T4 Vide", "T4 Meublé", "T5 Vide", "T5 Meublé", "Maison Vide", "Maison Meublée", "Local commercial", "Bureau", "Autre".
-Pour date : format YYYY-MM-DD.
-Pour surface : chiffre uniquement sans m².
-
-TEXTE :
-${texte}
-
-JSON UNIQUEMENT sans markdown :
-{"type":"","type_bien":"","surface":"","address":"","etage":"","code_immeuble":"","proprietaire":"","locataire":"","email_locataire":"","tel_locataire":"","date":"","observations":""}`;
-
-    const res = await fetch(`${PROXY_BASE}/claude-proxy`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 800,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-
+    // Rechercher dans Nockee par adresse + locataire
+    const searchTerm = (r.locataire || r.address || '').trim().split(' ')[0];
+    const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=search&search_term=${encodeURIComponent(searchTerm)}`);
     const data = await res.json();
-    const text = (data.content?.[0]?.text || '{}').replace(/```json|```/g, '').trim();
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Réponse inattendue de l\'IA');
-    const infos = JSON.parse(jsonMatch[0]);
+    const reports = data.data || [];
 
-    // Remplir les champs du formulaire
-    if (infos.type) document.getElementById('edlType').value = infos.type;
-    if (infos.type_bien) document.getElementById('edlBienType').value = infos.type_bien;
-    if (infos.surface) document.getElementById('edlSurface').value = infos.surface;
-    if (infos.address) document.getElementById('edlAdresse').value = infos.address;
-    if (infos.etage) document.getElementById('edlEtage').value = infos.etage;
-    if (infos.code_immeuble) document.getElementById('edlCode').value = infos.code_immeuble;
-    if (infos.proprietaire) document.getElementById('edlProprietaire').value = infos.proprietaire;
-    if (infos.locataire) document.getElementById('edlLocataire').value = infos.locataire;
-    if (infos.email_locataire) document.getElementById('edlEmailLocataire').value = infos.email_locataire;
-    if (infos.tel_locataire) document.getElementById('edlTelLocataire').value = infos.tel_locataire;
-    if (infos.date) document.getElementById('edlDate').value = infos.date;
-    if (infos.observations) document.getElementById('edlObservations').value = infos.observations;
+    // Trouver le rapport qui correspond à cette adresse
+    const addrNorm = (r.address || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const locNorm  = (r.locataire || '').toLowerCase();
 
-    // Compter les champs remplis
-    const nbRemplis = Object.values(infos).filter(v => v && v.trim() !== '').length;
-    msg.textContent = '✓ ' + nbRemplis + ' champ(s) remplis automatiquement. Vérifiez et complétez si besoin.';
-    msg.style.color = 'var(--success)';
-    msg.style.display = 'block';
+    let found = null;
+    for (const rep of reports) {
+      const repAddr = [
+        rep.property?.address?.line_1 || '',
+        rep.property?.address?.line_2 || '',
+        rep.property?.address?.city   || '',
+      ].join(' ').toLowerCase().replace(/\s+/g, ' ').trim();
 
+      // Match adresse (premiers 20 chars) ou locataire dans le titre
+      const addrMatch = addrNorm.substring(0, 20).length > 3 &&
+        repAddr.includes(addrNorm.substring(0, 20));
+      const locMatch  = locNorm.split('/').some(l =>
+        l.trim().length > 2 && repAddr.includes(l.trim().toLowerCase())
+      );
+
+      if (addrMatch || locMatch) { found = rep; break; }
+    }
+
+    // Afficher la modale
+    const addrLabel = r.address || '—';
+    const locLabel  = r.locataire || '—';
+    const typeLabel = r.type || '';
+
+    document.getElementById('rapportModalAdresse').textContent = addrLabel;
+    document.getElementById('rapportModalLocataire').textContent = locLabel;
+    document.getElementById('rapportModalType').textContent = typeLabel;
+
+    const linkBox = document.getElementById('rapportLinkBox');
+    if (found && found.id) {
+      const nockeeUrl = 'https://app.nockee.eu/inspection_reports/' + found.id;
+      linkBox.innerHTML =
+        '<div style="font-size:12px;color:#15803d;margin-bottom:10px">Rapport trouvé ✅</div>' +
+        '<a href="' + nockeeUrl + '" target="_blank" style="display:block;background:#16a34a;color:white;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;text-align:center">🔗 Ouvrir le rapport Nockee</a>' +
+        '<div style="margin-top:10px;font-size:11px;color:#888">Statut : ' + (found.status || '—') + ' · Date : ' + (found.date || found.check_in_date || '—') + '</div>';
+    } else {
+      linkBox.innerHTML =
+        '<div class="rapport-not-found">' +
+        '⚠️ Rapport non trouvé dans Nockee.<br>' +
+        '<span style="font-size:12px;margin-top:6px;display:block">Le rapport n\'a peut-être pas encore été créé, ou l\'adresse ne correspond pas exactement.</span>' +
+        '</div>';
+    }
+
+    document.getElementById('rapportModalOverlay').classList.add('open');
   } catch(e) {
-    msg.textContent = 'Erreur : ' + e.message;
-    msg.style.color = 'var(--error)';
-    msg.style.display = 'block';
+    alert('Erreur lors de la recherche du rapport : ' + e.message);
   }
 
-  btn.disabled = false;
-  spinner.style.display = 'none';
+  btn.classList.remove('loading');
+  btn.textContent = '🔗 Voir rapport';
+}
+
+function closeRapportModal() {
+  document.getElementById('rapportModalOverlay').classList.remove('open');
 }
 
 // Charger l'historique est géré directement dans showTab ci-dessous
 </script>
 <!-- ══════════════════════════════════════════════════ -->
-<!-- MODALE MODIFICATION MISSION                       -->
+<!-- MODALE RAPPORT NOCKEE                            -->
 <!-- ══════════════════════════════════════════════════ -->
-<div class="edit-modal-overlay" id="editModalOverlay">
-  <div class="edit-modal">
-    <div class="edit-modal-header">
-      <h3>✏️ Modifier la mission</h3>
-      <button onclick="closeEditModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
+<div class="rapport-modal-overlay" id="rapportModalOverlay">
+  <div class="rapport-modal">
+    <div class="rapport-modal-header">
+      <h3>🔗 Rapport EDL — <span id="rapportModalType"></span></h3>
+      <button onclick="closeRapportModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
     </div>
-    <div class="edit-modal-body">
-      <div class="edit-ref" id="editModalRef">Réf. —</div>
-      <input type="hidden" id="editId">
-      <input type="hidden" id="editCalEventId">
-
-      <div class="edit-grid-2">
-        <div class="edit-field-group">
-          <label>Type de mission</label>
-          <select id="editType">
-            <option value="EDLE">EDLE — Entrée</option>
-            <option value="EDLS">EDLS — Sortie</option>
-          </select>
-        </div>
-        <div class="edit-field-group">
-          <label>Type de bien</label>
-          <input type="text" id="editTypeBien" placeholder="T2 Vide, Studio Meublé…">
-        </div>
+    <div class="rapport-modal-body">
+      <div style="font-size:12px;color:var(--texte-leger);margin-bottom:16px;padding:10px 14px;background:var(--bleu-mid);border-radius:8px">
+        <div><strong>Adresse :</strong> <span id="rapportModalAdresse"></span></div>
+        <div style="margin-top:4px"><strong>Locataire :</strong> <span id="rapportModalLocataire"></span></div>
       </div>
-
-      <div class="edit-field-group">
-        <label>Adresse</label>
-        <input type="text" id="editAdresse" placeholder="Adresse complète">
-      </div>
-
-      <div class="edit-grid-2">
-        <div class="edit-field-group">
-          <label>Étage</label>
-          <input type="text" id="editEtage" placeholder="2ème droite">
-        </div>
-        <div class="edit-field-group">
-          <label>Code immeuble</label>
-          <input type="text" id="editCode" placeholder="1234A">
-        </div>
-      </div>
-
-      <div class="edit-grid-2">
-        <div class="edit-field-group">
-          <label>Propriétaire</label>
-          <input type="text" id="editProprietaire" placeholder="Nom du propriétaire">
-        </div>
-        <div class="edit-field-group">
-          <label>Locataire</label>
-          <input type="text" id="editLocataire" placeholder="Nom du locataire">
-        </div>
-      </div>
-
-      <div class="edit-grid-2">
-        <div class="edit-field-group">
-          <label>Email locataire</label>
-          <input type="text" id="editEmailLocataire" placeholder="email@exemple.com">
-        </div>
-        <div class="edit-field-group">
-          <label>Téléphone locataire</label>
-          <input type="text" id="editTelLocataire" placeholder="06 XX XX XX XX">
-        </div>
-      </div>
-
-      <div class="edit-field-group">
-        <label>Date RDV</label>
-        <input type="date" id="editDateRdv">
-      </div>
-
-      <div class="edit-field-group">
-        <label>Observations</label>
-        <textarea id="editObservations" rows="3" placeholder="Informations complémentaires…"></textarea>
-      </div>
-
-      <div class="edit-success" id="editSuccess">✅ Mission mise à jour avec succès — Sheet et agenda synchronisés.</div>
+      <div id="rapportLinkBox"></div>
     </div>
-    <div class="edit-modal-footer">
-      <button class="btn-cancel-edit" onclick="closeEditModal()">Annuler</button>
-      <button class="btn-save-edit" id="btnSaveEdit" onclick="saveEditMission()">💾 Enregistrer les modifications</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════ -->
-<!-- MODALE INSTRUCTION SPÉCIALE                       -->
-<!-- ══════════════════════════════════════════════════ -->
-<div class="instr-modal-overlay" id="instrModalOverlay">
-  <div class="instr-modal">
-    <div class="instr-modal-header">
-      <h3>💬 Instruction spéciale</h3>
-      <button onclick="closeInstructionModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
-    </div>
-    <div class="instr-modal-body">
-      <div class="instr-ref" id="instrModalRef">Mission —</div>
-
-      <label class="instr-label">Suggestions rapides</label>
-      <div class="instr-suggestions">
-        <span class="instr-chip" onclick="toggleChip(this, '🔑 Laisser les clés à un tiers')">🔑 Laisser les clés à un tiers</span>
-        <span class="instr-chip" onclick="toggleChip(this, '⚡ Rapporter les clés rapidement')">⚡ Rapporter les clés rapidement</span>
-        <span class="instr-chip" onclick="toggleChip(this, '🔍 Faire attention à un dégât particulier')">🔍 Dégât particulier</span>
-        <span class="instr-chip" onclick="toggleChip(this, '⏰ RDV à confirmer urgemment')">⏰ Confirmer urgemment</span>
-      </div>
-
-      <label class="instr-label" style="margin-top:4px">Votre message</label>
-      <textarea class="instr-textarea" id="instrMessage" placeholder="Décrivez votre instruction spéciale…"></textarea>
-
-      <div class="instr-success" id="instrSuccess">✅ Instruction transmise à EPI — nous en tiendrons compte pour cette mission.</div>
-    </div>
-    <div class="instr-modal-footer">
-      <button class="btn-cancel-instr" onclick="closeInstructionModal()">Annuler</button>
-      <button class="btn-send-instr" id="btnSendInstr" onclick="sendInstruction()">📨 Envoyer l'instruction</button>
+    <div class="rapport-modal-footer">
+      <button class="btn-cancel-edit" onclick="closeRapportModal()">Fermer</button>
     </div>
   </div>
 </div>
