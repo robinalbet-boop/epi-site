@@ -320,16 +320,20 @@
   .statut-realise { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
   .statut-facture { background: #f3e8ff; color: #7c3aed; border: 1px solid #c4b5fd; }
 
+  .btn-om { background: var(--bleu); color: white; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; white-space: nowrap; text-decoration: none; display: inline-block; }
+  .btn-om:hover { background: var(--bleu-clair); }
+
+  .spinner-inline { width: 14px; height: 14px; border: 2px solid var(--bleu-pale); border-top-color: var(--bleu); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
+
   /* ── BOUTON MODIFIER ── */
   .btn-edit-mission {
     background: var(--or-pale); border: 1px solid var(--or); color: var(--bleu);
     border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-weight: 500; white-space: nowrap;
-    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif; font-weight: 500; white-space: nowrap; transition: all 0.15s;
   }
   .btn-edit-mission:hover { background: var(--or); color: white; }
 
-  /* ── MODALE MODIFICATION MISSION ── */
+  /* ── MODALE MODIFICATION ── */
   .edit-modal-overlay {
     display: none; position: fixed; inset: 0;
     background: rgba(13,37,72,0.6); backdrop-filter: blur(4px);
@@ -338,24 +342,16 @@
   .edit-modal-overlay.open { display: flex; }
   .edit-modal {
     background: white; border-radius: 16px; width: 100%; max-width: 580px;
-    max-height: 90vh; overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(13,37,72,0.25);
+    max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(13,37,72,0.25);
     animation: modalIn 0.2s ease;
   }
-  .edit-modal-header {
-    background: var(--bleu); color: white; padding: 20px 24px;
-    border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: space-between;
-  }
+  .edit-modal-header { background: var(--bleu); color: white; padding: 20px 24px; border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: space-between; }
   .edit-modal-header h3 { font-size: 16px; font-weight: 600; }
   .edit-modal-body { padding: 24px; }
   .edit-modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
   .edit-field-group { margin-bottom: 14px; }
   .edit-field-group label { display: block; font-size: 11px; font-weight: 600; color: var(--bleu); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-  .edit-field-group input, .edit-field-group textarea, .edit-field-group select {
-    width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
-    padding: 9px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif;
-    color: var(--texte); background: white; transition: border-color 0.15s;
-  }
+  .edit-field-group input, .edit-field-group textarea, .edit-field-group select { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--texte); background: white; transition: border-color 0.15s; }
   .edit-field-group input:focus, .edit-field-group textarea:focus, .edit-field-group select:focus { outline: none; border-color: var(--bleu); }
   .edit-field-group textarea { resize: vertical; min-height: 70px; }
   .edit-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -367,48 +363,23 @@
   .edit-success.visible { display: block; }
 
   /* ── BOUTON INSTRUCTION ── */
-  .btn-instruction {
-    background: #f0fdf4; border: 1px solid #16a34a; color: #16a34a;
-    border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-weight: 500; white-space: nowrap;
-    transition: all 0.15s;
-  }
+  .btn-instruction { background: #f0fdf4; border: 1px solid #16a34a; color: #16a34a; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; white-space: nowrap; transition: all 0.15s; }
   .btn-instruction:hover { background: #16a34a; color: white; }
 
   /* ── MODALE INSTRUCTION ── */
-  .instr-modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(13,37,72,0.6); backdrop-filter: blur(4px);
-    z-index: 3000; align-items: center; justify-content: center; padding: 20px;
-  }
+  .instr-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(13,37,72,0.6); backdrop-filter: blur(4px); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
   .instr-modal-overlay.open { display: flex; }
-  .instr-modal {
-    background: white; border-radius: 16px; width: 100%; max-width: 520px;
-    box-shadow: 0 20px 60px rgba(13,37,72,0.25);
-    animation: modalIn 0.2s ease;
-  }
-  .instr-modal-header {
-    background: #16a34a; color: white; padding: 18px 24px;
-    border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: space-between;
-  }
+  .instr-modal { background: white; border-radius: 16px; width: 100%; max-width: 520px; box-shadow: 0 20px 60px rgba(13,37,72,0.25); animation: modalIn 0.2s ease; }
+  .instr-modal-header { background: #16a34a; color: white; padding: 18px 24px; border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: space-between; }
   .instr-modal-header h3 { font-size: 15px; font-weight: 600; }
   .instr-modal-body { padding: 20px 24px; }
   .instr-modal-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
   .instr-ref { font-size: 11px; color: var(--texte-leger); margin-bottom: 14px; padding: 8px 12px; background: var(--bleu-mid); border-radius: 6px; }
   .instr-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-  .instr-chip {
-    background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d;
-    border-radius: 20px; padding: 5px 12px; font-size: 12px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap;
-  }
+  .instr-chip { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; border-radius: 20px; padding: 5px 12px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; }
   .instr-chip:hover { background: #dcfce7; border-color: #16a34a; }
   .instr-chip.selected { background: #16a34a; color: white; border-color: #16a34a; }
-  .instr-textarea {
-    width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
-    padding: 10px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif;
-    color: var(--texte); resize: vertical; min-height: 100px;
-    transition: border-color 0.15s;
-  }
+  .instr-textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--texte); resize: vertical; min-height: 100px; transition: border-color 0.15s; }
   .instr-textarea:focus { outline: none; border-color: #16a34a; }
   .instr-label { font-size: 11px; font-weight: 600; color: var(--bleu); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
   .btn-send-instr { background: #16a34a; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
@@ -416,55 +387,21 @@
   .btn-cancel-instr { background: white; color: var(--texte-leger); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
   .instr-success { display: none; background: #dcfce7; color: #16a34a; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 13px; font-weight: 500; }
   .instr-success.visible { display: block; }
-  @keyframes modalIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+
+  /* ── BOUTON RAPPORT ── */
+  .btn-rapport { background: #f0fdf4; border: 1px solid #16a34a; color: #16a34a; border-radius: 6px; padding: 5px 10px; font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; white-space: nowrap; transition: all 0.15s; text-decoration: none; display: inline-block; }
+  .btn-rapport:hover { background: #16a34a; color: white; }
 
   /* ── MODALE RAPPORT NOCKEE ── */
-  .btn-rapport {
-    background: #f0fdf4; border: 1px solid #16a34a; color: #16a34a;
-    border-radius: 6px; padding: 5px 10px; font-size: 11px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-weight: 600; white-space: nowrap;
-    transition: all 0.15s; text-decoration: none; display: inline-block;
-  }
-  .btn-rapport:hover { background: #16a34a; color: white; }
-  .btn-rapport.loading { opacity: 0.6; cursor: wait; }
-
-  /* ── MODALE RAPPORT ── */
-  .rapport-modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(13,37,72,0.6); backdrop-filter: blur(4px);
-    z-index: 3000; align-items: center; justify-content: center; padding: 20px;
-  }
+  .rapport-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(13,37,72,0.55); backdrop-filter: blur(3px); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
   .rapport-modal-overlay.open { display: flex; }
-  .rapport-modal {
-    background: white; border-radius: 16px; width: 100%; max-width: 480px;
-    box-shadow: 0 20px 60px rgba(13,37,72,0.25); animation: modalIn 0.2s ease;
-  }
-  .rapport-modal-header {
-    background: #16a34a; color: white; padding: 18px 24px;
-    border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: space-between;
-  }
+  .rapport-modal { background: white; border-radius: 16px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(13,37,72,0.25); animation: modalIn 0.2s ease; }
+  .rapport-modal-header { background: #16a34a; color: white; padding: 18px 24px; border-radius: 16px 16px 0 0; display: flex; align-items: center; justify-content: space-between; }
   .rapport-modal-header h3 { font-size: 15px; font-weight: 600; }
   .rapport-modal-body { padding: 24px; }
   .rapport-modal-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
-  .rapport-link-box {
-    background: #f0fdf4; border: 1.5px solid #16a34a; border-radius: 10px;
-    padding: 16px 20px; margin-bottom: 16px; text-align: center;
-  }
-  .rapport-link-box a {
-    color: #16a34a; font-weight: 600; font-size: 14px;
-    text-decoration: none; word-break: break-all;
-  }
-  .rapport-link-box a:hover { text-decoration: underline; }
-  .rapport-not-found {
-    background: #fff5f5; border: 1.5px solid #fca5a5; border-radius: 10px;
-    padding: 16px 20px; color: #dc2626; font-size: 13px; text-align: center;
-  }
+  .rapport-not-found { background: #fff5f5; border: 1.5px solid #fca5a5; border-radius: 10px; padding: 16px 20px; color: #dc2626; font-size: 13px; text-align: center; }
   @keyframes modalIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
-
-  .btn-om { background: var(--bleu); color: white; border: none; border-radius: 6px; padding: 5px 12px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; white-space: nowrap; text-decoration: none; display: inline-block; }
-  .btn-om:hover { background: var(--bleu-clair); }
-
-  .spinner-inline { width: 14px; height: 14px; border: 2px solid var(--bleu-pale); border-top-color: var(--bleu); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 6px; }
 </style>
 </head>
 <body>
@@ -528,18 +465,6 @@
     <!-- ONGLET EDL -->
     <div class="tab-panel active" id="panel-edl">
       <div class="section-label">Demande d'état des lieux</div>
-
-      <!-- REMPLISSAGE AUTOMATIQUE IA -->
-      <div style="background:var(--bleu-pale);border:1.5px solid rgba(26,60,110,0.15);border-radius:12px;padding:18px 20px;margin-bottom:24px">
-        <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--bleu);font-weight:700;margin-bottom:10px">✨ Remplissage automatique</div>
-        <div style="font-size:12px;color:var(--texte-leger);margin-bottom:10px">Collez le texte de l'ordre de mission reçu par mail — l'IA remplit le formulaire automatiquement.</div>
-        <textarea id="autoFillText" class="form-textarea" style="min-height:80px;font-size:12px;background:white" placeholder="Collez ici le texte de l'ordre de mission (adresse, locataire, date, type de bien…)"></textarea>
-        <button onclick="autoFillForm()" id="btnAutoFill" style="margin-top:10px;background:var(--bleu);color:white;border:none;border-radius:8px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px">
-          <span id="autoFillSpinner" style="display:none;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite"></span>
-          ✨ Remplir automatiquement
-        </button>
-        <div id="autoFillMsg" style="font-size:12px;margin-top:8px;color:var(--success);display:none"></div>
-      </div>
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">Type de mission</label>
@@ -608,6 +533,10 @@
         </div>
       </div>
       <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Nom du locataire (sortant)</label>
+          <input type="text" class="form-input" id="edlAncienLocataire" placeholder="Nom complet">
+        </div>
         <div class="form-group">
           <label class="form-label">Téléphone du locataire</label>
           <input type="tel" class="form-input" id="edlTelLocataire" placeholder="06 00 00 00 00">
@@ -678,42 +607,13 @@
     <!-- ONGLET HISTORIQUE -->
     <div class="tab-panel" id="panel-historique">
       <div class="section-label">Mes demandes</div>
-
       <div id="histLoadingMsg" style="text-align:center;padding:24px;color:var(--texte-leger)">
         <div class="spinner" style="border-top-color:var(--bleu);border-color:var(--bleu-pale);margin:0 auto 12px"></div>
         Chargement de vos demandes…
       </div>
-
       <div id="histEmpty" style="display:none;text-align:center;padding:40px;color:var(--texte-leger);font-size:13px">
         Aucune demande enregistrée pour le moment.
       </div>
-
-      <!-- TOOLBAR FILTRES -->
-      <div id="histToolbar" style="display:none;margin-bottom:14px">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
-          <div class="search-wrap" style="flex:1;min-width:220px;margin-bottom:0">
-            <input type="text" id="histSearchInput" placeholder="Rechercher : adresse, locataire, référence…" autocomplete="off">
-            <span class="search-icon">⌕</span>
-          </div>
-          <select class="form-select" id="histFilterType" style="width:auto;min-width:130px">
-            <option value="">Tous types</option>
-            <option value="EDLE">EDLE</option>
-            <option value="EDLS">EDLS</option>
-          </select>
-          <select class="form-select" id="histFilterStatut" style="width:auto;min-width:150px">
-            <option value="">Tous statuts</option>
-            <option value="En attente">En attente</option>
-            <option value="RDV confirmé">RDV confirmé</option>
-            <option value="Réalisé">Réalisé</option>
-            <option value="Facturé">Facturé</option>
-          </select>
-          <select class="form-select" id="histFilterMois" style="width:auto;min-width:140px">
-            <option value="">Tous les mois</option>
-          </select>
-        </div>
-        <div style="font-size:11px;color:var(--texte-leger)" id="histResultCount"></div>
-      </div>
-
       <div id="histTable" style="display:none">
         <table class="hist-table">
           <thead>
@@ -734,9 +634,6 @@
           </thead>
           <tbody id="histBody"></tbody>
         </table>
-        <div id="histNoResults" style="display:none;text-align:center;padding:32px;color:var(--texte-leger);font-size:13px">
-          Aucune demande ne correspond à votre recherche.
-        </div>
       </div>
     </div>
 
@@ -789,111 +686,6 @@
       </div>
     </div>
 
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════ -->
-<!-- MODALE MODIFICATION MISSION                       -->
-<!-- ══════════════════════════════════════════════════ -->
-<div class="edit-modal-overlay" id="editModalOverlay">
-  <div class="edit-modal">
-    <div class="edit-modal-header">
-      <h3>✏️ Modifier la mission</h3>
-      <button onclick="closeEditModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
-    </div>
-    <div class="edit-modal-body">
-      <div class="edit-ref" id="editModalRef">Réf. —</div>
-      <input type="hidden" id="editId">
-      <div class="edit-grid-2">
-        <div class="edit-field-group">
-          <label>Type de mission</label>
-          <select id="editType">
-            <option value="EDLE">EDLE — Entrée</option>
-            <option value="EDLS">EDLS — Sortie</option>
-          </select>
-        </div>
-        <div class="edit-field-group">
-          <label>Type de bien</label>
-          <input type="text" id="editTypeBien" placeholder="T2 Vide, Studio Meublé…">
-        </div>
-      </div>
-      <div class="edit-field-group">
-        <label>Adresse</label>
-        <input type="text" id="editAdresse" placeholder="Adresse complète">
-      </div>
-      <div class="edit-grid-2">
-        <div class="edit-field-group">
-          <label>Étage</label>
-          <input type="text" id="editEtage" placeholder="2ème droite">
-        </div>
-        <div class="edit-field-group">
-          <label>Code immeuble</label>
-          <input type="text" id="editCode" placeholder="1234A">
-        </div>
-      </div>
-      <div class="edit-grid-2">
-        <div class="edit-field-group">
-          <label>Propriétaire</label>
-          <input type="text" id="editProprietaire" placeholder="Nom du propriétaire">
-        </div>
-        <div class="edit-field-group">
-          <label>Locataire</label>
-          <input type="text" id="editLocataire" placeholder="Nom du locataire">
-        </div>
-      </div>
-      <div class="edit-grid-2">
-        <div class="edit-field-group">
-          <label>Email locataire</label>
-          <input type="text" id="editEmailLocataire" placeholder="email@exemple.com">
-        </div>
-        <div class="edit-field-group">
-          <label>Téléphone locataire</label>
-          <input type="text" id="editTelLocataire" placeholder="06 XX XX XX XX">
-        </div>
-      </div>
-      <div class="edit-field-group">
-        <label>Date RDV</label>
-        <input type="date" id="editDateRdv">
-      </div>
-      <div class="edit-field-group">
-        <label>Observations</label>
-        <textarea id="editObservations" rows="3" placeholder="Informations complémentaires…"></textarea>
-      </div>
-      <div class="edit-success" id="editSuccess">✅ Mission mise à jour avec succès.</div>
-    </div>
-    <div class="edit-modal-footer">
-      <button class="btn-cancel-edit" onclick="closeEditModal()">Annuler</button>
-      <button class="btn-save-edit" id="btnSaveEdit" onclick="saveEditMission()">💾 Enregistrer</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════ -->
-<!-- MODALE INSTRUCTION SPÉCIALE                       -->
-<!-- ══════════════════════════════════════════════════ -->
-<div class="instr-modal-overlay" id="instrModalOverlay">
-  <div class="instr-modal">
-    <div class="instr-modal-header">
-      <h3>💬 Instruction spéciale</h3>
-      <button onclick="closeInstructionModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
-    </div>
-    <div class="instr-modal-body">
-      <div class="instr-ref" id="instrModalRef">Mission —</div>
-      <label class="instr-label">Suggestions rapides</label>
-      <div class="instr-suggestions">
-        <span class="instr-chip" onclick="toggleChip(this, '🔑 Laisser les clés à un tiers')">🔑 Laisser les clés à un tiers</span>
-        <span class="instr-chip" onclick="toggleChip(this, '⚡ Rapporter les clés rapidement')">⚡ Rapporter les clés rapidement</span>
-        <span class="instr-chip" onclick="toggleChip(this, '🔍 Faire attention à un dégât particulier')">🔍 Dégât particulier</span>
-        <span class="instr-chip" onclick="toggleChip(this, '⏰ RDV à confirmer urgemment')">⏰ Confirmer urgemment</span>
-      </div>
-      <label class="instr-label" style="margin-top:8px">Votre message</label>
-      <textarea class="instr-textarea" id="instrMessage" placeholder="Décrivez votre instruction…"></textarea>
-      <div class="instr-success" id="instrSuccess">✅ Instruction transmise à EPI.</div>
-    </div>
-    <div class="instr-modal-footer">
-      <button class="btn-cancel-instr" onclick="closeInstructionModal()">Annuler</button>
-      <button class="btn-send-instr" id="btnSendInstr" onclick="sendInstruction()">📨 Envoyer</button>
-    </div>
   </div>
 </div>
 
@@ -1002,7 +794,6 @@ function selectDiag(el, type) {
 
 // ── SOUMETTRE EDL ──
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzqKY7eDpgAMEAdGXZDPuLIslYEtqb5HH_UEElGFRVBAZmm7tTNagbGPPFvrXfyqAVx/exec';
-const APPS_SCRIPT_PROXY = '/api/apps-script';
 
 async function submitEdl() {
   const type = document.getElementById('edlType').value;
@@ -1543,40 +1334,15 @@ compBtnCopy.addEventListener('click', () => {
 // ── HISTORIQUE DES DEMANDES ──
 // ══════════════════════════════════════
 
-let histAllRows = [];
-let histFilteredRows = [];
-
-const MOIS_ORDRE = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-
-function histFmtDate(val) {
-  if (!val || val === '—' || val.toString().trim() === '') return '—';
-  const s = val.toString().trim();
-  if (s.includes('T')) { const d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString('fr-FR'); }
-  if (s.match(/^\d{4}-\d{2}-\d{2}$/)) { const [y,m,d] = s.split('-'); return d+'/'+m+'/'+y; }
-  return s;
-}
-
-function histMoisDepuisDate(val) {
-  if (!val) return '';
-  const s = val.toString().trim();
-  let d;
-  if (s.includes('T')) d = new Date(s);
-  else if (s.match(/^\d{4}-\d{2}-\d{2}$/)) { const [y,m,day] = s.split('-'); d = new Date(parseInt(y), parseInt(m)-1, parseInt(day)); }
-  else if (s.includes('/')) { const p = s.split('/'); if (p.length===3) d = new Date(parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0])); }
-  if (!d || isNaN(d)) return '';
-  return MOIS_ORDRE[d.getMonth()];
-}
-
 async function loadHistorique() {
   const loadMsg = document.getElementById('histLoadingMsg');
   const emptyMsg = document.getElementById('histEmpty');
   const table = document.getElementById('histTable');
-  const toolbar = document.getElementById('histToolbar');
+  const tbody = document.getElementById('histBody');
 
   loadMsg.style.display = 'block';
   emptyMsg.style.display = 'none';
   table.style.display = 'none';
-  if (toolbar) toolbar.style.display = 'none';
 
   try {
     const url = APPS_SCRIPT_PROXY + '?client=' + encodeURIComponent(currentClient);
@@ -1590,27 +1356,58 @@ async function loadHistorique() {
       return;
     }
 
-    histAllRows = rows;
+    tbody.innerHTML = '';
+    let histFilteredRows = [];
+    rows.forEach((r, idx) => {
+      histFilteredRows[idx] = r;
+      const statut = r.statut || 'En attente';
+      const statutClass = {
+        'En attente': 'statut-attente',
+        'RDV confirmé': 'statut-confirme',
+        'Réalisé': 'statut-realise',
+        'Facturé': 'statut-facture',
+      }[statut] || 'statut-attente';
 
-    // Peupler le filtre Mois si présent
-    const filterMois = document.getElementById('histFilterMois');
-    if (filterMois) {
-      const moisPresents = new Set();
-      rows.forEach(r => {
-        const m = (r.mois && r.mois.trim()) ? r.mois.trim() : histMoisDepuisDate(r.date_rdv);
-        if (m) moisPresents.add(m);
-      });
-      filterMois.innerHTML = '<option value="">Tous les mois</option>';
-      MOIS_ORDRE.filter(m => moisPresents.has(m)).forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m; opt.textContent = m;
-        filterMois.appendChild(opt);
-      });
-    }
+      const dateRdv = r.date_rdv_confirme || r.date_rdv || '—';
+      const dateRdvFr = dateRdv && dateRdv.includes('-') ?
+        dateRdv.split('-').reverse().join('/') : dateRdv;
 
-    if (toolbar) toolbar.style.display = 'block';
+      // Lien ordre de mission
+      const omParams = new URLSearchParams({
+        id: r.id || '',
+        client: r.client || '',
+        type: r.type || '',
+        type_bien: r.type_bien || '',
+        surface: r.surface || '',
+        address: r.address || '',
+        etage: r.etage || '',
+        code_immeuble: r.code_immeuble || '',
+        proprietaire: r.proprietaire || '',
+        locataire: r.locataire || '',
+        ancien_locataire: r.ancien_locataire || '',
+        date_rdv: r.date_rdv || '',
+        observations: r.observations || '',
+      });
+      const omUrl = '/ordre-mission-template.html?' + omParams.toString();
+
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td style="font-size:11px;color:#8a909e">' + (r.id || '—') + '</td>' +
+        '<td>' + (r.date || '—') + '</td>' +
+        '<td><strong>' + (r.type || '—') + '</strong></td>' +
+        '<td style="color:var(--texte-leger)">' + (r.type_bien || '—') + '</td>' +
+        '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (r.address || '—') + '</td>' +
+        '<td>' + (r.locataire || '—') + '</td>' +
+        '<td>' + dateRdvFr + '</td>' +
+        '<td><span class="statut-badge ' + statutClass + '">' + statut + '</span></td>' +
+        '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>' +
+        '<td><button class="btn-edit-mission" onclick="openEditModal(' + idx + ')">✏️ Modifier</button></td>' +
+        '<td><button class="btn-instruction" onclick="openInstructionModal(' + idx + ')">💬 Instruction</button></td>' +
+        '<td>' + ((statut === 'Réalisé' || statut === 'Facturé') ? '<button class="btn-rapport" onclick="voirRapportNockee(this,' + idx + ')">🔗 Voir rapport</button>' : '<span style="color:#ccc;font-size:11px">—</span>') + '</td>';
+      tbody.appendChild(tr);
+    });
+
     table.style.display = 'block';
-    histRenderFiltered();
 
   } catch(e) {
     loadMsg.style.display = 'none';
@@ -1619,436 +1416,76 @@ async function loadHistorique() {
   }
 }
 
-function histGetFiltered() {
-  const search = (document.getElementById('histSearchInput')?.value || '').trim().toLowerCase();
-  const fType   = document.getElementById('histFilterType')?.value || '';
-  const fStatut = document.getElementById('histFilterStatut')?.value || '';
-  const fMois   = document.getElementById('histFilterMois')?.value || '';
-
-  return histAllRows.filter(r => {
-    if (fType && r.type !== fType) return false;
-    if (fStatut && (r.statut || 'En attente') !== fStatut) return false;
-    if (fMois) {
-      const m = (r.mois && r.mois.trim()) ? r.mois.trim() : histMoisDepuisDate(r.date_rdv);
-      if (m !== fMois) return false;
-    }
-    if (search) {
-      const blob = [r.id, r.address, r.locataire, r.proprietaire, r.type_bien, r.client]
-        .map(v => (v||'').toString().toLowerCase()).join(' ');
-      if (!blob.includes(search)) return false;
-    }
-    return true;
-  });
-}
-
-function histRenderFiltered() {
-  const tbody = document.getElementById('histBody');
-  const noResults = document.getElementById('histNoResults');
-  const countEl = document.getElementById('histResultCount');
-  const filtered = histGetFiltered();
-
-  if (countEl) countEl.textContent = filtered.length + ' demande(s) sur ' + histAllRows.length;
-  tbody.innerHTML = '';
-  histFilteredRows = [];
-
-  if (filtered.length === 0) {
-    if (noResults) noResults.style.display = 'block';
-    return;
-  }
-  if (noResults) noResults.style.display = 'none';
-
-  const STATUT_CLASS = {
-    'En attente': 'statut-attente',
-    'RDV confirmé': 'statut-confirme',
-    'Réalisé': 'statut-realise',
-    'Facturé': 'statut-facture',
-  };
-
-  filtered.forEach((r, idx) => {
-    histFilteredRows[idx] = r;
-    const statut = r.statut || 'En attente';
-    const statutClass = STATUT_CLASS[statut] || 'statut-attente';
-    const dateRdvFr = histFmtDate(r.date_rdv);
-
-    const omParams = new URLSearchParams({
-      id: r.id || '', client: r.client || '', type: r.type || '',
-      type_bien: r.type_bien || '', surface: r.surface || '', address: r.address || '',
-      etage: r.etage || '', code_immeuble: r.code_immeuble || '',
-      proprietaire: r.proprietaire || '', locataire: r.locataire || '',
-      ancien_locataire: r.ancien_locataire || '',
-      date_rdv: r.date_rdv || '', observations: r.observations || '',
-    });
-    const omUrl = '/ordre-mission-template.html?' + omParams.toString();
-
-    const tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td style="font-size:11px;color:#8a909e">' + (r.id || '—') + '</td>' +
-      '<td>' + histFmtDate(r.date) + '</td>' +
-      '<td><strong>' + (r.type || '—') + '</strong></td>' +
-      '<td style="color:var(--texte-leger)">' + (r.type_bien || '—') + '</td>' +
-      '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (r.address || '—') + '</td>' +
-      '<td>' + (r.locataire || '—') + '</td>' +
-      '<td>' + dateRdvFr + '</td>' +
-      '<td><span class="statut-badge ' + statutClass + '">' + statut + '</span></td>' +
-      '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>' +
-      '<td><button class="btn-edit-mission" onclick="openEditModal(' + idx + ')">✏️ Modifier</button></td>' +
-      '<td><button class="btn-instruction" onclick="openInstructionModal(' + idx + ')">💬 Instruction</button></td>' +
-      '<td>' + (
-        (statut === 'Réalisé' || statut === 'Facturé')
-          ? '<button class="btn-rapport" onclick="voirRapportNockee(this,' + idx + ')">🔗 Voir rapport</button>'
-          : '<span style="color:#ccc;font-size:11px">—</span>'
-      ) + '</td>';
-    tbody.appendChild(tr);
-  });
-}
-
-// Brancher les filtres
-['histSearchInput'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('input', histRenderFiltered);
-});
-['histFilterType','histFilterStatut','histFilterMois'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('change', histRenderFiltered);
-});
-
-// ══════════════════════════════════════════════
-// ── MODIFICATION MISSION ──
-// ══════════════════════════════════════════════
-
-let currentEditRow = null;
-
-function openEditModal(idx) {
-  const r = histFilteredRows[idx];
-  if (!r) return;
-  currentEditRow = r;
-  document.getElementById('editModalRef').textContent = 'Réf. ' + (r.id || '—') + ' — ' + (r.address || '');
-  document.getElementById('editId').value = r.id || '';
-  document.getElementById('editType').value = r.type || 'EDLE';
-  document.getElementById('editTypeBien').value = r.type_bien || '';
-  document.getElementById('editAdresse').value = r.address || '';
-  document.getElementById('editEtage').value = r.etage || '';
-  document.getElementById('editCode').value = r.code_immeuble || '';
-  document.getElementById('editProprietaire').value = r.proprietaire || '';
-  document.getElementById('editLocataire').value = r.locataire || '';
-  document.getElementById('editEmailLocataire').value = r.email_locataire || '';
-  document.getElementById('editTelLocataire').value = r.tel_locataire || '';
-  document.getElementById('editObservations').value = r.observations || '';
-  // Convertir date_rdv en format input[date]
-  const drv = r.date_rdv || '';
-  if (drv) {
-    try {
-      let d;
-      if (drv.match(/^\d{4}-\d{2}-\d{2}$/)) d = drv;
-      else if (drv.includes('/')) { const p = drv.split('/'); d = p[2] + '-' + p[1].padStart(2,'0') + '-' + p[0].padStart(2,'0'); }
-      if (d) document.getElementById('editDateRdv').value = d;
-    } catch(e) {}
-  }
-  document.getElementById('editSuccess').classList.remove('visible');
-  document.getElementById('btnSaveEdit').disabled = false;
-  document.getElementById('btnSaveEdit').textContent = '💾 Enregistrer';
-  document.getElementById('editModalOverlay').classList.add('open');
-}
-
-function closeEditModal() {
-  document.getElementById('editModalOverlay').classList.remove('open');
-  currentEditRow = null;
-}
-
-async function saveEditMission() {
-  const btn = document.getElementById('btnSaveEdit');
-  btn.disabled = true;
-  btn.textContent = '⏳ Enregistrement…';
-
-  const payload = {
-    action:          'updateMission',
-    id:              document.getElementById('editId').value,
-    type:            document.getElementById('editType').value,
-    type_bien:       document.getElementById('editTypeBien').value,
-    address:         document.getElementById('editAdresse').value,
-    etage:           document.getElementById('editEtage').value,
-    code_immeuble:   document.getElementById('editCode').value,
-    proprietaire:    document.getElementById('editProprietaire').value,
-    locataire:       document.getElementById('editLocataire').value,
-    email_locataire: document.getElementById('editEmailLocataire').value,
-    tel_locataire:   document.getElementById('editTelLocataire').value,
-    date_rdv:        document.getElementById('editDateRdv').value,
-    observations:    document.getElementById('editObservations').value,
-    client:          currentEditRow ? (currentEditRow.client || '') : '',
-  };
-
-  try {
-    await fetch(APPS_SCRIPT_PROXY, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    document.getElementById('editSuccess').classList.add('visible');
-    btn.textContent = '✅ Enregistré';
-    setTimeout(() => closeEditModal(), 1500);
-  } catch(err) {
-    btn.disabled = false;
-    btn.textContent = '💾 Enregistrer';
-    alert('Erreur lors de la mise à jour. Veuillez réessayer.');
-  }
-}
-
-// ══════════════════════════════════════════════
-// ── INSTRUCTION SPÉCIALE ──
-// ══════════════════════════════════════════════
-
-let currentInstrMission = null;
-
-function openInstructionModal(idx) {
-  const r = histFilteredRows[idx];
-  if (!r) return;
-  currentInstrMission = r;
-  document.getElementById('instrModalRef').textContent =
-    'Réf. ' + (r.id || '—') + ' — ' + (r.address || '') +
-    (r.date_rdv ? ' — RDV ' + histFmtDate(r.date_rdv) : '');
-  document.getElementById('instrMessage').value = '';
-  document.getElementById('instrSuccess').classList.remove('visible');
-  document.getElementById('btnSendInstr').disabled = false;
-  document.getElementById('btnSendInstr').textContent = '📨 Envoyer';
-  document.querySelectorAll('.instr-chip').forEach(c => c.classList.remove('selected'));
-  document.getElementById('instrModalOverlay').classList.add('open');
-}
-
-function closeInstructionModal() {
-  document.getElementById('instrModalOverlay').classList.remove('open');
-  currentInstrMission = null;
-}
-
-function toggleChip(el, text) {
-  el.classList.toggle('selected');
-  const textarea = document.getElementById('instrMessage');
-  const current = textarea.value;
-  if (el.classList.contains('selected')) {
-    textarea.value = current ? current + '\n' + text : text;
-  } else {
-    textarea.value = current.replace('\n' + text, '').replace(text + '\n', '').replace(text, '').trim();
-  }
-}
-
-async function sendInstruction() {
-  const message = document.getElementById('instrMessage').value.trim();
-  if (!message) { alert('Veuillez saisir une instruction.'); return; }
-
-  const btn = document.getElementById('btnSendInstr');
-  btn.disabled = true;
-  btn.textContent = '⏳ Envoi…';
-
-  const payload = {
-    action:   'addInstruction',
-    id:       currentInstrMission?.id || '',
-    client:   currentInstrMission?.client || '',
-    address:  currentInstrMission?.address || '',
-    locataire: currentInstrMission?.locataire || '',
-    date_rdv: currentInstrMission?.date_rdv || '',
-    message,
-  };
-
-  try {
-    await fetch(APPS_SCRIPT_PROXY, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    document.getElementById('instrSuccess').classList.add('visible');
-    btn.textContent = '✅ Envoyé';
-    setTimeout(() => closeInstructionModal(), 2000);
-  } catch(err) {
-    btn.disabled = false;
-    btn.textContent = '📨 Envoyer';
-    alert('Erreur lors de l\'envoi. Veuillez réessayer.');
-  }
-}
-
-// ══════════════════════════════════════════════
-// ── RAPPORT NOCKEE ──
-// ══════════════════════════════════════════════
-
-async function voirRapportNockee(btn, idx) {
-  const r = histFilteredRows[idx];
-  if (!r) return;
-
-  btn.classList.add('loading');
-  btn.textContent = '⏳ Recherche…';
-
-  try {
-    // Rechercher dans Nockee — essayer locataire puis adresse
-    const locataireMot = (r.locataire || '').trim().split(/[\s\/]+/).filter(m => m.length > 2)[0] || '';
-    const adresseMot = (r.address || '').trim().split(/[\s,]+/).filter(m => m.length > 3)[0] || '';
-    const searchTerm = locataireMot || adresseMot;
-
-    const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=search&search_term=${encodeURIComponent(searchTerm)}`);
-    const data = await res.json();
-    const reports = data.data || [];
-
-    // Matching souple — adresse + locataire
-    const addrNorm = (r.address || '').toLowerCase().replace(/[,\.\-]/g, ' ').replace(/\s+/g, ' ').trim();
-    const addrMots = addrNorm.split(' ').filter(m => m.length > 2 && !/^(paris|rue|avenue|bd|boulevard|alle|impasse|place)$/.test(m));
-    const locNorm  = (r.locataire || '').toLowerCase().replace(/[,\.\-\/]/g, ' ').trim();
-    const locMots  = locNorm.split(' ').filter(m => m.length > 2);
-
-    let found = null;
-    let bestScore = 0;
-
-    for (const rep of reports) {
-      const a = rep.property?.address || {};
-      const repAddrFull = [a.line_1||'', a.line_2||'', a.postal_code||'', a.city||'']
-        .join(' ').toLowerCase().replace(/[,\.\-]/g, ' ').replace(/\s+/g, ' ').trim();
-
-      // Score adresse : chaque mot de l'adresse Sheet trouvé dans Nockee
-      const addrScore = addrMots.filter(m => repAddrFull.includes(m)).length;
-
-      // Score locataire : chaque mot du locataire Sheet trouvé dans le titre ou signataires Nockee
-      const repTitle = (rep.display_name || rep.name || '').toLowerCase();
-      const locScore = locMots.filter(m => repAddrFull.includes(m) || repTitle.includes(m)).length;
-
-      const score = addrScore + locScore;
-      if (score > bestScore) {
-        bestScore = score;
-        found = rep;
-      }
-    }
-
-    // Seuil : au moins 1 mot significatif en commun (numéro ou nom de rue)
-    if (bestScore < 1) found = null;
-
-    // Afficher la modale
-    const addrLabel = r.address || '—';
-    const locLabel  = r.locataire || '—';
-    const typeLabel = r.type || '';
-
-    document.getElementById('rapportModalAdresse').textContent = addrLabel;
-    document.getElementById('rapportModalLocataire').textContent = locLabel;
-    document.getElementById('rapportModalType').textContent = typeLabel;
-
-    const linkBox = document.getElementById('rapportLinkBox');
-
-    // Récupérer le lien public du rapport via get_report
-    let nockeeUrl = null;
-    if (found && found.id) {
-      try {
-        const detailRes = await fetch(`${PROXY_BASE}/nockee-proxy?action=get_report&inspection_report_id=${found.id}`);
-        const detailData = await detailRes.json();
-        nockeeUrl = detailData.hosted_inspection_report_url
-          || detailData.public_url
-          || detailData.share_url
-          || detailData.url;
-        console.log('Champs rapport Nockee :', Object.keys(detailData));
-      } catch(e) {
-        console.log('Erreur get_report :', e.message);
-      }
-      if (!nockeeUrl) nockeeUrl = 'https://app.nockee.fr/inspection_reports/' + found.id;
-    }
-
-    if (found && found.id) {
-      linkBox.innerHTML =
-        '<div style="font-size:12px;color:#15803d;margin-bottom:10px">Rapport trouvé ✅</div>' +
-        '<a href="' + nockeeUrl + '" target="_blank" style="display:block;background:#16a34a;color:white;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;text-align:center">🔗 Ouvrir le rapport Nockee</a>' +
-        '<div style="margin-top:10px;font-size:11px;color:#888">Statut : ' + ({'delivered':'Remis','draft':'Brouillon','finalized':'Finalisé'}[found.status] || found.status || '—') + ' · Date : ' + (found.date || found.check_in_date || '—') + '</div>';
-    } else {
-      linkBox.innerHTML =
-        '<div class="rapport-not-found">' +
-        '⚠️ Rapport non trouvé dans Nockee.<br>' +
-        '<span style="font-size:12px;margin-top:6px;display:block">Le rapport n\'a peut-être pas encore été créé, ou l\'adresse ne correspond pas exactement.</span>' +
-        '</div>';
-    }
-
-    document.getElementById('rapportModalOverlay').classList.add('open');
-  } catch(e) {
-    alert('Erreur lors de la recherche du rapport : ' + e.message);
-  }
-
-  btn.classList.remove('loading');
-  btn.textContent = '🔗 Voir rapport';
-}
-
-function closeRapportModal() {
-  document.getElementById('rapportModalOverlay').classList.remove('open');
-}
-
 // Charger l'historique est géré directement dans showTab ci-dessous
-// ══════════════════════════════════════════════
-// ── REMPLISSAGE AUTOMATIQUE IA ──
-// ══════════════════════════════════════════════
-
-async function autoFillForm() {
-  const texte = document.getElementById('autoFillText').value.trim();
-  if (!texte) { alert('Collez d\'abord le texte de l\'ordre de mission.'); return; }
-
-  const btn = document.getElementById('btnAutoFill');
-  const spinner = document.getElementById('autoFillSpinner');
-  const msg = document.getElementById('autoFillMsg');
-  btn.disabled = true;
-  spinner.style.display = 'inline-block';
-  msg.style.display = 'none';
-
-  try {
-    const prompt = `Tu es un expert en extraction d'informations immobilières françaises.
-Analyse ce texte d'ordre de mission et extrais les informations en JSON.
-Si une info est absente mets "".
-Pour type : EDLE (entrée) ou EDLS (sortie).
-Pour type_bien : utilise exactement l'une de ces valeurs : "Studio Vide", "Studio Meublé", "T1 Vide", "T1 Meublé", "T2 Vide", "T2 Meublé", "T3 Vide", "T3 Meublé", "T4 Vide", "T4 Meublé", "T5 Vide", "T5 Meublé", "Maison Vide", "Maison Meublée", "Local commercial", "Bureau", "Autre".
-Pour date : format YYYY-MM-DD.
-Pour surface : chiffre uniquement sans m².
-
-TEXTE :
-${texte}
-
-JSON UNIQUEMENT sans markdown :
-{"type":"","type_bien":"","surface":"","address":"","etage":"","code_immeuble":"","proprietaire":"","locataire":"","email_locataire":"","tel_locataire":"","date":"","observations":""}`;
-
-    const res = await fetch(`${PROXY_BASE}/claude-proxy`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 800,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-
-    const data = await res.json();
-    const text = (data.content?.[0]?.text || '{}').replace(/```json|```/g, '').trim();
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Réponse inattendue de l\'IA');
-    const infos = JSON.parse(jsonMatch[0]);
-
-    if (infos.type) document.getElementById('edlType').value = infos.type;
-    if (infos.type_bien) document.getElementById('edlBienType').value = infos.type_bien;
-    if (infos.surface) document.getElementById('edlSurface').value = infos.surface;
-    if (infos.address) document.getElementById('edlAdresse').value = infos.address;
-    if (infos.etage) document.getElementById('edlEtage').value = infos.etage;
-    if (infos.code_immeuble) document.getElementById('edlCode').value = infos.code_immeuble;
-    if (infos.proprietaire) document.getElementById('edlProprietaire').value = infos.proprietaire;
-    if (infos.locataire) document.getElementById('edlLocataire').value = infos.locataire;
-    if (infos.email_locataire) document.getElementById('edlEmailLocataire').value = infos.email_locataire;
-    if (infos.tel_locataire) document.getElementById('edlTelLocataire').value = infos.tel_locataire;
-    if (infos.date) document.getElementById('edlDate').value = infos.date;
-    if (infos.observations) document.getElementById('edlObservations').value = infos.observations;
-
-    const nbRemplis = Object.values(infos).filter(v => v && v.trim() !== '').length;
-    msg.textContent = '✓ ' + nbRemplis + ' champ(s) remplis automatiquement. Vérifiez et complétez si besoin.';
-    msg.style.color = 'var(--success)';
-    msg.style.display = 'block';
-
-  } catch(e) {
-    msg.textContent = 'Erreur : ' + e.message;
-    msg.style.color = 'var(--error)';
-    msg.style.display = 'block';
-  }
-
-  btn.disabled = false;
-  spinner.style.display = 'none';
-}
-
 </script>
-<!-- ══════════════════════════════════════════════════ -->
-<!-- MODALE RAPPORT NOCKEE                            -->
-<!-- ══════════════════════════════════════════════════ -->
+
+<!-- MODALE MODIFICATION MISSION -->
+<div class="edit-modal-overlay" id="editModalOverlay">
+  <div class="edit-modal">
+    <div class="edit-modal-header">
+      <h3>✏️ Modifier la mission</h3>
+      <button onclick="closeEditModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div class="edit-modal-body">
+      <div class="edit-ref" id="editModalRef">Réf. —</div>
+      <input type="hidden" id="editId">
+      <div class="edit-grid-2">
+        <div class="edit-field-group"><label>Type de mission</label>
+          <select id="editType"><option value="EDLE">EDLE — Entrée</option><option value="EDLS">EDLS — Sortie</option></select></div>
+        <div class="edit-field-group"><label>Type de bien</label><input type="text" id="editTypeBien" placeholder="T2 Vide…"></div>
+      </div>
+      <div class="edit-field-group"><label>Adresse</label><input type="text" id="editAdresse"></div>
+      <div class="edit-grid-2">
+        <div class="edit-field-group"><label>Étage</label><input type="text" id="editEtage"></div>
+        <div class="edit-field-group"><label>Code immeuble</label><input type="text" id="editCode"></div>
+      </div>
+      <div class="edit-grid-2">
+        <div class="edit-field-group"><label>Propriétaire</label><input type="text" id="editProprietaire"></div>
+        <div class="edit-field-group"><label>Locataire</label><input type="text" id="editLocataire"></div>
+      </div>
+      <div class="edit-grid-2">
+        <div class="edit-field-group"><label>Email locataire</label><input type="text" id="editEmailLocataire"></div>
+        <div class="edit-field-group"><label>Téléphone locataire</label><input type="text" id="editTelLocataire"></div>
+      </div>
+      <div class="edit-field-group"><label>Date RDV</label><input type="date" id="editDateRdv"></div>
+      <div class="edit-field-group"><label>Observations</label><textarea id="editObservations" rows="3"></textarea></div>
+      <div class="edit-success" id="editSuccess">✅ Mission mise à jour avec succès.</div>
+    </div>
+    <div class="edit-modal-footer">
+      <button class="btn-cancel-edit" onclick="closeEditModal()">Annuler</button>
+      <button class="btn-save-edit" id="btnSaveEdit" onclick="saveEditMission()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE INSTRUCTION -->
+<div class="instr-modal-overlay" id="instrModalOverlay">
+  <div class="instr-modal">
+    <div class="instr-modal-header">
+      <h3>💬 Instruction spéciale</h3>
+      <button onclick="closeInstructionModal()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div class="instr-modal-body">
+      <div class="instr-ref" id="instrModalRef">Mission —</div>
+      <label class="instr-label">Suggestions rapides</label>
+      <div class="instr-suggestions">
+        <span class="instr-chip" onclick="toggleChip(this,'🔑 Laisser les clés à un tiers')">🔑 Laisser les clés à un tiers</span>
+        <span class="instr-chip" onclick="toggleChip(this,'⚡ Rapporter les clés rapidement')">⚡ Rapporter les clés rapidement</span>
+        <span class="instr-chip" onclick="toggleChip(this,'🔍 Faire attention à un dégât particulier')">🔍 Dégât particulier</span>
+        <span class="instr-chip" onclick="toggleChip(this,'⏰ RDV à confirmer urgemment')">⏰ Confirmer urgemment</span>
+      </div>
+      <label class="instr-label" style="margin-top:8px">Votre message</label>
+      <textarea class="instr-textarea" id="instrMessage" placeholder="Décrivez votre instruction…"></textarea>
+      <div class="instr-success" id="instrSuccess">✅ Instruction transmise à EPI.</div>
+    </div>
+    <div class="instr-modal-footer">
+      <button class="btn-cancel-instr" onclick="closeInstructionModal()">Annuler</button>
+      <button class="btn-send-instr" id="btnSendInstr" onclick="sendInstruction()">📨 Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE RAPPORT NOCKEE -->
 <div class="rapport-modal-overlay" id="rapportModalOverlay">
   <div class="rapport-modal">
     <div class="rapport-modal-header">
@@ -2068,5 +1505,123 @@ JSON UNIQUEMENT sans markdown :
   </div>
 </div>
 
+<script>
+
+// ── MODIFICATION MISSION ──
+let currentEditRow = null;
+function openEditModal(idx) {
+  const r = histFilteredRows[idx]; if (!r) return;
+  currentEditRow = r;
+  document.getElementById('editModalRef').textContent = 'Réf. ' + (r.id||'—') + ' — ' + (r.address||'');
+  document.getElementById('editId').value = r.id||'';
+  document.getElementById('editType').value = r.type||'EDLE';
+  document.getElementById('editTypeBien').value = r.type_bien||'';
+  document.getElementById('editAdresse').value = r.address||'';
+  document.getElementById('editEtage').value = r.etage||'';
+  document.getElementById('editCode').value = r.code_immeuble||'';
+  document.getElementById('editProprietaire').value = r.proprietaire||'';
+  document.getElementById('editLocataire').value = r.locataire||'';
+  document.getElementById('editEmailLocataire').value = r.email_locataire||'';
+  document.getElementById('editTelLocataire').value = r.tel_locataire||'';
+  document.getElementById('editObservations').value = r.observations||'';
+  const drv = r.date_rdv||'';
+  if (drv) { try { let d; if (drv.match(/^\d{4}-\d{2}-\d{2}$/)) d=drv; else if (drv.includes('/')) { const p=drv.split('/'); d=p[2]+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0'); } if(d) document.getElementById('editDateRdv').value=d; } catch(e){} }
+  document.getElementById('editSuccess').classList.remove('visible');
+  document.getElementById('btnSaveEdit').disabled = false;
+  document.getElementById('btnSaveEdit').textContent = '💾 Enregistrer';
+  document.getElementById('editModalOverlay').classList.add('open');
+}
+function closeEditModal() { document.getElementById('editModalOverlay').classList.remove('open'); currentEditRow=null; }
+async function saveEditMission() {
+  const btn = document.getElementById('btnSaveEdit');
+  btn.disabled = true; btn.textContent = '⏳ Enregistrement…';
+  const payload = { action:'updateMission', id:document.getElementById('editId').value, type:document.getElementById('editType').value, type_bien:document.getElementById('editTypeBien').value, address:document.getElementById('editAdresse').value, etage:document.getElementById('editEtage').value, code_immeuble:document.getElementById('editCode').value, proprietaire:document.getElementById('editProprietaire').value, locataire:document.getElementById('editLocataire').value, email_locataire:document.getElementById('editEmailLocataire').value, tel_locataire:document.getElementById('editTelLocataire').value, date_rdv:document.getElementById('editDateRdv').value, observations:document.getElementById('editObservations').value, client:currentEditRow?(currentEditRow.client||''):'' };
+  try {
+    await fetch(APPS_SCRIPT_PROXY, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+    document.getElementById('editSuccess').classList.add('visible');
+    btn.textContent = '✅ Enregistré';
+    setTimeout(() => closeEditModal(), 1500);
+  } catch(err) { btn.disabled=false; btn.textContent='💾 Enregistrer'; alert('Erreur lors de la mise à jour.'); }
+}
+
+// ── INSTRUCTION SPÉCIALE ──
+let currentInstrMission = null;
+function openInstructionModal(idx) {
+  const r = histFilteredRows[idx]; if (!r) return;
+  currentInstrMission = r;
+  document.getElementById('instrModalRef').textContent = 'Réf. '+(r.id||'—')+' — '+(r.address||'');
+  document.getElementById('instrMessage').value = '';
+  document.getElementById('instrSuccess').classList.remove('visible');
+  document.getElementById('btnSendInstr').disabled = false;
+  document.getElementById('btnSendInstr').textContent = '📨 Envoyer';
+  document.querySelectorAll('.instr-chip').forEach(c => c.classList.remove('selected'));
+  document.getElementById('instrModalOverlay').classList.add('open');
+}
+function closeInstructionModal() { document.getElementById('instrModalOverlay').classList.remove('open'); currentInstrMission=null; }
+function toggleChip(el, text) {
+  el.classList.toggle('selected');
+  const ta = document.getElementById('instrMessage');
+  if (el.classList.contains('selected')) { ta.value = ta.value ? ta.value+'\n'+text : text; }
+  else { ta.value = ta.value.replace('\n'+text,'').replace(text+'\n','').replace(text,'').trim(); }
+}
+async function sendInstruction() {
+  const message = document.getElementById('instrMessage').value.trim();
+  if (!message) { alert('Veuillez saisir une instruction.'); return; }
+  const btn = document.getElementById('btnSendInstr');
+  btn.disabled = true; btn.textContent = '⏳ Envoi…';
+  const payload = { action:'addInstruction', id:currentInstrMission?.id||'', client:currentInstrMission?.client||'', address:currentInstrMission?.address||'', locataire:currentInstrMission?.locataire||'', date_rdv:currentInstrMission?.date_rdv||'', message };
+  try {
+    await fetch(APPS_SCRIPT_PROXY, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+    document.getElementById('instrSuccess').classList.add('visible');
+    btn.textContent = '✅ Envoyé';
+    setTimeout(() => closeInstructionModal(), 2000);
+  } catch(err) { btn.disabled=false; btn.textContent='📨 Envoyer'; alert('Erreur lors de l\'envoi.'); }
+}
+
+// ── RAPPORT NOCKEE ──
+async function voirRapportNockee(btn, idx) {
+  const r = histFilteredRows[idx]; if (!r) return;
+  btn.textContent = '⏳…'; btn.disabled = true;
+  try {
+    const locMot = (r.locataire||'').trim().split(/[\s\/]+/).filter(m=>m.length>2)[0]||'';
+    const adrMot = (r.address||'').trim().split(/[\s,]+/).filter(m=>m.length>3)[0]||'';
+    const term = locMot||adrMot;
+    const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=search&search_term=${encodeURIComponent(term)}`);
+    const data = await res.json();
+    const reports = data.data||[];
+    const adrN = (r.address||'').toLowerCase().replace(/[,\.\-]/g,' ').replace(/\s+/g,' ').trim();
+    const adrMots = adrN.split(' ').filter(m=>m.length>2&&!/^(paris|rue|avenue|bd|boulevard|alle|impasse|place)$/.test(m));
+    let found=null, bestScore=0;
+    for (const rep of reports) {
+      const a = rep.property?.address||{};
+      const ra = [a.line_1||'',a.line_2||'',a.postal_code||'',a.city||''].join(' ').toLowerCase().replace(/[,\.\-]/g,' ').replace(/\s+/g,' ');
+      const score = adrMots.filter(m=>ra.includes(m)).length;
+      if (score>bestScore) { bestScore=score; found=rep; }
+    }
+    if (bestScore<1) found=null;
+    document.getElementById('rapportModalAdresse').textContent = r.address||'—';
+    document.getElementById('rapportModalLocataire').textContent = r.locataire||'—';
+    document.getElementById('rapportModalType').textContent = r.type||'';
+    const linkBox = document.getElementById('rapportLinkBox');
+    if (found&&found.id) {
+      let nockeeUrl=null;
+      try {
+        const dr = await fetch(`${PROXY_BASE}/nockee-proxy?action=get_report&inspection_report_id=${found.id}`);
+        const dd = await dr.json();
+        nockeeUrl = dd.hosted_inspection_report_url||dd.public_url||dd.share_url||dd.url||null;
+      } catch(e){}
+      if (!nockeeUrl) nockeeUrl='https://app.nockee.fr/inspection_reports/'+found.id;
+      const statFr = {'delivered':'Remis','draft':'Brouillon','finalized':'Finalisé'}[found.status]||found.status||'—';
+      linkBox.innerHTML = '<div style="font-size:12px;color:#15803d;margin-bottom:10px">Rapport trouvé ✅</div><a href="'+nockeeUrl+'" target="_blank" style="display:block;background:#16a34a;color:white;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;text-align:center">🔗 Ouvrir le rapport Nockee</a><div style="margin-top:10px;font-size:11px;color:#888">Statut : '+statFr+' · Date : '+(found.date||found.check_in_date||'—')+'</div>';
+    } else {
+      linkBox.innerHTML = '<div class="rapport-not-found">⚠️ Rapport non trouvé dans Nockee.<br><span style="font-size:12px;margin-top:6px;display:block">Le rapport n\'a peut-être pas encore été créé.</span></div>';
+    }
+    document.getElementById('rapportModalOverlay').classList.add('open');
+  } catch(e) { alert('Erreur : '+e.message); }
+  btn.textContent = '🔗 Voir rapport'; btn.disabled=false;
+}
+function closeRapportModal() { document.getElementById('rapportModalOverlay').classList.remove('open'); }
+
+</script>
 </body>
 </html>
