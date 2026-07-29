@@ -710,6 +710,7 @@ const PROXY_BASE = '/api';
 const NOCKEE_KEY = 'Uw5SReDnLWK99u3qcbtFEJzLPinvua7IMkF1DuTbBH8iEkNTVC';
 let currentClient = null;
 let selectedDiagType = 'DPE';
+let histFilteredRows = [];
 
 // ── VÉRIFIER SESSION ──
 window.addEventListener('DOMContentLoaded', () => {
@@ -1375,7 +1376,7 @@ async function loadHistorique() {
     }
 
     tbody.innerHTML = '';
-    let histFilteredRows = [];
+    histFilteredRows = [];
     rows.forEach((r, idx) => {
       histFilteredRows[idx] = r;
       const statut = r.statut || 'En attente';
