@@ -629,6 +629,33 @@
       <div id="histEmpty" style="display:none;text-align:center;padding:40px;color:var(--texte-leger);font-size:13px">
         Aucune demande enregistrée pour le moment.
       </div>
+
+      <!-- TOOLBAR FILTRES -->
+      <div id="histToolbar" style="display:none;margin-bottom:14px">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+          <div class="search-wrap" style="flex:1;min-width:220px;margin-bottom:0">
+            <input type="text" id="histSearchInput" placeholder="Rechercher : adresse, locataire, référence…" autocomplete="off">
+            <span class="search-icon">⌕</span>
+          </div>
+          <select class="form-select" id="histFilterType" style="width:auto;min-width:130px">
+            <option value="">Tous types</option>
+            <option value="EDLE">EDLE</option>
+            <option value="EDLS">EDLS</option>
+          </select>
+          <select class="form-select" id="histFilterStatut" style="width:auto;min-width:150px">
+            <option value="">Tous statuts</option>
+            <option value="En attente">En attente</option>
+            <option value="RDV confirmé">RDV confirmé</option>
+            <option value="Réalisé">Réalisé</option>
+            <option value="Facturé">Facturé</option>
+          </select>
+          <select class="form-select" id="histFilterMois" style="width:auto;min-width:140px">
+            <option value="">Tous les mois</option>
+          </select>
+        </div>
+        <div style="font-size:11px;color:var(--texte-leger)" id="histResultCount"></div>
+      </div>
+
       <div id="histTable" style="display:none">
         <table class="hist-table">
           <thead>
@@ -1353,80 +1380,115 @@ compBtnCopy.addEventListener('click', () => {
 // ── HISTORIQUE DES DEMANDES ──
 // ══════════════════════════════════════
 
+const MOIS_ORDRE = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+function histFmtDate(val) {
+  if (!val || val === '—' || val.toString().trim() === '') return '—';
+  const s = val.toString().trim();
+  if (s.match(/^\d{4}-\d{2}-\d{2}$/)) { const [y,m,d] = s.split('-'); return d+'/'+m+'/'+y; }
+  if (s.includes('T')) { const d = new Date(s); return isNaN(d) ? s : d.toLocaleDateString('fr-FR'); }
+  return s;
+}
+
+function histMoisDepuisDate(val) {
+  if (!val) return '';
+  const s = val.toString().trim();
+  let d;
+  if (s.match(/^\d{4}-\d{2}-\d{2}$/)) { const [y,m,day] = s.split('-'); d = new Date(parseInt(y),parseInt(m)-1,parseInt(day)); }
+  else if (s.includes('T')) d = new Date(s);
+  else if (s.includes('/')) { const p = s.split('/'); if(p.length===3) d = new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0])); }
+  if (!d || isNaN(d)) return '';
+  return MOIS_ORDRE[d.getMonth()];
+}
+
+let histAllRows = [];
+
+function histGetFiltered() {
+  const search = (document.getElementById('histSearchInput')?.value||'').trim().toLowerCase();
+  const fType   = document.getElementById('histFilterType')?.value||'';
+  const fStatut = document.getElementById('histFilterStatut')?.value||'';
+  const fMois   = document.getElementById('histFilterMois')?.value||'';
+  return histAllRows.filter(r => {
+    if (fType && r.type !== fType) return false;
+    if (fStatut && (r.statut||'En attente') !== fStatut) return false;
+    if (fMois) { const m = (r.mois&&r.mois.trim()) ? r.mois.trim() : histMoisDepuisDate(r.date_rdv); if(m!==fMois) return false; }
+    if (search) { const blob = [r.id,r.address,r.locataire,r.proprietaire,r.type_bien,r.client].map(v=>(v||'').toLowerCase()).join(' '); if(!blob.includes(search)) return false; }
+    return true;
+  });
+}
+
+function histRenderFiltered() {
+  const tbody = document.getElementById('histBody');
+  const noResults = document.getElementById('histNoResults');
+  const countEl = document.getElementById('histResultCount');
+  const filtered = histGetFiltered();
+  if (countEl) countEl.textContent = filtered.length + ' demande(s) sur ' + histAllRows.length;
+  tbody.innerHTML = '';
+  histFilteredRows = [];
+  const STATUT_CLASS = { 'En attente':'statut-attente','RDV confirmé':'statut-confirme','Réalisé':'statut-realise','Facturé':'statut-facture' };
+  filtered.forEach((r, idx) => {
+    histFilteredRows[idx] = r;
+    const statut = r.statut||'En attente';
+    const statutClass = STATUT_CLASS[statut]||'statut-attente';
+    const dateRdvFr = histFmtDate(r.date_rdv);
+    const omParams = new URLSearchParams({ id:r.id||'',client:r.client||'',type:r.type||'',type_bien:r.type_bien||'',surface:r.surface||'',address:r.address||'',etage:r.etage||'',code_immeuble:r.code_immeuble||'',proprietaire:r.proprietaire||'',locataire:r.locataire||'',date_rdv:r.date_rdv||'',observations:r.observations||'' });
+    const omUrl = '/ordre-mission-template.html?' + omParams.toString();
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td style="font-size:11px;color:#8a909e">'+(r.id||'—')+'</td>'+
+      '<td>'+(r.date||'—')+'</td>'+
+      '<td><strong>'+(r.type||'—')+'</strong></td>'+
+      '<td style="color:var(--texte-leger)">'+(r.type_bien||'—')+'</td>'+
+      '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(r.address||'—')+'</td>'+
+      '<td>'+(r.locataire||'—')+'</td>'+
+      '<td>'+dateRdvFr+'</td>'+
+      '<td><span class="statut-badge '+statutClass+'">'+statut+'</span></td>'+
+      '<td><a href="'+omUrl+'" target="_blank" class="btn-om">📋 Ordre de service</a></td>'+
+      '<td><button class="btn-edit-mission" onclick="openEditModal('+idx+')">✏️ Modifier</button></td>'+
+      '<td><button class="btn-instruction" onclick="openInstructionModal('+idx+')">💬 Instruction</button></td>'+
+      '<td>'+((statut==='Réalisé'||statut==='Facturé') ? '<button class="btn-rapport" onclick="voirRapportNockee(this,'+idx+')">🔗 Voir rapport</button>' : '<span style="color:#ccc;font-size:11px">—</span>')+'</td>';
+    tbody.appendChild(tr);
+  });
+  if (noResults) noResults.style.display = filtered.length === 0 ? 'block' : 'none';
+}
+
 async function loadHistorique() {
   const loadMsg = document.getElementById('histLoadingMsg');
   const emptyMsg = document.getElementById('histEmpty');
   const table = document.getElementById('histTable');
-  const tbody = document.getElementById('histBody');
+  const toolbar = document.getElementById('histToolbar');
 
   loadMsg.style.display = 'block';
   emptyMsg.style.display = 'none';
   table.style.display = 'none';
+  if (toolbar) toolbar.style.display = 'none';
 
   try {
     const url = APPS_SCRIPT_PROXY + '?client=' + encodeURIComponent(currentClient);
     const res = await fetch(url);
     const rows = await res.json();
-
     loadMsg.style.display = 'none';
 
-    if (!Array.isArray(rows) || rows.length === 0) {
-      emptyMsg.style.display = 'block';
-      return;
+    if (!Array.isArray(rows) || rows.length === 0) { emptyMsg.style.display = 'block'; return; }
+
+    histAllRows = rows;
+
+    // Peupler filtre mois
+    const filterMois = document.getElementById('histFilterMois');
+    if (filterMois) {
+      const moisPresents = new Set();
+      rows.forEach(r => { const m = (r.mois&&r.mois.trim()) ? r.mois.trim() : histMoisDepuisDate(r.date_rdv); if(m) moisPresents.add(m); });
+      filterMois.innerHTML = '<option value="">Tous les mois</option>';
+      MOIS_ORDRE.filter(m => moisPresents.has(m)).forEach(m => { const o = document.createElement('option'); o.value=m; o.textContent=m; filterMois.appendChild(o); });
     }
 
-    tbody.innerHTML = '';
-    histFilteredRows = [];
-    rows.forEach((r, idx) => {
-      histFilteredRows[idx] = r;
-      const statut = r.statut || 'En attente';
-      const statutClass = {
-        'En attente': 'statut-attente',
-        'RDV confirmé': 'statut-confirme',
-        'Réalisé': 'statut-realise',
-        'Facturé': 'statut-facture',
-      }[statut] || 'statut-attente';
-
-      const dateRdv = r.date_rdv_confirme || r.date_rdv || '—';
-      const dateRdvFr = dateRdv && dateRdv.includes('-') ?
-        dateRdv.split('-').reverse().join('/') : dateRdv;
-
-      // Lien ordre de mission
-      const omParams = new URLSearchParams({
-        id: r.id || '',
-        client: r.client || '',
-        type: r.type || '',
-        type_bien: r.type_bien || '',
-        surface: r.surface || '',
-        address: r.address || '',
-        etage: r.etage || '',
-        code_immeuble: r.code_immeuble || '',
-        proprietaire: r.proprietaire || '',
-        locataire: r.locataire || '',
-        ancien_locataire: r.ancien_locataire || '',
-        date_rdv: r.date_rdv || '',
-        observations: r.observations || '',
-      });
-      const omUrl = '/ordre-mission-template.html?' + omParams.toString();
-
-      const tr = document.createElement('tr');
-      tr.innerHTML =
-        '<td style="font-size:11px;color:#8a909e">' + (r.id || '—') + '</td>' +
-        '<td>' + (r.date || '—') + '</td>' +
-        '<td><strong>' + (r.type || '—') + '</strong></td>' +
-        '<td style="color:var(--texte-leger)">' + (r.type_bien || '—') + '</td>' +
-        '<td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (r.address || '—') + '</td>' +
-        '<td>' + (r.locataire || '—') + '</td>' +
-        '<td>' + dateRdvFr + '</td>' +
-        '<td><span class="statut-badge ' + statutClass + '">' + statut + '</span></td>' +
-        '<td><a href="' + omUrl + '" target="_blank" class="btn-om">📄 Télécharger</a></td>' +
-        '<td><button class="btn-edit-mission" onclick="openEditModal(' + idx + ')">✏️ Modifier</button></td>' +
-        '<td><button class="btn-instruction" onclick="openInstructionModal(' + idx + ')">💬 Instruction</button></td>' +
-        '<td>' + ((statut === 'Réalisé' || statut === 'Facturé') ? '<button class="btn-rapport" onclick="voirRapportNockee(this,' + idx + ')">🔗 Voir rapport</button>' : '<span style="color:#ccc;font-size:11px">—</span>') + '</td>';
-      tbody.appendChild(tr);
-    });
-
+    if (toolbar) toolbar.style.display = 'block';
     table.style.display = 'block';
+    histRenderFiltered();
+
+    // Brancher filtres
+    ['histSearchInput'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('input', histRenderFiltered); });
+    ['histFilterType','histFilterStatut','histFilterMois'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('change', histRenderFiltered); });
 
   } catch(e) {
     loadMsg.style.display = 'none';
