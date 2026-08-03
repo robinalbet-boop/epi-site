@@ -670,7 +670,6 @@
               <th>Statut</th>
               <th>Ordre de mission</th>
               <th>Modifier</th>
-              <th>Instructions</th>
               <th>Rapport EDL</th>
             </tr>
           </thead>
@@ -1445,7 +1444,6 @@ function histRenderFiltered() {
       '<td><span class="statut-badge '+statutClass+'">'+statut+'</span></td>'+
       '<td><a href="'+omUrl+'" target="_blank" class="btn-om">📋 Ordre de service</a></td>'+
       '<td><button class="btn-edit-mission" onclick="openEditModal('+idx+')">✏️ Modifier</button></td>'+
-      '<td><button class="btn-instruction" onclick="openInstructionModal('+idx+')">💬 Instruction</button></td>'+
       '<td>'+((statut==='Réalisé'||statut==='Facturé') ? '<button class="btn-rapport" onclick="voirRapportNockee(this,'+idx+')">🔗 Voir rapport</button>' : '<span style="color:#ccc;font-size:11px">—</span>')+'</td>';
     tbody.appendChild(tr);
   });
