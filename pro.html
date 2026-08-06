@@ -1777,16 +1777,20 @@ async function voirRapportNockee(btn, idx) {
     const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=search&search_term=${encodeURIComponent(term)}`);
     const data = await res.json();
     const reports = data.data||[];
-    const adrN = (r.address||'').toLowerCase().replace(/[,\.\-]/g,' ').replace(/\s+/g,' ').trim();
-    const adrMots = adrN.split(' ').filter(m=>m.length>2&&!/^(paris|rue|avenue|bd|boulevard|alle|impasse|place)$/.test(m));
+    // Mots exclus du matching (trop génériques — villes, types de voie, codes postaux)
+    const MOTS_EXCLUS = /^(paris|neuilly|boulogne|levallois|clichy|puteaux|issy|vanves|montrouge|courbevoie|nanterre|rueil|asnieres|suresnes|vincennes|montreuil|saint|rue|avenue|bd|boulevard|allee|impasse|place|chemin|quai|passage|square|villa|cite|voie|route|\d{5})$/i;
+    const adrN = (r.address||'').toLowerCase().replace(/[,.\-]/g,' ').replace(/\s+/g,' ').trim();
+    // Garder uniquement les mots significatifs (numéro + nom de rue)
+    const adrMots = adrN.split(' ').filter(m => m.length>2 && !MOTS_EXCLUS.test(m));
     let found=null, bestScore=0;
     for (const rep of reports) {
       const a = rep.property?.address||{};
-      const ra = [a.line_1||'',a.line_2||'',a.postal_code||'',a.city||''].join(' ').toLowerCase().replace(/[,\.\-]/g,' ').replace(/\s+/g,' ');
+      const ra = [a.line_1||'',a.line_2||'',a.postal_code||'',a.city||''].join(' ').toLowerCase().replace(/[,.\-]/g,' ').replace(/\s+/g,' ');
       const score = adrMots.filter(m=>ra.includes(m)).length;
       if (score>bestScore) { bestScore=score; found=rep; }
     }
-    if (bestScore<1) found=null;
+    // Seuil : au moins 2 mots significatifs en commun pour éviter les faux positifs
+    if (bestScore<2) found=null;
     document.getElementById('rapportModalAdresse').textContent = r.address||'—';
     document.getElementById('rapportModalLocataire').textContent = r.locataire||'—';
     document.getElementById('rapportModalType').textContent = r.type||'';
