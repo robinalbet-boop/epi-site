@@ -402,6 +402,22 @@
   .rapport-modal-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
   .rapport-not-found { background: #fff5f5; border: 1.5px solid #fca5a5; border-radius: 10px; padding: 16px 20px; color: #dc2626; font-size: 13px; text-align: center; }
   @keyframes modalIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+
+  /* ── MODALE CHIFFRAGE ── */
+  .chiffrage-modal-overlay { display:none; position:fixed; inset:0; background:rgba(13,37,72,0.6); backdrop-filter:blur(4px); z-index:4000; align-items:center; justify-content:center; padding:20px; }
+  .chiffrage-modal-overlay.open { display:flex; }
+  .chiffrage-modal { background:white; border-radius:16px; width:100%; max-width:480px; box-shadow:0 20px 60px rgba(13,37,72,0.25); animation:modalIn 0.2s ease; overflow:hidden; }
+  .chiffrage-modal-header { background:var(--bleu); color:white; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; }
+  .chiffrage-modal-header h3 { font-size:15px; font-weight:600; }
+  .chiffrage-modal-body { padding:20px 24px; }
+  .chiffrage-opt { display:flex; align-items:center; gap:14px; padding:14px 16px; border:1.5px solid var(--border); border-radius:10px; margin-bottom:10px; cursor:pointer; transition:all 0.15s; background:white; width:100%; font-family:'DM Sans',sans-serif; text-align:left; }
+  .chiffrage-opt:hover { border-color:var(--bleu); background:var(--bleu-pale); }
+  .chiffrage-opt-icon { font-size:20px; flex-shrink:0; }
+  .chiffrage-opt-label { font-size:13px; font-weight:600; color:var(--texte); }
+  .chiffrage-opt-sub { font-size:11px; color:var(--texte-leger); margin-top:2px; }
+  .chiffrage-feedback { font-size:12px; color:var(--success); margin-top:10px; text-align:center; display:none; }
+  .chiffrage-feedback.visible { display:block; }
+  .chiffrage-modal-footer { padding:14px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; }
 </style>
 </head>
 <body>
@@ -1322,8 +1338,11 @@ function compRenderAnalysis(json, edle, edls) {
       `• ${c.dataset.piece} — ${c.dataset.element}\n  Entrée : ${c.dataset.entree}\n  Sortie : ${c.dataset.sortie}\n  Note : ${c.dataset.commentaire}`
     ).join('\n\n');
     const body = `Bonjour,\n\nVeuillez trouver ci-dessous le détail des dégradations imputables au locataire pour le bien situé au ${addrStr} (locataire : ${tenantStr}), pour chiffrage.\n\n━━ PARTIE LOCATAIRE ━━\n\n${lignes}\n\nCordialement,\nEPI Expertises Immobilières`;
-    const mailto = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage dégradations locataire — ' + addrStr + ' — ' + tenantStr)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
+    ouvrirModaleChiffrage(
+      'Chiffrage — Dégradations locataire',
+      'Chiffrage dégradations locataire — ' + addrStr + ' — ' + tenantStr,
+      body
+    );
   });
 
   document.getElementById('compBtnValBail')?.addEventListener('click', () => {
@@ -1333,8 +1352,11 @@ function compRenderAnalysis(json, edle, edls) {
       `• ${c.dataset.piece} — ${c.dataset.element}\n  Entrée : ${c.dataset.entree}\n  Sortie : ${c.dataset.sortie}\n  Note : ${c.dataset.commentaire}`
     ).join('\n\n');
     const body = `Bonjour,\n\nVeuillez trouver ci-dessous le détail des remises en état à la charge du bailleur pour le bien situé au ${addrStr} (locataire : ${tenantStr}), pour chiffrage.\n\n━━ PARTIE BAILLEUR ━━\n\n${lignes}\n\nCordialement,\nEPI Expertises Immobilières`;
-    const mailto = `mailto:jmrservices75@gmail.com?subject=${encodeURIComponent('Chiffrage remise en état bailleur — ' + addrStr + ' — ' + tenantStr)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
+    ouvrirModaleChiffrage(
+      'Chiffrage — Remise en état bailleur',
+      'Chiffrage remise en état bailleur — ' + addrStr + ' — ' + tenantStr,
+      body
+    );
   });
 }
 
@@ -1586,6 +1608,46 @@ async function loadHistorique() {
 
 <script>
 
+
+// ── MODALE CHIFFRAGE ──
+let chiffrageData = { subject: '', body: '' };
+
+function ouvrirModaleChiffrage(titre, subject, body) {
+  chiffrageData = { subject, body };
+  document.getElementById('chiffrageModalTitle').textContent = '✉️ ' + titre;
+  document.getElementById('chiffrageFeedback').classList.remove('visible');
+  document.getElementById('chiffrageModalOverlay').classList.add('open');
+
+  document.getElementById('chiffrageOptJMR').onclick = () => {
+    const url = 'mailto:jmrservices75@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    window.location.href = url;
+    showChiffrageFeedback('✓ Ouverture de votre messagerie — JMR Services en destinataire.');
+  };
+  document.getElementById('chiffrageOptMailto').onclick = () => {
+    const url = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    window.location.href = url;
+    showChiffrageFeedback('✓ Ouverture de votre messagerie — ajoutez le destinataire.');
+  };
+  document.getElementById('chiffrageOptCopy').onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(body);
+      showChiffrageFeedback('✓ Texte copié — collez-le dans votre mail.');
+    } catch(e) {
+      showChiffrageFeedback('Erreur lors de la copie : ' + e.message);
+    }
+  };
+}
+
+function fermerModaleChiffrage() {
+  document.getElementById('chiffrageModalOverlay').classList.remove('open');
+}
+
+function showChiffrageFeedback(msg) {
+  const fb = document.getElementById('chiffrageFeedback');
+  fb.textContent = msg;
+  fb.classList.add('visible');
+}
+
 // ── MODIFICATION MISSION ──
 let currentEditRow = null;
 function openEditModal(idx) {
@@ -1749,5 +1811,34 @@ async function voirRapportNockee(btn, idx) {
 function closeRapportModal() { document.getElementById('rapportModalOverlay').classList.remove('open'); }
 
 </script>
+
+<!-- MODALE CHIFFRAGE -->
+<div class="chiffrage-modal-overlay" id="chiffrageModalOverlay">
+  <div class="chiffrage-modal">
+    <div class="chiffrage-modal-header">
+      <h3 id="chiffrageModalTitle">✉️ Envoyer pour chiffrage</h3>
+      <button onclick="fermerModaleChiffrage()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div class="chiffrage-modal-body">
+      <p style="font-size:12px;color:var(--texte-leger);margin-bottom:16px" id="chiffrageModalSub">Choisissez comment transmettre les dégradations sélectionnées.</p>
+      <button class="chiffrage-opt" id="chiffrageOptJMR">
+        <span class="chiffrage-opt-icon">📨</span>
+        <span><span class="chiffrage-opt-label">Envoyer à JMR Services</span><br><span class="chiffrage-opt-sub">jmrservices75@gmail.com — envoi direct depuis votre messagerie</span></span>
+      </button>
+      <button class="chiffrage-opt" id="chiffrageOptMailto">
+        <span class="chiffrage-opt-icon">💻</span>
+        <span><span class="chiffrage-opt-label">Envoyer via ma messagerie</span><br><span class="chiffrage-opt-sub">Ouvre votre logiciel de mail habituel</span></span>
+      </button>
+      <button class="chiffrage-opt" id="chiffrageOptCopy">
+        <span class="chiffrage-opt-icon">📋</span>
+        <span><span class="chiffrage-opt-label">Copier le texte</span><br><span class="chiffrage-opt-sub">À coller dans votre mail ou message</span></span>
+      </button>
+      <div class="chiffrage-feedback" id="chiffrageFeedback"></div>
+    </div>
+    <div class="chiffrage-modal-footer">
+      <button class="btn-cancel-edit" onclick="fermerModaleChiffrage()">Fermer</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
