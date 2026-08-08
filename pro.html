@@ -1771,7 +1771,10 @@ async function voirRapportNockee(btn, idx) {
   const r = histFilteredRows[idx]; if (!r) return;
   btn.textContent = '⏳…'; btn.disabled = true;
   try {
-    const locMot = (r.locataire||'').trim().split(/[\s\/]+/).filter(m=>m.length>2)[0]||'';
+    // Ignorer les civilités pour la recherche Nockee
+    const CIVILITES = /^(mme|mme\.?|mr|m\.|monsieur|madame|mlle|dr|dr\.|me|me\.)$/i;
+    const locMots = (r.locataire||'').trim().split(/[\s\/\-]+/).filter(m=>m.length>2 && !CIVILITES.test(m));
+    const locMot = locMots[0]||'';
     const adrMot = (r.address||'').trim().split(/[\s,]+/).filter(m=>m.length>3)[0]||'';
     const term = locMot||adrMot;
     const res = await fetch(`${PROXY_BASE}/nockee-proxy?action=search&search_term=${encodeURIComponent(term)}`);
