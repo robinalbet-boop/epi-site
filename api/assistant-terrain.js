@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
   // ── Chat ────────────────────────────────────────────────────────
   if (action === 'chat') {
-    const ANTHROPIC_KEY = process.env['CLÉ_API_ANTHROPIC'];
+    const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
     if (!ANTHROPIC_KEY) return res.status(500).json({ error: 'Clé API Anthropic manquante' });
     if (!message) return res.status(400).json({ error: 'Message manquant' });
 
