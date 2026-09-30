@@ -61,7 +61,35 @@ export default async function handler(req, res) {
       console.error('getMissions error:', err.message);
     }
 
-    // ── 2. Récupérer les mails récents si la question semble y faire référence ──
+    // ── 2. Récupérer l'agenda Google Calendar (±7j / +14j) ───────
+    let agendaContext = '';
+    try {
+      const aResp = await fetch(`${APPS_SCRIPT_URL}?action=getAgenda`, {
+        signal: AbortSignal.timeout(8000)
+      });
+      if (aResp.ok) {
+        const events = await aResp.json();
+        if (Array.isArray(events) && events.length > 0) {
+          const now2 = new Date();
+          now2.setHours(0,0,0,0);
+          agendaContext = `\n\n## AGENDA GOOGLE CALENDAR (7 derniers jours + 14 prochains jours)\n` +
+            events.map(ev => {
+              const d = ev.debut.split(' ')[0];
+              const h = ev.debut.split(' ')[1] || '';
+              const [dd, mm, yyyy] = d.split('/');
+              const evDate = new Date(parseInt(yyyy), parseInt(mm)-1, parseInt(dd));
+              const flag = evDate < now2 ? '✅' : evDate.getTime() === now2.getTime() ? '📅 AUJOURD\'HUI' : '🔜';
+              return `${flag} ${ev.debut} → ${ev.fin.split(' ')[1]} | ${ev.titre}${ev.lieu ? ' | 📍'+ev.lieu : ''}${ev.description ? ' | '+ev.description.substring(0,150) : ''}`;
+            }).join('\n');
+        } else {
+          agendaContext = '\n\n## AGENDA\nAucun événement trouvé sur cette période.';
+        }
+      }
+    } catch (err) {
+      console.error('getAgenda error:', err.message);
+    }
+
+    // ── 3. Récupérer les mails récents si la question semble y faire référence ──
     let mailsContext = '';
     const msgLower = message.toLowerCase();
     const parleDeMails = ['mail', 'email', 'message', 'reçu', 'envoyé', 'répondu', 'confirmation', 'client a dit', 'agence a', 'locataire a'].some(k => msgLower.includes(k));
@@ -84,7 +112,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // ── 3. Construire le system prompt avec contexte live ─────────
+    // ── 4. Construire le system prompt avec contexte live ─────────
     const now = new Date();
     const today = now.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const heure = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
@@ -109,7 +137,7 @@ ID | Date création | Client | Type (EDLE/EDLS) | Type Bien | Surface | Adresse 
 
 ## Clients principaux
 M3G, CABINET MAURICE BURGER (CMB), SOFINCAL CONSEIL, EUROPA GESTION PARISIENNE, ADUXIM, VLN, MAVILLE IMMOBILIER, DMG DAVID MARCHENOIR GESTION, PAP EDL, COMEANDWORK, AMBASSADE DU CANADA, MOVEIN
-${missionsContext}${mailsContext}
+${missionsContext}${agendaContext}${mailsContext}
 
 ## Ton rôle
 - Répondre aux questions sur les missions, locataires, adresses, codes immeuble, contacts
@@ -126,7 +154,7 @@ ${missionsContext}${mailsContext}
 - Si une info n'est pas disponible, dis-le clairement et suggère de contacter Robin
 - Toujours en français`;
 
-    // ── 4. Appel Claude ───────────────────────────────────────────
+    // ── 5. Appel Claude ───────────────────────────────────────────
     const messages = [];
     if (history && Array.isArray(history)) {
       for (const msg of history.slice(-10)) {
