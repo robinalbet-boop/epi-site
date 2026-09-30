@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Assistant EPI — Terrain</title>
+  <style>
+    :root {
+      --bleu: #1a3c6e;
+      --bleu-clair: #2a5298;
+      --or: #c9a84c;
+      --or-clair: #e8c96a;
+      --gris: #f4f5f7;
+      --gris-msg: #e8eaed;
+      --texte: #1a1a2e;
+      --texte-clair: #555;
+      --blanc: #ffffff;
+      --rouge: #e74c3c;
+      --vert: #27ae60;
+      --radius: 18px;
+      --radius-sm: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bleu);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      color: var(--texte);
+    }
+
+    /* ── ÉCRAN MOT DE PASSE ─────────────────────────────────────── */
+    #loginScreen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      gap: 32px;
+    }
+
+    .login-logo {
+      text-align: center;
+    }
+
+    .login-logo .epi-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      background: var(--or);
+      border-radius: 20px;
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--bleu);
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .login-logo h1 {
+      color: var(--blanc);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .login-logo p {
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .login-card {
+      background: var(--blanc);
+      border-radius: 20px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .login-card h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--bleu);
+      margin-bottom: 6px;
+    }
+
+    .login-card p {
+      font-size: 13px;
+      color: var(--texte-clair);
+      margin-bottom: 24px;
+    }
+
+    .login-card input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--gris-msg);
+      border-radius: var(--radius-sm);
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 12px;
+      -webkit-appearance: none;
+    }
+
+    .login-card input:focus {
+      border-color: var(--bleu-clair);
+    }
+
+    .login-card input.error {
+      border-color: var(--rouge);
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: var(--bleu);
+      color: var(--blanc);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-login:active { background: var(--bleu-clair); }
+    .btn-login:disabled { opacity: 0.5; }
+
+    .login-error {
+      color: var(--rouge);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 10px;
+      min-height: 20px;
+    }
+
+    /* ── ÉCRAN CHAT ─────────────────────────────────────────────── */
+    #chatScreen {
+      display: none;
+      flex-direction: column;
+      height: 100dvh;
+    }
+
+    /* Header */
+    .chat-header {
+      background: var(--bleu);
+      padding: 14px 16px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .chat-header .avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--or);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 14px;
+      color: var(--bleu);
+      flex-shrink: 0;
+    }
+
+    .chat-header-info h2 {
+      color: var(--blanc);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .chat-header-info p {
+      color: rgba(255,255,255,0.65);
+      font-size: 12px;
+    }
+
+    .online-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: var(--vert);
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+
+    .btn-deconnexion {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      font-size: 22px;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+
+    /* Messages */
+    #messagesContainer {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--gris);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .msg-wrapper {
+      display: flex;
+      flex-direction: column;
+      max-width: 85%;
+    }
+
+    .msg-wrapper.user { align-self: flex-end; align-items: flex-end; }
+    .msg-wrapper.assistant { align-self: flex-start; align-items: flex-start; }
+
+    .msg-bubble {
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      font-size: 15px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .msg-wrapper.user .msg-bubble {
+      background: var(--bleu);
+      color: var(--blanc);
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-wrapper.assistant .msg-bubble {
+      background: var(--blanc);
+      color: var(--texte);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .msg-wrapper.assistant .msg-bubble.thinking {
+      background: var(--blanc);
+      color: var(--texte-clair);
+      font-style: italic;
+    }
+
+    .typing-dots span {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--texte-clair);
+      margin: 0 2px;
+      animation: bounce 1.2s infinite;
+    }
+
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-6px); }
+    }
+
+    .msg-time {
+      font-size: 11px;
+      color: var(--texte-clair);
+      margin-top: 3px;
+      padding: 0 4px;
+    }
+
+    /* Suggestions rapides */
+    .quick-suggestions {
+      padding: 0 16px 12px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      flex-shrink: 0;
+      background: var(--gris);
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .quick-suggestions::-webkit-scrollbar { display: none; }
+
+    .suggestion-chip {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      background: var(--blanc);
+      border: 1.5px solid var(--gris-msg);
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--bleu);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .suggestion-chip:active {
+      background: var(--bleu);
+      color: var(--blanc);
+      border-color: var(--bleu);
+    }
+
+    /* Barre de saisie */
+    .chat-input-bar {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      padding: 12px 16px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      background: var(--blanc);
+      border-top: 1px solid var(--gris-msg);
+      flex-shrink: 0;
+    }
+
+    #messageInput {
+      flex: 1;
+      border: 1.5px solid var(--gris-msg);
+      border-radius: 22px;
+      padding: 10px 16px;
+      font-size: 16px;
+      font-family: inherit;
+      outline: none;
+      resize: none;
+      max-height: 120px;
+      overflow-y: auto;
+      transition: border-color 0.2s;
+      background: var(--gris);
+      -webkit-appearance: none;
+    }
+
+    #messageInput:focus { border-color: var(--bleu-clair); background: var(--blanc); }
+
+    .btn-send {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bleu);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-send:active { transform: scale(0.92); background: var(--bleu-clair); }
+    .btn-send:disabled { opacity: 0.4; }
+
+    .btn-send svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: var(--blanc);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Message système */
+    .msg-systeme {
+      align-self: center;
+      background: rgba(0,0,0,0.06);
+      border-radius: 12px;
+      padding: 6px 14px;
+      font-size: 12px;
+      color: var(--texte-clair);
+      text-align: center;
+      max-width: 80%;
+    }
+
+    /* Formattage des réponses */
+    .msg-bubble strong { font-weight: 700; }
+    .msg-bubble em { font-style: italic; }
+    .msg-bubble ul { margin: 6px 0 6px 20px; }
+    .msg-bubble li { margin-bottom: 3px; }
+    .msg-bubble p { margin-bottom: 6px; }
+    .msg-bubble p:last-child { margin-bottom: 0; }
+    .msg-bubble code {
+      background: rgba(0,0,0,0.08);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── ÉCRAN MOT DE PASSE ───────────────────────────────────────── -->
+<div id="loginScreen">
+  <div class="login-logo">
+    <div class="epi-badge">EPI</div>
+    <h1>Assistant Terrain</h1>
+    <p>EPI Expertises Immobilières</p>
+  </div>
+
+  <div class="login-card">
+    <h2>Accès techniciens</h2>
+    <p>Entrez votre mot de passe pour accéder à l'assistant.</p>
+
+    <input
+      type="password"
+      id="passwordInput"
+      placeholder="Mot de passe"
+      autocomplete="current-password"
+      inputmode="text"
+    >
+
+    <button class="btn-login" id="btnLogin" onclick="verifierMdp()">
+      Connexion
+    </button>
+
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ── ÉCRAN CHAT ──────────────────────────────────────────────── -->
+<div id="chatScreen">
+
+  <div class="chat-header">
+    <div class="avatar">EPI</div>
+    <div class="chat-header-info">
+      <h2>Assistant EPI</h2>
+      <p><span class="online-dot"></span>En ligne · Disponible 24h/24</p>
+    </div>
+    <button class="btn-deconnexion" onclick="deconnecter()" title="Déconnexion">⎋</button>
+  </div>
+
+  <div id="messagesContainer">
+    <!-- Messages injectés ici -->
+  </div>
+
+  <div class="quick-suggestions" id="quickSuggestions">
+    <button class="suggestion-chip" onclick="envoyerSuggestion('Mes missions du jour')">📋 Missions du jour</button>
+    <button class="suggestion-chip" onclick="envoyerSuggestion('Comment rédiger un constat de dégradation ?')">✍️ Constat dégradation</button>
+    <button class="suggestion-chip" onclick="envoyerSuggestion('Quelle est la différence entre vétusté et dégradation imputable ?')">❓ Vétusté vs dégradation</button>
+    <button class="suggestion-chip" onclick="envoyerSuggestion('Procédure EDLS en cas de locataire absent')">🚪 Locataire absent</button>
+    <button class="suggestion-chip" onclick="envoyerSuggestion('Quels éléments vérifier en arrivant sur place ?')">✅ Checklist arrivée</button>
+  </div>
+
+  <div class="chat-input-bar">
+    <textarea
+      id="messageInput"
+      placeholder="Posez votre question…"
+      rows="1"
+      onkeydown="handleKeydown(event)"
+      oninput="autoResize(this)"
+    ></textarea>
+    <button class="btn-send" id="btnEnvoyer" onclick="envoyerMessage()">
+      <svg viewBox="0 0 24 24">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  // ── État ────────────────────────────────────────────────────────
+  let historique = [];
+  let enCours = false;
+
+  // ── Connexion ───────────────────────────────────────────────────
+  async function verifierMdp() {
+    const mdp = document.getElementById('passwordInput').value.trim();
+    const errEl = document.getElementById('loginError');
+    const btn = document.getElementById('btnLogin');
+
+    if (!mdp) {
+      errEl.textContent = 'Veuillez entrer le mot de passe.';
+      document.getElementById('passwordInput').classList.add('error');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Vérification…';
+    errEl.textContent = '';
+
+    try {
+      const resp = await fetch('/api/assistant-terrain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'check_password', password: mdp }),
+      });
+
+      const data = await resp.json();
+
+      if (data.valid) {
+        sessionStorage.setItem('terrain_auth', '1');
+        ouvrirChat();
+      } else {
+        document.getElementById('passwordInput').classList.add('error');
+        errEl.textContent = 'Mot de passe incorrect.';
+        btn.disabled = false;
+        btn.textContent = 'Connexion';
+      }
+    } catch (e) {
+      errEl.textContent = 'Erreur de connexion. Réessayez.';
+      btn.disabled = false;
+      btn.textContent = 'Connexion';
+    }
+  }
+
+  function ouvrirChat() {
+    document.getElementById('loginScreen').style.display = 'none';
+    const chatEl = document.getElementById('chatScreen');
+    chatEl.style.display = 'flex';
+
+    // Message d'accueil
+    const maintenant = new Date();
+    const heure = maintenant.getHours();
+    let salut = heure < 12 ? 'Bonjour' : heure < 18 ? 'Bonjour' : 'Bonsoir';
+
+    const today = maintenant.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+    ajouterMessageSysteme(`${today}`);
+    ajouterMessage('assistant',
+      `${salut} 👋\n\nJe suis votre assistant EPI. Posez-moi vos questions sur les missions, les procédures d'état des lieux, ou tout ce dont vous avez besoin sur le terrain.\n\nComment puis-je vous aider ?`
+    );
+  }
+
+  function deconnecter() {
+    sessionStorage.removeItem('terrain_auth');
+    historique = [];
+    document.getElementById('messagesContainer').innerHTML = '';
+    document.getElementById('chatScreen').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('btnLogin').disabled = false;
+    document.getElementById('btnLogin').textContent = 'Connexion';
+  }
+
+  // ── Chat ─────────────────────────────────────────────────────────
+  async function envoyerMessage() {
+    if (enCours) return;
+    const input = document.getElementById('messageInput');
+    const texte = input.value.trim();
+    if (!texte) return;
+
+    enCours = true;
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('btnEnvoyer').disabled = true;
+    document.getElementById('quickSuggestions').style.display = 'none';
+
+    // Afficher le message utilisateur
+    ajouterMessage('user', texte);
+    historique.push({ role: 'user', content: texte });
+
+    // Afficher l'indicateur de frappe
+    const typingId = ajouterTyping();
+
+    try {
+      const resp = await fetch('/api/assistant-terrain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'chat',
+          message: texte,
+          history: historique.slice(-10), // 5 échanges max
+        }),
+      });
+
+      const data = await resp.json();
+      supprimerTyping(typingId);
+
+      if (data.reply) {
+        ajouterMessage('assistant', data.reply);
+        historique.push({ role: 'assistant', content: data.reply });
+
+        // Garder l'historique raisonnable
+        if (historique.length > 20) {
+          historique = historique.slice(-20);
+        }
+      } else {
+        ajouterMessage('assistant', `Désolé, une erreur est survenue : ${data.error || 'Erreur inconnue'}`);
+      }
+    } catch (e) {
+      supprimerTyping(typingId);
+      ajouterMessage('assistant', 'Impossible de joindre le serveur. Vérifiez votre connexion internet.');
+    }
+
+    enCours = false;
+    document.getElementById('btnEnvoyer').disabled = false;
+    input.focus();
+  }
+
+  function envoyerSuggestion(texte) {
+    document.getElementById('messageInput').value = texte;
+    envoyerMessage();
+  }
+
+  // ── Helpers d'affichage ──────────────────────────────────────────
+  function ajouterMessage(role, contenu) {
+    const container = document.getElementById('messagesContainer');
+
+    const wrapper = document.createElement('div');
+    wrapper.className = `msg-wrapper ${role}`;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.innerHTML = formatterTexte(contenu);
+
+    const time = document.createElement('div');
+    time.className = 'msg-time';
+    time.textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+    wrapper.appendChild(bubble);
+    wrapper.appendChild(time);
+    container.appendChild(wrapper);
+    scrollBas();
+    return wrapper;
+  }
+
+  function ajouterMessageSysteme(texte) {
+    const container = document.getElementById('messagesContainer');
+    const el = document.createElement('div');
+    el.className = 'msg-systeme';
+    el.textContent = texte;
+    container.appendChild(el);
+  }
+
+  let typingCounter = 0;
+  function ajouterTyping() {
+    const id = 'typing-' + (++typingCounter);
+    const container = document.getElementById('messagesContainer');
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'msg-wrapper assistant';
+    wrapper.id = id;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+
+    wrapper.appendChild(bubble);
+    container.appendChild(wrapper);
+    scrollBas();
+    return id;
+  }
+
+  function supprimerTyping(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  }
+
+  function formatterTexte(texte) {
+    // Convertir markdown basique en HTML
+    let html = texte
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`(.+?)`/g, '<code>$1</code>');
+
+    // Listes
+    const lignes = html.split('\n');
+    const résultat = [];
+    let enListe = false;
+
+    for (const ligne of lignes) {
+      const matchListe = ligne.match(/^[-•]\s(.+)/);
+      if (matchListe) {
+        if (!enListe) { résultat.push('<ul>'); enListe = true; }
+        résultat.push(`<li>${matchListe[1]}</li>`);
+      } else {
+        if (enListe) { résultat.push('</ul>'); enListe = false; }
+        if (ligne.trim()) {
+          résultat.push(`<p>${ligne}</p>`);
+        }
+      }
+    }
+    if (enListe) résultat.push('</ul>');
+
+    return résultat.join('');
+  }
+
+  function scrollBas() {
+    const c = document.getElementById('messagesContainer');
+    c.scrollTop = c.scrollHeight;
+  }
+
+  // ── Clavier ──────────────────────────────────────────────────────
+  function handleKeydown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      envoyerMessage();
+    }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────
+  document.getElementById('passwordInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') verifierMdp();
+    document.getElementById('passwordInput').classList.remove('error');
+  });
+
+  // Vérifier si déjà connecté dans cette session
+  if (sessionStorage.getItem('terrain_auth') === '1') {
+    ouvrirChat();
+  }
+</script>
+</body>
+</html>
